@@ -1,0 +1,1525 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Times New Roman', Times, serif;
+  background: #f5f5f5;
+  color: #000;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+/* ---- Shared layout helpers ---- */
+.container-x {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+.eyebrow {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 400;
+}
+
+/* ---- Navigation ---- */
+.nav {
+  background: #f5f5f5;
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #000;
+}
+
+.nav a {
+  text-decoration: none;
+  color: #000;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.nav a:hover {
+  opacity: 0.5;
+}
+
+/* ---- Featured Work — "The Folio", Edition B filmstrip ----
+   Approved 2026-07-09 (replaces the "Signed Reel" projection bands).
+   Four 3:4 specimen plates on the brand color fields in a horizontal
+   scroll-snap strip. Each plate layers, back to front:
+   - the ghost discipline word (.fw-word) at press scale behind the copy;
+   - the discipline's instrument (.fw-mark) drawn past the plate edges as a
+     watermark, idling slowly (needle sway / node pulse / blades / dashes);
+   - a giant outlined specimen numeral (.fw-num) top-right, drifting;
+   - category → title → blurb over a white hairline rule (.fw-rule) — the
+     blurb reserves two lines so the rules align across all four frames
+     (client-flagged fix, keep it). Frame labels/counters were removed at
+     client direction (2026-07-09).
+   The strip arrives animated, then "spins down" to stillness 3s after the
+   section enters view (Portfolio.tsx ramps every animation's playbackRate
+   1 → 0 over ~900ms and pauses; once-only). SSR/no-JS renders fully visible
+   with the CSS animations simply running; prefers-reduced-motion renders
+   everything static from the start (see the reduce block below). */
+
+.fw-folio {
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.fw-folio[data-animate='hidden'] {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.fw-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 64px 40px 32px;
+}
+
+.fw-strip {
+  display: flex;
+  gap: 26px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 0 40px 14px;
+  /* keep the snap origin on the 40px gutter — without this, mandatory
+     snapping swallows the left padding and the first plate sits flush
+     against the viewport edge, off the eyebrow's alignment */
+  scroll-padding: 0 40px;
+  scrollbar-width: thin;
+}
+
+.fw-strip::-webkit-scrollbar {
+  height: 6px;
+}
+
+.fw-strip::-webkit-scrollbar-thumb {
+  background: #8a8a8a;
+}
+
+.fw-strip:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: -2px;
+}
+
+.fw-cell {
+  flex: none;
+  width: clamp(280px, 34vw, 400px);
+  scroll-snap-align: start;
+}
+
+.fw-plate {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 3 / 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  color: #fff;
+}
+
+.fw-field {
+  position: absolute;
+  inset: 0;
+}
+
+/* Gold is deepened from the accent (#ccb718) so the white type and the
+   watermark instrument hold contrast — carried over from the approved
+   Whisper Tone treatment and re-approved on the Folio plates. */
+.fw-field--gold {
+  background: linear-gradient(135deg, #a89613 0%, #6e6400 100%);
+}
+
+.fw-field--navy {
+  background: linear-gradient(135deg, #233452 0%, #16202f 100%);
+}
+
+.fw-field--red {
+  background: linear-gradient(135deg, #b73d3d 0%, #8b2e2e 100%);
+}
+
+.fw-field--charcoal {
+  background: linear-gradient(135deg, #333 0%, #1a1a1a 100%);
+}
+
+/* The instrument is the image: oversized, drawn past the plate edges,
+   center-left. Per-frame offsets ride inline from the frames[] data. */
+.fw-mark {
+  position: absolute;
+  z-index: 1;
+  width: 132%;
+  left: -14%;
+  top: 14%;
+}
+
+.fw-mark svg {
+  width: 100%;
+  height: auto;
+  stroke: rgba(255, 255, 255, 0.16);
+  stroke-width: 0.8;
+  fill: none;
+  animation: fw-drift 30s ease-in-out infinite alternate;
+}
+
+@keyframes fw-drift {
+  from {
+    transform: translateY(0) rotate(0deg);
+  }
+  to {
+    transform: translateY(-14px) rotate(1.2deg);
+  }
+}
+
+.fw-goldfill {
+  fill: rgba(204, 183, 24, 0.4);
+  stroke: none;
+}
+
+.fw-whitefill {
+  fill: rgba(255, 255, 255, 0.2);
+  stroke: none;
+}
+
+.fw-goldstroke {
+  stroke: rgba(204, 183, 24, 0.45);
+}
+
+/* Instrument idle motion — slow, breathing, never bouncy. */
+.fw-needle {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+  animation: fw-sway 7s ease-in-out infinite alternate;
+}
+
+@keyframes fw-sway {
+  from {
+    transform: rotate(-7deg);
+  }
+  to {
+    transform: rotate(9deg);
+  }
+}
+
+.fw-blades {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+  animation: fw-spin 46s linear infinite;
+}
+
+@keyframes fw-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.fw-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fw-pulse 3.2s ease-in-out infinite;
+}
+
+@keyframes fw-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.28);
+  }
+}
+
+.fw-dash {
+  animation: fw-travel 7s linear infinite;
+}
+
+@keyframes fw-travel {
+  to {
+    stroke-dashoffset: -50;
+  }
+}
+
+/* Specimen layers: outlined numeral top-right, ghost word behind the copy.
+   They drift in counter-phase (alternate vs alternate-reverse). */
+.fw-num {
+  position: absolute;
+  z-index: 2;
+  top: -3%;
+  right: -5%;
+  font-size: min(17vw, 190px);
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.32);
+  animation: fw-specdrift 28s ease-in-out infinite alternate;
+}
+
+@supports not (-webkit-text-stroke: 1px #fff) {
+  .fw-num {
+    color: rgba(255, 255, 255, 0.12);
+  }
+}
+
+.fw-word {
+  position: absolute;
+  z-index: 1;
+  bottom: 24%;
+  left: -3%;
+  font-size: min(7vw, 74px);
+  line-height: 1;
+  white-space: nowrap;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.06);
+  animation: fw-specdrift 34s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes fw-specdrift {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-10px);
+  }
+}
+
+.fw-meta {
+  position: relative;
+  z-index: 2;
+  padding: 0 26px 24px;
+}
+
+.fw-rule {
+  border-top: 1px solid rgba(255, 255, 255, 0.6);
+  padding-top: 12px;
+}
+
+.fw-cat {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.8;
+  margin-bottom: 6px;
+}
+
+.fw-rule h3 {
+  font-size: 19px;
+  font-weight: 400;
+  margin-bottom: 5px;
+}
+
+.fw-rule p {
+  font-size: 11.5px;
+  line-height: 1.6;
+  opacity: 0.85;
+  /* exactly two blurb lines on every plate: short blurbs reserve the space
+     (client-flagged rule alignment) and long ones clamp with an ellipsis —
+     the full Production description lives on the /about Services tab */
+  min-height: calc(1.6em * 2);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (max-width: 760px) {
+  .fw-head {
+    padding: 48px 20px 24px;
+  }
+
+  .fw-strip {
+    padding: 0 20px 14px;
+    scroll-padding: 0 20px;
+  }
+
+  /* One plate per screen with the next peeking. */
+  .fw-cell {
+    width: clamp(280px, 78vw, 400px);
+  }
+
+  /* The specimen sizes were tuned against ~34vw cells; rescale them so the
+     numeral/word keep the approved proportion of the plate. */
+  .fw-num {
+    font-size: min(44vw, 190px);
+  }
+
+  .fw-word {
+    font-size: min(17vw, 74px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fw-folio {
+    transition: none;
+  }
+
+  .fw-folio[data-animate='hidden'] {
+    opacity: 1;
+    transform: none;
+  }
+
+  .fw-mark svg,
+  .fw-needle,
+  .fw-blades,
+  .fw-pulse,
+  .fw-dash,
+  .fw-num,
+  .fw-word {
+    animation: none;
+  }
+}
+
+/* ---- Services — folio tabs ----
+   The section speaks the Featured Work language: the four folio frames as
+   SMALL TAB-PLATES (brand field + instrument watermark + specimen numeral +
+   category), one active at a time, with the active frame's title/blurb in
+   the panel beneath. Replaced the accordion rows and the separate Mini Folio
+   strip (client-directed 2026-07-09). */
+.svct-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.svct-tab {
+  position: relative;
+  overflow: hidden;
+  width: clamp(120px, 13vw, 160px);
+  aspect-ratio: 4 / 3;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: #fff;
+  cursor: pointer;
+  opacity: 0.45;
+  transition: opacity 0.25s ease;
+}
+
+.svct-tab:hover {
+  opacity: 0.8;
+}
+
+.svct-tab--active {
+  opacity: 1;
+  outline: 1px solid #000;
+  outline-offset: 3px;
+}
+
+.svct-tab:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 3px;
+}
+
+/* the shared instrument plate, rescaled for the small tab */
+.svct-mark {
+  width: 150%;
+  left: -25%;
+  top: 4%;
+}
+
+.svct-num {
+  position: absolute;
+  z-index: 2;
+  top: 2px;
+  right: 8px;
+  font-size: 40px;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.4);
+}
+
+@supports not (-webkit-text-stroke: 1px #fff) {
+  .svct-num {
+    color: rgba(255, 255, 255, 0.16);
+  }
+}
+
+.svct-cat {
+  position: absolute;
+  z-index: 2;
+  bottom: 10px;
+  left: 12px;
+  right: 8px;
+  text-align: left;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.svct-panel {
+  padding-top: 30px;
+  min-height: 170px;
+  animation: svct-fade 0.35s ease;
+}
+
+@keyframes svct-fade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (max-width: 760px) {
+  .svct-tab {
+    width: clamp(96px, 21vw, 130px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .svct-tab {
+    transition: none;
+  }
+
+  .svct-panel {
+    animation: none;
+  }
+}
+
+/* ---- Clients — colophon strip ---- */
+/* Full-bleed hairline-divided index strip on the paper ground. Mobile-first:
+   a stacked hairline list; ≥1024px five equal cells split by vertical 1px
+   rules. The strip runs flush to the section's bottom edge — the next
+   section's border-top closes it. */
+.client-strip {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  border-top: 1px solid #000;
+}
+
+.client-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 22px 20px;
+}
+
+.client-cell + .client-cell {
+  border-top: 1px solid #000;
+}
+
+@media (min-width: 1024px) {
+  .client-strip {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .client-cell {
+    padding: 38px 24px;
+  }
+
+  .client-cell + .client-cell {
+    border-top: 0;
+    border-left: 1px solid #000;
+  }
+}
+
+/* The supplied PNGs are pre-coloured white; invert(1) sets them as black ink
+   on the light ground (all five verified to invert cleanly). Width follows
+   from the per-logo inline height (optical balance, see Clients.tsx);
+   max-width guards narrow cells. */
+.client-logo {
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  filter: invert(1);
+  opacity: 0.85;
+  transition: opacity 0.3s ease;
+}
+
+.client-cell:hover .client-logo {
+  opacity: 1;
+}
+
+/* Scroll reveal removed at client direction (2026-07-09) — the strip is
+   always static; only the logo's hover ink-deepening remains. */
+@media (prefers-reduced-motion: reduce) {
+  .client-logo {
+    transition: none;
+  }
+}
+
+/* ---- Yellow brush highlight ---- */
+/* A hand-drawn highlighter swipe behind a phrase (first used on "Think
+   backwards" in the About journey). A rough two-stroke SVG in the site's gold
+   family, painted as the element's own background so it WRAPS across lines —
+   box-decoration-break: clone repaints the swipe on each line fragment, so a
+   long multi-line phrase gets a highlighter mark on every row. */
+.brush-highlight {
+  color: #000;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' preserveAspectRatio='none'%3E%3Cpath d='M3 14 C25 9 55 7 85 9 C100 10 112 11 117 14 L118 27 C95 32 60 34 32 32 C18 31 7 29 2 26 Z' fill='%23eed63c' fill-opacity='0.55'/%3E%3Cpath d='M8 18 C35 14 70 13 112 16 L111 24 C75 27 40 28 9 25 Z' fill='%23e3c92e' fill-opacity='0.45'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  padding: 0.04em 0.28em;
+  margin: 0 -0.14em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* ---- About: Journey dot-to-dot timeline ---- */
+/* Horizontal connect-the-dots milestone strip replacing the photo placeholders.
+   The connecting hairline runs between the first and last dot centers (each of the
+   4 nodes is an equal flex column, so dot centers sit at 12.5% … 87.5%). */
+.journey-timeline {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  padding: 16px 0 4px;
+}
+
+.journey-timeline::before {
+  content: '';
+  position: absolute;
+  top: 21px; /* aligns with the dot centers (padding-top 16 + half the 11px dot) */
+  left: 12.5%;
+  right: 12.5%;
+  height: 1px;
+  background: #000;
+}
+
+.journey-node {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+}
+
+.journey-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #000;
+  /* small light halo so the dot reads cleanly where it sits on the line */
+  box-shadow: 0 0 0 4px #fff;
+}
+
+.journey-node-caption {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #666;
+  line-height: 1.6;
+  max-width: 130px;
+  padding: 0 6px;
+}
+
+/* Mobile: the four equal columns can't shrink below their caption width, so the
+   horizontal strip becomes a VERTICAL dot-to-dot list — the connecting hairline
+   runs top-to-bottom through the dot centers, captions sit to the right. */
+@media (max-width: 640px) {
+  .journey-timeline {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 8px 0 4px;
+    gap: 22px;
+  }
+  .journey-timeline::before {
+    top: 12px;
+    bottom: 12px;
+    left: 5px; /* center of the 11px dot */
+    right: auto;
+    width: 1px;
+    height: auto;
+  }
+  .journey-node {
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+  }
+  .journey-node-caption {
+    text-align: left;
+    max-width: none;
+    padding: 0;
+    font-size: 10px;
+  }
+}
+
+/* ---- Video Portfolio ---- */
+/* Gallery grid: row-major left-to-right order (V1, V2, V3…), each tile sized
+   to its thumbnail's natural aspect ratio — no forced crop. `align-items: start`
+   lets tiles of differing heights top-align within a row instead of stretching. */
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: start;
+  gap: 30px;
+  padding: 0 40px 64px;
+}
+
+.video-item {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  background: #f5f5f5;
+  border: none;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.video-item:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: -2px;
+}
+
+/* Wraps the thumbnail + hover overlay so the overlay's inset:0 covers only the
+   thumbnail, leaving the services caption below it untouched. overflow:hidden
+   clips the thumbnail's 1.03 hover scale to the frame so the tint never leaks
+   past the enlarged image edges (notably the bottom). */
+.video-frame {
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+
+.video-media {
+  position: relative;
+  display: block;
+  transition: transform 0.35s ease;
+}
+
+.video-item:hover .video-media,
+.video-item:focus-visible .video-media {
+  transform: scale(1.03);
+}
+
+/* All tiles share the standard horizontal 16:9 height so rows stay flush and
+   horizontal thumbnails are unaffected by odd-shaped neighbors. Squarish or
+   vertical images (e.g. V3) are anchored to the TOP of the frame — the top of
+   the image is preserved and only the bottom overflow is cropped. */
+.video-poster {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #e8e8e8;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+
+.video-poster--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-thumbnail {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 0; /* top-anchored: crop from the bottom, never the top */
+}
+
+/* Squarish/vertical images (e.g. V3) break the uniform 16:9 rule: the tile
+   renders at the image's natural height, full-size and uncropped, pushing the
+   row below down. (.video-grid's align-items: start keeps neighbors top-aligned.) */
+.video-poster--natural {
+  aspect-ratio: auto;
+}
+
+.video-poster--natural .video-thumbnail {
+  height: auto;
+}
+
+/* Circular hairline-ring play button, frosted so thumbnails show through.
+   Triangle is a ::before pseudo-element, flex-centered inside the ring —
+   keeps the component markup a single decorative <span>. */
+.video-play-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  transform: translate(-50%, -50%);
+  opacity: 0; /* hidden until the tile is hovered/focused */
+  transition: opacity 0.3s ease, transform 0.35s ease, background-color 0.35s ease,
+    border-color 0.35s ease;
+  pointer-events: none;
+}
+
+.video-play-icon::before {
+  content: '';
+  width: 0;
+  height: 0;
+  margin-left: 3px; /* optical centering: triangle's mass sits toward its flat edge */
+  border-style: solid;
+  border-width: 8px 0 8px 13px;
+  border-color: transparent transparent transparent #fff;
+  transition: border-color 0.35s ease;
+}
+
+.video-item:hover .video-play-icon,
+.video-item:focus-visible .video-play-icon {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+.video-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 24px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, 0.7) 100%);
+  color: #fff;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.video-item:hover .video-overlay,
+.video-item:focus-visible .video-overlay {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---- Selected Work — featured cover ("The Cinema Poster", Study C) ----
+   V1 plays full-frame at the top of the section: the 16:9 background embed is
+   oversized and centered so it cover-crops the viewport-height frame, with a
+   soft bottom scrim carrying the white credit. */
+.work-cover {
+  position: relative;
+  height: 88vh;
+  min-height: 480px;
+  overflow: hidden;
+  background: #000;
+  border-top: 1px solid #000;
+}
+
+.work-cover iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100vw;
+  height: 56.25vw; /* 16:9 of the viewport width */
+  min-height: 100%;
+  min-width: 177.78vh; /* 16:9 of the frame height — whichever is larger covers */
+  transform: translate(-50%, -50%);
+  border: 0;
+  pointer-events: none;
+}
+
+.work-cover-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.65) 100%);
+}
+
+.work-cover-text {
+  position: absolute;
+  left: 40px;
+  right: 40px;
+  bottom: 44px;
+  color: #fff;
+}
+
+.work-cover-eyebrow {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.work-cover-title {
+  font-size: clamp(30px, 5.5vw, 54px);
+  font-weight: 400;
+  letter-spacing: 1px;
+  margin-top: 12px;
+}
+
+/* Same non-selectable/non-searchable CSS-content treatment as .video-services. */
+.work-cover-services {
+  display: block;
+  margin-top: 10px;
+  font-size: 12px;
+  font-style: italic;
+  letter-spacing: 0.3px;
+  color: rgba(255, 255, 255, 0.75);
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+.work-cover-services::after {
+  content: 'Production';
+}
+
+.video-grid--below-cover {
+  padding-top: 56px;
+}
+
+/* Services caption below each thumbnail. The copy is NOT in the markup — it is
+   emitted from CSS via a ::after pseudo-element per slot, so it can't be
+   selected, copied, found by the browser's in-page search, or read off the DOM.
+   The element itself is aria-hidden in the JSX and locked down here. */
+.video-services {
+  margin-top: 12px;
+  font-size: 12px;
+  font-style: italic;
+  line-height: 1.4;
+  letter-spacing: 0.3px;
+  color: #666;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Services list only (client name removed at client direction). */
+.video-services::after {
+  content: attr(data-noop); /* overridden per slot below */
+}
+
+.video-services--v1::after { content: 'Production'; }
+.video-services--v2::after { content: 'Production'; }
+.video-services--v3::after { content: 'Production, Marketing'; }
+.video-services--v4::after { content: 'Production'; }
+.video-services--v5::after { content: 'Marketing, Production, Strategy'; }
+.video-services--v6::after { content: 'Production'; }
+.video-services--v7::after { content: 'Production'; }
+.video-services--v8::after { content: 'Marketing, Production, Strategy'; }
+.video-services--v9::after { content: 'Marketing, Production, Strategy'; }
+.video-services--v10::after { content: 'Production'; }
+
+@media (prefers-reduced-motion: reduce) {
+  .video-media,
+  .video-overlay,
+  .video-play-icon,
+  .video-play-icon::before {
+    transition: none;
+  }
+
+  .video-item:hover .video-media,
+  .video-item:focus-visible .video-media {
+    transform: none;
+  }
+
+  .video-item:hover .video-play-icon,
+  .video-item:focus-visible .video-play-icon {
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* ---- Video Modal ---- */
+.video-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 40px;
+  background: rgba(0, 0, 0, 0.85);
+}
+
+/* Modal sizes to the clip's own aspect ratio (set via --clip-aspect /
+   --clip-ratio custom properties, e.g. 4:3 for V3) instead of a hard 16:9,
+   and is capped so it always fits within the viewport. */
+.video-modal {
+  position: relative;
+  width: 100%;
+  max-width: min(1000px, calc((100vh - 160px) * var(--clip-ratio, 1.7778)));
+}
+
+.video-modal-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--clip-aspect, 16 / 9);
+  max-height: calc(100vh - 160px);
+  background: #000;
+}
+
+.video-modal-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.video-modal-close {
+  position: absolute;
+  top: -44px;
+  right: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.video-modal-close:hover {
+  opacity: 0.7;
+}
+
+.video-modal-close:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .video-modal-close {
+    top: -40px;
+    right: 0;
+  }
+}
+
+/* ---- Video Gallery Badge (tile affordance for gallery clips) ---- */
+.video-gallery-badge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  padding: 6px 10px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+}
+
+/* ---- Gallery Overlay ---- */
+/* Full-screen scrollable case-study overlay opened by an image-gallery clip.
+   Position: fixed on the backdrop (not the animated inner wrapper) keeps the
+   close button correctly pinned to the viewport while the content scrolls. */
+.gallery-overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow-y: auto;
+  background: #f5f5f5;
+  -webkit-overflow-scrolling: touch;
+}
+
+.gallery-overlay-close {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 101;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #000;
+  background: #f5f5f5;
+  color: #000;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.gallery-overlay-close:hover {
+  opacity: 0.6;
+}
+
+.gallery-overlay-close:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 2px;
+}
+
+.gallery-overlay-inner {
+  min-height: 100%;
+  animation: gallery-overlay-in 0.6s ease both;
+}
+
+@keyframes gallery-overlay-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.gallery-overlay-content {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 120px 40px 100px;
+}
+
+.gallery-overlay-header {
+  margin-bottom: 60px;
+}
+
+.gallery-overlay-hero {
+  margin-bottom: 60px;
+}
+
+.gallery-overlay-image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.gallery-overlay-description {
+  max-width: 65ch;
+  margin: 0 auto 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.gallery-overlay-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+/* ---- Reveal on scroll (gallery overlay images + description) ---- */
+.gallery-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.9s ease, transform 0.9s ease;
+}
+
+.gallery-reveal--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-overlay-inner {
+    animation: none;
+  }
+
+  .gallery-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .gallery-overlay-close {
+    top: 16px;
+    right: 16px;
+  }
+
+  .gallery-overlay-content {
+    padding: 90px 20px 70px;
+  }
+
+  .gallery-overlay-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+/* ---- Impact: scroll-triggered reveals + chart animations ---- */
+/* The hidden state below is only ever entered via the `data-animate="hidden"`
+   attribute, which JS applies after mount right before arming an
+   IntersectionObserver (see `useInView` in Impact.tsx). With no attribute at
+   all (SSR / no-JS / IO never fires) every rule here is inert and content
+   renders fully visible, matching `data-animate="visible"` exactly. */
+
+.impact-reveal {
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.impact-reveal[data-animate='hidden'] {
+  opacity: 0;
+  transform: translateY(24px);
+}
+.impact-reveal[data-animate='visible'] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.impact-stat {
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.impact-stat[data-animate='hidden'] {
+  opacity: 0;
+  transform: translateY(16px);
+}
+.impact-stat[data-animate='visible'] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Chart internals are scoped to a `figure[data-animate]` ancestor (never a
+   bare `[data-animate]`) so a surrounding .impact-reveal block flipping to
+   "visible" can never leak into — and prematurely fire — a nested chart's
+   own, separately-observed draw-in. */
+.impact-chart-line {
+  transition: stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.impact-chart-dot {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+figure[data-animate='hidden'] .impact-chart-dot {
+  opacity: 0;
+  transform: scale(0.3);
+}
+figure[data-animate='visible'] .impact-chart-dot {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+figure[data-animate='hidden'] .impact-chart-label {
+  opacity: 0;
+}
+figure[data-animate='visible'] .impact-chart-label {
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+/* Bar chart: bars grow up from the baseline, then the lift label fades in. */
+.impact-bar {
+  transform-box: fill-box;
+  transform-origin: bottom;
+}
+figure[data-animate='hidden'] .impact-bar {
+  transform: scaleY(0);
+}
+figure[data-animate='visible'] .impact-bar {
+  transform: scaleY(1);
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+figure[data-animate='hidden'] .impact-lift-label {
+  opacity: 0;
+}
+figure[data-animate='visible'] .impact-lift-label {
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .impact-reveal,
+  .impact-stat,
+  .impact-chart-line,
+  .impact-chart-dot,
+  .impact-chart-label,
+  .impact-bar,
+  .impact-lift-label {
+    transition: none !important;
+  }
+
+  .impact-reveal[data-animate],
+  .impact-stat[data-animate] {
+    opacity: 1;
+    transform: none;
+  }
+
+  figure[data-animate] .impact-chart-dot,
+  figure[data-animate] .impact-chart-label,
+  figure[data-animate] .impact-lift-label {
+    opacity: 1;
+    transform: none;
+  }
+
+  figure[data-animate] .impact-bar {
+    transform: none;
+  }
+}
+
+/* ---- Typewriter animations ---- */
+@keyframes blink-cursor {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes blink-out {
+  0%, 66% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.typewriter-cursor {
+  display: inline-block;
+  width: 3px;
+  height: 1em;
+  background: #000;
+  margin-left: 4px;
+  animation: blink-cursor 0.8s infinite;
+}
+
+.typewriter-cursor.blinking-out {
+  animation: blink-out 0.6s ease-out forwards;
+}
+
+.typewriter-text {
+  display: inline;
+}
+
+/* ---- Booking — "The Concierge" (client-approved Study 2, 2026-07-09) ----
+   Booking as typography: three editorial stanzas of large serif text whose
+   controls are native selects/inputs styled as underline blanks (1px black
+   bottom border, no box; gold 2px underline on focus). Ported from the
+   approved booking-template.html. The booking section's rounded-corner
+   license survives only in .booking-info (the success card) — the underline
+   language itself needs no rounding. */
+
+.sentence {
+  font-size: clamp(22px, 3vw, 32px);
+  line-height: 1.9;
+  max-width: 30ch;
+  letter-spacing: 0.2px;
+}
+
+.sentence + .sentence {
+  margin-top: 10px;
+}
+
+/* The optional third stanza — quieter voice, slightly smaller measure. */
+.sentence--soft {
+  color: #66625c;
+  font-size: clamp(19px, 2.4vw, 26px);
+}
+
+/* Underline blank: a native control wearing only a hairline. */
+.blank {
+  display: inline-block;
+  border: none;
+  border-bottom: 1px solid #000;
+  background: transparent;
+  font: inherit;
+  color: #000;
+  padding: 0 4px;
+  min-width: 120px;
+}
+
+/* Custom double-triangle arrow for selects (no native chrome). Set smaller
+   than the surrounding prose (client direction 2026-07-10) — the picked
+   service/date/time reads like a value filled into a printed form blank. */
+select.blank {
+  appearance: none;
+  -webkit-appearance: none;
+  border-radius: 0;
+  cursor: pointer;
+  font-size: 0.62em;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #000 50%),
+    linear-gradient(135deg, #000 50%, transparent 50%);
+  background-position: calc(100% - 12px) 60%, calc(100% - 7px) 60%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 22px;
+}
+
+/* Unfilled selects read like placeholders (data-empty set by the component). */
+select.blank[data-empty] {
+  color: #b5b0a8;
+  font-style: italic;
+}
+
+input.blank::placeholder,
+textarea.blank::placeholder {
+  color: #b5b0a8;
+  font-style: italic;
+}
+
+/* Focus: the underline turns gold and doubles — the section's one accent. */
+input.blank:focus,
+select.blank:focus,
+textarea.blank:focus {
+  outline: none;
+  border-bottom-color: #b3a013;
+  border-bottom-width: 2px;
+}
+
+/* The optional-message underline grows with its content (field-sizing where
+   supported; the component's onInput fallback covers the rest). */
+.blank--area {
+  width: min(30ch, 100%);
+  max-width: 100%;
+  resize: none;
+  overflow: hidden;
+  line-height: inherit;
+  vertical-align: top;
+  field-sizing: content;
+}
+
+.concierge-cta {
+  margin-top: 34px;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-decoration: underline;
+  color: #000;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.concierge-cta:hover {
+  opacity: 0.55;
+}
+
+.concierge-cta:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* Inline error, concierge voice — muted ink, no alarm boxes. */
+.concierge-error {
+  font-size: 13px;
+  font-style: italic;
+  color: #66625c;
+  margin-top: 14px;
+  max-width: 52ch;
+  line-height: 1.7;
+}
+
+.concierge-note {
+  font-size: 12px;
+  color: #999;
+  margin-top: 14px;
+}
+
+/* Scroll reveal — house pattern (tri-state useInView in the component; the
+   hidden state is applied only post-mount so SSR/no-JS output is never
+   invisible; fires once; ~120ms stagger via --stagger inline). */
+.concierge .cg-reveal {
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition-delay: var(--stagger, 0ms);
+}
+
+.concierge[data-animate='hidden'] .cg-reveal {
+  opacity: 0;
+  transform: translateY(14px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .concierge .cg-reveal {
+    transition: none;
+  }
+}
+
+/* Two-step page turn — a soft fade-and-rise as the Concierge moves between the
+   details leaf and the message leaf. Same 0.5s house cadence; the class is
+   applied only on an actual step change (not first mount, where the scroll
+   reveal owns arrival). No persistent hidden state, so SSR/no-JS output is
+   never invisible. */
+.cg-step--anim {
+  animation: cgStepIn 0.5s ease both;
+}
+
+@keyframes cgStepIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cg-step--anim {
+    animation: none;
+  }
+}
+
+/* Step 2 actions: the quiet "← back" leaf-turn beside the true Submit. */
+.concierge-actions {
+  display: flex;
+  align-items: baseline;
+  gap: 28px;
+  margin-top: 34px;
+}
+
+.concierge-actions .concierge-cta {
+  margin-top: 0;
+}
+
+.concierge-back {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-decoration: underline;
+  color: #66625c;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.concierge-back:hover {
+  opacity: 0.55;
+}
+
+/* Success card — the booking section's rounded exception. */
+.booking-info {
+  padding: 24px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* ---- Mobile Responsive ---- */
+@media (max-width: 1024px) {
+  .video-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .video-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-info {
+    padding: 20px;
+  }
+}

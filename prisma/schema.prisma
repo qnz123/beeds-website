@@ -1,0 +1,28 @@
+// Prisma schema for BEEDS bookings.
+// Provider: SQLite (local dev). To swap to Postgres/Supabase for production,
+// change provider to "postgresql" and update DATABASE_URL — no model changes needed.
+//
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+// In Prisma 7, the connection URL is configured in prisma.config.ts (datasource.url),
+// not here. To swap to Postgres/Supabase in production, change provider to "postgresql"
+// and set DATABASE_URL="postgresql://..." in your environment — no model changes needed.
+datasource db {
+  provider = "sqlite"
+}
+
+model Booking {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  service   String
+  message   String?  // optional
+  date      String   // human-readable string as sent by the client, e.g. "Monday, June 30, 2026"
+  time      String   // e.g. "10:00 AM"
+  createdAt DateTime @default(now())
+}

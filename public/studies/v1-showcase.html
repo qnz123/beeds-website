@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>V1 Showcase — 3 Studies</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Times New Roman', Times, serif;
+    background: #f5f5f5;
+    color: #000;
+    -webkit-font-smoothing: antialiased;
+  }
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 400;
+  }
+  .container-x { max-width: 1600px; margin: 0 auto; }
+
+  /* ---- study divider chrome (review scaffolding, not part of the design) ---- */
+  .study-label {
+    padding: 90px 40px 26px;
+    border-top: 3px solid #000;
+    background: #ece9e2;
+  }
+  .study-label h2 { font-size: 34px; font-weight: 400; margin-top: 10px; }
+  .study-label p { font-size: 14px; color: #555; margin-top: 10px; max-width: 640px; line-height: 1.6; font-style: italic; }
+
+  /* ---- shared section bits ---- */
+  .sw-head { padding: 64px 40px 28px; }
+  .services-cap {
+    font-size: 12px;
+    font-style: italic;
+    letter-spacing: 0.3px;
+    color: #666;
+  }
+  .grid-mock {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    padding: 0 40px 72px;
+    align-items: start;
+  }
+  .grid-mock figure img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    object-position: 50% 0;
+    display: block;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.12);
+  }
+  .grid-mock figcaption { margin-top: 12px; }
+  .frame169 { position: relative; padding-top: 56.25%; background: #000; }
+  .frame169 iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; pointer-events: none; }
+
+  /* =====================  STUDY A — THE MARQUEE  ===================== */
+  .a-video { border-top: 1px solid #000; border-bottom: 1px solid #000; }
+  .a-caption {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 18px 40px 56px;
+  }
+  .a-caption .name { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; }
+
+  /* =====================  STUDY B — THE EDITORIAL PLATE  ===================== */
+  .b-wrap {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 40px;
+    padding: 0 40px 26px;
+    align-items: end;
+  }
+  .b-col .eyebrow { color: #666; margin-bottom: 22px; display: block; }
+  .b-col h3 { font-size: 44px; line-height: 1.1; font-weight: 400; }
+  .b-col .services-cap { display: block; margin-top: 16px; }
+  .b-col .num {
+    font-size: 12px; letter-spacing: 2px; color: #999; display: block; margin-top: 44px;
+  }
+  .b-plate { border: 1px solid #000; }
+  .b-rule { border-top: 1px solid #000; margin: 30px 40px 0; }
+  .b-grid { padding-top: 30px; }
+  @media (max-width: 900px) { .b-wrap { grid-template-columns: 1fr; } }
+
+  /* =====================  STUDY C — THE CINEMA POSTER  ===================== */
+  .c-cover {
+    position: relative;
+    height: 88vh;
+    min-height: 480px;
+    overflow: hidden;
+    background: #000;
+    border-top: 1px solid #000;
+  }
+  .c-cover iframe {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 100vw; height: 56.25vw;
+    min-height: 100%; min-width: 177.78vh;
+    transform: translate(-50%, -50%);
+    border: 0;
+    pointer-events: none;
+  }
+  .c-scrim {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,.65) 100%);
+  }
+  .c-text {
+    position: absolute; left: 40px; right: 40px; bottom: 44px;
+    color: #fff;
+  }
+  .c-text .eyebrow { color: rgba(255,255,255,.8); }
+  .c-text h3 { font-size: 54px; font-weight: 400; letter-spacing: 1px; margin-top: 12px; }
+  .c-text .services-cap { color: rgba(255,255,255,.75); display: block; margin-top: 10px; }
+  .c-grid { padding-top: 56px; }
+
+  .endnote { padding: 60px 40px 90px; font-size: 13px; color: #666; font-style: italic; border-top: 1px solid #000; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<div class="study-label">
+  <span class="eyebrow">Study A</span>
+  <h2>The Marquee</h2>
+  <p>The film runs edge-to-edge as a silent loop, framed by two hairlines — a cinema
+  marquee above the grid. The caption sits under it like a plate credit: name left,
+  services right. The quietest of the three; the video is simply the first, largest tile.</p>
+</div>
+
+<section>
+  <div class="sw-head"><span class="eyebrow">Selected Work</span></div>
+  <div class="a-video">
+    <div class="frame169">
+      <iframe src="https://player.vimeo.com/video/25015740?background=1&autoplay=1&muted=1&loop=1&autopause=0&app_id=58479"
+        allow="autoplay; fullscreen" title="WIRED MAGAZINE"></iframe>
+    </div>
+  </div>
+  <div class="a-caption">
+    <span class="name">Wired Magazine</span>
+    <span class="services-cap">Production</span>
+  </div>
+  <div class="grid-mock">
+    <figure><img src="/thumbnails/v2-will-ferrell.png" alt=""><figcaption class="services-cap">Production</figcaption></figure>
+    <figure><img src="/thumbnails/v3-bon-appetit.png" alt=""><figcaption class="services-cap">Production, Marketing</figcaption></figure>
+    <figure><img src="/thumbnails/v4-brides-balloon.png" alt=""><figcaption class="services-cap">Production</figcaption></figure>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<div class="study-label">
+  <span class="eyebrow">Study B</span>
+  <h2>The Editorial Plate</h2>
+  <p>The film sits inside the page margins in a hairline plate, with a left colophon
+  column — eyebrow, the title set large, services in italic, and a folio number.
+  Reads like the opening plate of a printed portfolio; the grid follows under a rule.</p>
+</div>
+
+<section>
+  <div class="sw-head"><span class="eyebrow">Selected Work</span></div>
+  <div class="container-x">
+    <div class="b-wrap">
+      <div class="b-col">
+        <span class="eyebrow">Featured Film</span>
+        <h3>Wired<br>Magazine</h3>
+        <span class="services-cap">Production</span>
+        <span class="num">01 — 09</span>
+      </div>
+      <div class="b-plate">
+        <div class="frame169">
+          <iframe src="https://player.vimeo.com/video/25015740?background=1&autoplay=1&muted=1&loop=1&autopause=0&app_id=58479"
+            allow="autoplay; fullscreen" title="WIRED MAGAZINE"></iframe>
+        </div>
+      </div>
+    </div>
+    <div class="b-rule"></div>
+  </div>
+  <div class="grid-mock b-grid">
+    <figure><img src="/thumbnails/v2-will-ferrell.png" alt=""><figcaption class="services-cap">Production</figcaption></figure>
+    <figure><img src="/thumbnails/v3-bon-appetit.png" alt=""><figcaption class="services-cap">Production, Marketing</figcaption></figure>
+    <figure><img src="/thumbnails/v4-brides-balloon.png" alt=""><figcaption class="services-cap">Production</figcaption></figure>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<div class="study-label">
+  <span class="eyebrow">Study C</span>
+  <h2>The Cinema Poster</h2>
+  <p>Full-height opening: the film cover-crops the whole frame like a title sequence,
+  with the credit set in white over a soft bottom scrim. The most cinematic — Selected
+  Work opens as a screening room, then settles into the light grid below.</p>
+</div>
+
+<section>
+  <div class="c-cover">
+    <iframe src="https://player.vimeo.com/video/25015740?background=1&autoplay=1&muted=1&loop=1&autopause=0&app_id=58479"
+      allow="autoplay; fullscreen" title="WIRED MAGAZINE"></iframe>
+    <div class="c-scrim"></div>
+    <div class="c-text">
+      <span class="eyebrow">Selected Work — Featured</span>
+      <h3>WIRED MAGAZINE</h3>
+      <span class="services-cap">Production</span>
+    </div>
+  </div>
+  <div class="grid-mock c-grid">
+    <figure><img src="/thumbnails/v2-will-ferrell.png" alt=""><figcaption class="services-cap">Production</figcaption></figure>
+    <figure><img src="/thumbnails/v3-bon-appetit.png" alt=""><figcaption class="services-cap">Production, Marketing</figcaption></figure>
+    <figure><img src="/thumbnails/v4-brides-balloon.png" alt=""><figcaption class="services-cap">Production</figcaption></figure>
+  </div>
+</section>
+
+<div class="endnote">
+  Review page only — the tan bands label each study and are not part of the design.
+  In all three, the WIRED film plays inline (muted, no controls) and loops its first
+  30 seconds. V2–V9 keep their current grid and captions below.
+</div>
+
+<script src="https://player.vimeo.com/api/player.js"></script>
+<script>
+  // 30-second loop: when playback passes 30s, rewind to 0. The background=1
+  // embed keeps playing, so this cycles the film's first 30 seconds forever.
+  var SECONDS = 30
+  document.querySelectorAll('iframe[src*="player.vimeo.com"]').forEach(function (frame) {
+    var player = new Vimeo.Player(frame)
+    player.on('timeupdate', function (data) {
+      if (data.seconds >= SECONDS) player.setCurrentTime(0)
+    })
+  })
+</script>
+</body>
+</html>

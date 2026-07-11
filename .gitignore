@@ -1,0 +1,55 @@
+# Node modules and build output
+node_modules/
+.next/
+out/
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# Misc
+*.pem
+
+/src/generated/prisma
+/generated
+
+# SQLite dev database
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Build/TS caches
+*.tsbuildinfo
+
+# Local packaging artifacts & scratch copies (not part of the app source)
+*.zip
+beeds-deploy/
+Restore/
+live/
+preview.html
