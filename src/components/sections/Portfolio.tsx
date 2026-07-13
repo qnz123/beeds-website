@@ -174,14 +174,10 @@ export default function Portfolio() {
               2026-07-13; arrows removed at client direction). */}
           <h2 className="fw-journey-stack">
             <span className="fw-journey">We help you visualize your idea</span>
-            {/* Subline — "The Gold Thread" (client-approved Study B, 2026-07-13):
-                smaller grey caps with AI / HUMANS in the site's gold accent. */}
+            {/* Subline — "The Gold Thread" style (Study B, 2026-07-13);
+                copy updated 2026-07-13. */}
             <span className="fw-journey fw-journey-sub">
-              Powered by <span className="fw-journey-em">AI</span>
-              <span className="fw-journey-sep" aria-hidden="true">
-                ·
-              </span>
-              Guided by <span className="fw-journey-em">Humans</span>
+              Without the <span className="fw-journey-em">Guesswork</span>
             </span>
           </h2>
         </div>
