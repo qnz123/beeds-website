@@ -123,6 +123,12 @@ h6 {
   text-align: center;
 }
 
+/* "Guesswork" — italic throughout its scramble reveal (see ScrambleWord in
+   Portfolio.tsx: white->black + letters resolving on one clock). */
+.fw-journey-art {
+  font-style: italic;
+}
+
 .fw-strip {
   display: flex;
   gap: 26px;

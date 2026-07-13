@@ -59,6 +59,89 @@ function useInView<T extends Element>(threshold = 0.2) {
   return { ref, dataAnimate: state === 'idle' ? undefined : state }
 }
 
+// ---------------------------------------------------------------------------
+// ScrambleWord — "Guesswork" scroll effect (client-directed 2026-07-13).
+// When the heading scrolls into view, the word starts WHITE and DISORGANIZED
+// (random letters drawn from the word itself), then on one shared clock the
+// color fades white -> black while letters lock in left-to-right until the
+// true word forms. Italic throughout. SSR/no-JS renders the real word in ink
+// (never invisible); prefers-reduced-motion skips the effect entirely.
+// JS-driven (rAF), so the section's scroll-scrub of CSS animations never
+// freezes it.
+// ---------------------------------------------------------------------------
+
+const SCRAMBLE_MS = 1600
+const SHUFFLE_EVERY_MS = 45
+
+function ScrambleWord({ word }: { word: string }) {
+  const ref = useRef<HTMLSpanElement>(null)
+  const startedRef = useRef(false)
+  const [display, setDisplay] = useState(word)
+  const [color, setColor] = useState<string | null>(null)
+
+  useEffect(() => {
+    const node = ref.current
+    if (!node || typeof IntersectionObserver === 'undefined') return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const pool = word.split('')
+    const scrambled = () =>
+      word
+        .split('')
+        .map(() => pool[Math.floor(Math.random() * pool.length)])
+        .join('')
+
+    // Waiting state (post-hydration only): white + disorganized.
+    setDisplay(scrambled())
+    setColor('rgb(255,255,255)')
+
+    let raf = 0
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting || startedRef.current) return
+        startedRef.current = true
+        observer.disconnect()
+
+        const start = performance.now()
+        let lastShuffle = 0
+        let current = display
+
+        const tick = (now: number) => {
+          const t = Math.min(1, (now - start) / SCRAMBLE_MS)
+          // 1) color: white -> black, same clock as the letters
+          const v = Math.round(255 * (1 - t))
+          setColor(t >= 1 ? null : `rgb(${v},${v},${v})`)
+          // 2) letters: lock in left-to-right, the rest keep shuffling
+          if (now - lastShuffle >= SHUFFLE_EVERY_MS || t >= 1) {
+            lastShuffle = now
+            const locked = Math.floor(t * word.length)
+            current = word
+              .split('')
+              .map((ch, i) => (i < locked || t >= 1 ? ch : pool[Math.floor(Math.random() * pool.length)]))
+              .join('')
+            setDisplay(t >= 1 ? word : current)
+          }
+          if (t < 1) raf = requestAnimationFrame(tick)
+        }
+        raf = requestAnimationFrame(tick)
+      },
+      { threshold: 0.6 }
+    )
+    observer.observe(node)
+    return () => {
+      observer.disconnect()
+      cancelAnimationFrame(raf)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [word])
+
+  return (
+    <span ref={ref} className="fw-journey-art" style={color ? { color } : undefined}>
+      {display}
+    </span>
+  )
+}
+
 function FolioFrame({ frame }: { frame: FrameDatum }) {
   return (
     <div className="fw-cell">
@@ -174,7 +257,10 @@ export default function Portfolio() {
               large serif statement, sentence case, centered. */}
           <h2 className="fw-journey-stack">
             <span className="fw-journey">We help you visualize your idea</span>
-            <span className="fw-journey">Without the Guesswork</span>
+            <span className="fw-journey">
+              Without the&nbsp;
+              <ScrambleWord word="Guesswork" />
+            </span>
           </h2>
         </div>
         <div
