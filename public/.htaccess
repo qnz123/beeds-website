@@ -1,0 +1,31 @@
+# ---------------------------------------------------------------------------
+# BEEDS static site — HostGator / Apache cache policy
+#
+# This is a Next.js static export whose JS/CSS filenames are CONTENT-HASHED.
+# The HTML must always be revalidated, otherwise a returning visitor can run an
+# old cached page that points at chunks a newer deploy has replaced — which the
+# browser surfaces as "Application error: a client-side exception has occurred".
+# So: HTML = always fresh; hashed build assets = cache forever.
+# ---------------------------------------------------------------------------
+
+<IfModule mod_headers.c>
+  # HTML — never served stale; revalidate on every load.
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache, must-revalidate, max-age=0"
+  </FilesMatch>
+
+  # Hashed, immutable build assets — safe to cache hard (filename changes on edit).
+  <FilesMatch "\.(js|css|woff2?)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType image/webp "access plus 30 days"
+  ExpiresByType image/png "access plus 30 days"
+  ExpiresByType image/jpeg "access plus 30 days"
+</IfModule>
