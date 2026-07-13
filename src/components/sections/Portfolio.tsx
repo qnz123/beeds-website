@@ -116,14 +116,7 @@ export default function Portfolio() {
     let ticking = false
 
     const collect = () => {
-      // Exclude the "Guesswork" glitter shimmer from the scrub — it should run
-      // continuously rather than freeze between scrolls.
-      anims = section
-        .getAnimations({ subtree: true })
-        .filter((anim) => {
-          const target = anim.effect && 'target' in anim.effect ? anim.effect.target : null
-          return !(target instanceof Element && target.closest('.fw-journey-art'))
-        })
+      anims = section.getAnimations({ subtree: true })
       for (const anim of anims) {
         try {
           anim.pause()
@@ -177,15 +170,11 @@ export default function Portfolio() {
     <section id="featured-work" ref={sectionRef} className="pb-14">
       <div ref={folioRef} data-animate={dataAnimate} className="fw-folio">
         <div className="fw-head">
-          {/* Flight Path heading (Study B lineage, client-directed copy
-              2026-07-13; arrows removed at client direction). */}
+          {/* Heading in the About-BEEDS lede voice (client-directed 2026-07-13):
+              large serif statement, sentence case, centered. */}
           <h2 className="fw-journey-stack">
             <span className="fw-journey">We help you visualize your idea</span>
-            {/* Line 2: thinner stroke; "Guesswork" flips to an italic serif
-                flourish (client-directed 2026-07-13). */}
-            <span className="fw-journey fw-journey--light">
-              Without the <span className="fw-journey-art">Guesswork</span>
-            </span>
+            <span className="fw-journey">Without the Guesswork</span>
           </h2>
         </div>
         <div

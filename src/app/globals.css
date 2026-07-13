@@ -110,93 +110,17 @@ h6 {
   gap: 14px;
 }
 
+/* The heading speaks in the About-BEEDS lede voice (client-directed
+   2026-07-13): large Times serif statement, weight 400, sentence case —
+   the same treatment as the /about page's opening line, centered here. */
 .fw-journey {
   display: flex;
   align-items: center;
-  gap: 22px;
-  /* Modern/bold/clean (client-directed 2026-07-13): the one sans-serif moment
-     on the site — heavy weight, larger, tight tracking. Deliberate contrast
-     with the serif system; the folio is already the site's most designed
-     section. System sans stack: no webfont, loads instantly. */
-  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-size: clamp(20px, 2.3vw, 30px);
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  text-align: center;
-  /* Crispness: the body's grayscale `antialiased` smoothing visibly thins bold
-     sans strokes (reads soft/grey). Re-enable subpixel rendering + legibility
-     hinting for these two lines only. */
-  -webkit-font-smoothing: subpixel-antialiased;
-  -moz-osx-font-smoothing: auto;
-  text-rendering: optimizeLegibility;
-}
-
-/* Line 2 — thinner stroke than the bold first line. */
-.fw-journey--light {
-  font-weight: 300;
-}
-
-/* "Guesswork" — the artistic flourish: italic serif, mixed case, a touch
-   larger, against the thin sans around it. Wears a GLITTER SHIMMER
-   (client-directed 2026-07-13): a metallic gradient — deep gold, champagne
-   highlight, bronze — clipped to the glyphs and swept continuously. The
-   Portfolio scroll-scrub deliberately EXCLUDES this animation (see
-   Portfolio.tsx collect()) so the shimmer never freezes between scrolls. */
-.fw-journey-art {
   font-family: 'Times New Roman', Times, serif;
-  font-style: italic;
+  font-size: clamp(23px, 3.4vw, 48px);
   font-weight: 400;
-  text-transform: none;
-  font-size: 1.14em;
-  letter-spacing: 0.01em;
-  color: #b3a013; /* fallback + reduced-motion color */
-}
-
-@supports (-webkit-background-clip: text) or (background-clip: text) {
-  .fw-journey-art {
-    background-image: linear-gradient(
-      105deg,
-      #8f7d10 0%,
-      #b3a013 18%,
-      #e8cf52 34%,
-      #fdf3bd 46%,
-      #e8cf52 58%,
-      #b98a3e 74%,
-      #8f7d10 100%
-    );
-    background-size: 250% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    -webkit-text-fill-color: transparent;
-    animation: fw-glitter 3.2s linear infinite;
-  }
-}
-
-@keyframes fw-glitter {
-  from {
-    background-position: 125% 0;
-  }
-  to {
-    background-position: -125% 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .fw-journey-art {
-    animation: none;
-    background-image: none;
-    color: #b3a013;
-    -webkit-text-fill-color: currentColor;
-  }
-}
-
-/* Phones: step the lines down so each holds one row. */
-@media (max-width: 640px) {
-  .fw-journey {
-    font-size: 17px;
-  }
+  line-height: 1.2;
+  text-align: center;
 }
 
 .fw-strip {
