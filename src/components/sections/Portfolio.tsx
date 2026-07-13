@@ -170,7 +170,7 @@ export default function Portfolio() {
     <section id="featured-work" ref={sectionRef} className="pb-14">
       <div ref={folioRef} data-animate={dataAnimate} className="fw-folio">
         <div className="fw-head">
-          <h2 className="eyebrow">Featured Work</h2>
+          <h2 className="eyebrow">Discovery, Planning, Launch 🚀</h2>
         </div>
         <div
           className="fw-strip"

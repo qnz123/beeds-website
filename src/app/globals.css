@@ -94,7 +94,7 @@ h6 {
 
 .fw-head {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: baseline;
   padding: 64px 40px 32px;
 }
