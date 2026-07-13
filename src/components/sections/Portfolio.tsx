@@ -173,7 +173,7 @@ export default function Portfolio() {
           {/* Flight Path heading (Study B lineage, client-directed copy
               2026-07-13; arrows removed at client direction). */}
           <h2 className="fw-journey-stack">
-            <span className="fw-journey">Snap. Audit. Sound Impact.</span>
+            <span className="fw-journey">We help you visualize your idea</span>
             {/* Subline — "The Gold Thread" (client-approved Study B, 2026-07-13):
                 smaller grey caps with AI / HUMANS in the site's gold accent. */}
             <span className="fw-journey fw-journey-sub">
