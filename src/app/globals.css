@@ -615,6 +615,7 @@ h6 {
 .journey-dot {
   width: 11px;
   height: 11px;
+  flex-shrink: 0; /* keep a perfect circle in the mobile row layout (never squished by a long caption) */
   border-radius: 50%;
   background: #000;
   /* small light halo so the dot reads cleanly where it sits on the line */
@@ -1005,10 +1006,37 @@ h6 {
   outline-offset: 2px;
 }
 
-@media (max-width: 640px) {
+/* Portrait phones (narrow) OR landscape phones (short height) both get the
+   fill-the-frame modal — a rotated phone is wide but short, so max-height is
+   what needs relaxing there. */
+@media (max-width: 640px), (max-height: 600px) {
+  /* Fill the frame with almost no margin, and adapt to orientation: the video
+     is sized to the LARGER of what fits by width vs height while staying fully
+     in view (contain), so it fills the screen in both portrait and landscape. */
+  .video-modal-backdrop {
+    padding: 10px;
+  }
+
+  .video-modal {
+    max-width: min(100%, calc((100vh - 20px) * var(--clip-ratio, 1.7778)));
+  }
+
+  .video-modal-frame {
+    max-height: calc(100vh - 20px);
+  }
+
+  /* Close button moves inside the frame's top-right (no room above it now),
+     on a subtle scrim so it reads over any footage. */
   .video-modal-close {
-    top: -40px;
-    right: 0;
+    top: 8px;
+    right: 8px;
+    z-index: 2;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
   }
 }
 
@@ -1517,6 +1545,17 @@ textarea.blank:focus {
 @media (max-width: 768px) {
   .video-grid {
     grid-template-columns: 1fr;
+    /* Full-bleed on phones: thumbnails run edge-to-edge, no left/right margin. */
+    padding-left: 0;
+    padding-right: 0;
+    gap: 24px;
+  }
+
+  /* Thumbnail is flush to the screen edges; only the small caption stays inset
+     so the text isn't jammed against the edge. */
+  .video-services {
+    padding-left: 16px;
+    padding-right: 16px;
   }
 
   .booking-info {

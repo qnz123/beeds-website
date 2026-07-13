@@ -18,7 +18,7 @@ export default function AboutPage() {
         <section className="pt-24 pb-20 px-10">
           <div className="container-x">
             <h2 className="eyebrow mb-8">About BEEDS</h2>
-            <h1 className="text-5xl leading-[1.2] max-w-[900px]">
+            <h1 className="text-[23px] leading-[1.35] md:text-5xl md:leading-[1.2] max-w-[900px]">
               We help brands move through markets the way good stories move through a room —
               quietly, then all at once.
             </h1>
