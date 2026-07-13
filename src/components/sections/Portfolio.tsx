@@ -174,7 +174,11 @@ export default function Portfolio() {
               2026-07-13; arrows removed at client direction). */}
           <h2 className="fw-journey-stack">
             <span className="fw-journey">We help you visualize your idea</span>
-            <span className="fw-journey">Without the Guesswork</span>
+            {/* Line 2: thinner stroke; "Guesswork" flips to an italic serif
+                flourish (client-directed 2026-07-13). */}
+            <span className="fw-journey fw-journey--light">
+              Without the <span className="fw-journey-art">Guesswork</span>
+            </span>
           </h2>
         </div>
         <div

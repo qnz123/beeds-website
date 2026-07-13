@@ -126,6 +126,22 @@ h6 {
   text-align: center;
 }
 
+/* Line 2 — thinner stroke than the bold first line. */
+.fw-journey--light {
+  font-weight: 300;
+}
+
+/* "Guesswork" — the artistic flourish: italic serif, mixed case, a touch
+   larger, against the thin sans around it. */
+.fw-journey-art {
+  font-family: 'Times New Roman', Times, serif;
+  font-style: italic;
+  font-weight: 400;
+  text-transform: none;
+  font-size: 1.14em;
+  letter-spacing: 0.01em;
+}
+
 /* Phones: step the lines down so each holds one row. */
 @media (max-width: 640px) {
   .fw-journey {
