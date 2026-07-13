@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import Navigation from '@/components/Navigation'
 import Services from '@/components/sections/Services'
 import Footer from '@/components/Footer'
-import SmoothHashScroll from '@/components/SmoothHashScroll'
 
 export const metadata: Metadata = {
   title: 'About - BEEDS',
@@ -13,7 +12,6 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <>
-      <SmoothHashScroll targetId="services" />
       <Navigation />
       <main>
         {/* Lede */}
