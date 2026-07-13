@@ -26,7 +26,7 @@ export default function AboutPage() {
         </section>
 
         {/* Journey / History */}
-        <section className="bg-white py-14 px-10 border-t border-black">
+        <section className="bg-white py-14 px-10">
           <div className="container-x">
             <h2 className="eyebrow mb-8">Our Journey — Since 2012</h2>
 
