@@ -1,7 +1,10 @@
 name: Deploy to HostGator
 
-# Builds the static site and uploads it to HostGator over FTPS on every push to
-# main. Set these three repo secrets:
+# MANUAL DEPLOY ONLY. Pushing to GitHub does NOT publish to beedstu.com.
+# To go live, deploy on purpose: repo → Actions → "Deploy to HostGator" →
+# "Run workflow" → branch main → Run workflow. (Or: gh workflow run deploy.yml)
+#
+# Builds the static site and uploads it to HostGator over FTPS. Repo secrets:
 #   Settings → Secrets and variables → Actions → New repository secret
 #     FTP_SERVER    ftp.beedstu.com
 #     FTP_USERNAME  a DEDICATED FTP account whose Directory is set to public_html
@@ -9,8 +12,6 @@ name: Deploy to HostGator
 #     FTP_PASSWORD  that FTP account's password
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch: {}
 
 jobs:
