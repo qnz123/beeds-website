@@ -70,8 +70,12 @@ function useInView<T extends Element>(threshold = 0.2) {
 // freezes it.
 // ---------------------------------------------------------------------------
 
-const SCRAMBLE_MS = 1600
-const SHUFFLE_EVERY_MS = 45
+const SCRAMBLE_MS = 2200
+// The shuffle SPINS DOWN (client-directed 2026-07-13): letter swaps start at
+// this cadence and smoothly stretch as the effect eases out, so the motion
+// decelerates to rest instead of cutting off.
+const SHUFFLE_MIN_MS = 40
+const SHUFFLE_MAX_MS = 260
 
 function ScrambleWord({ word }: { word: string }) {
   const ref = useRef<HTMLSpanElement>(null)
@@ -108,13 +112,17 @@ function ScrambleWord({ word }: { word: string }) {
 
         const tick = (now: number) => {
           const t = Math.min(1, (now - start) / SCRAMBLE_MS)
-          // 1) color: white -> black, same clock as the letters
-          const v = Math.round(255 * (1 - t))
+          // Ease-out cubic: fast at first, smoothly decelerating to rest.
+          const eased = 1 - Math.pow(1 - t, 3)
+          // 1) color: white -> black, same (eased) clock as the letters
+          const v = Math.round(255 * (1 - eased))
           setColor(t >= 1 ? null : `rgb(${v},${v},${v})`)
-          // 2) letters: lock in left-to-right, the rest keep shuffling
-          if (now - lastShuffle >= SHUFFLE_EVERY_MS || t >= 1) {
+          // 2) letters: lock in left-to-right; the rest keep shuffling at a
+          //    cadence that stretches as the effect winds down.
+          const shuffleEvery = SHUFFLE_MIN_MS + (SHUFFLE_MAX_MS - SHUFFLE_MIN_MS) * eased
+          if (now - lastShuffle >= shuffleEvery || t >= 1) {
             lastShuffle = now
-            const locked = Math.floor(t * word.length)
+            const locked = Math.floor(eased * word.length)
             current = word
               .split('')
               .map((ch, i) => (i < locked || t >= 1 ? ch : pool[Math.floor(Math.random() * pool.length)]))
