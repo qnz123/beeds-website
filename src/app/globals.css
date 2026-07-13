@@ -844,14 +844,34 @@ h6 {
   pointer-events: none;
 }
 
+/* Instant still over the iframe (LCP), fades out once the film plays. Sits
+   above the video (z-index 1) but below the scrim/credit (2/3). */
+.work-cover-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 35%;
+  z-index: 1;
+  transition: opacity 0.7s ease;
+}
+
+.work-cover-poster--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .work-cover-scrim {
   position: absolute;
   inset: 0;
+  z-index: 2;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.65) 100%);
 }
 
 .work-cover-text {
   position: absolute;
+  z-index: 3;
   left: 40px;
   right: 40px;
   bottom: 44px;

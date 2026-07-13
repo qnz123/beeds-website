@@ -43,7 +43,7 @@ const CLIPS: Clip[] = [
     title: 'WIRED MAGAZINE',
     category: 'Commercial',
     vimeoId: '25015740',
-    thumbnail: '/thumbnails/v1-wired.png',
+    thumbnail: '/thumbnails/v1-wired.webp',
     width: 1896,
     height: 1052,
   },
@@ -51,7 +51,7 @@ const CLIPS: Clip[] = [
     title: 'WIRED — WILL FERRELL',
     category: 'Commercial',
     vimeoId: '25149398',
-    thumbnail: '/thumbnails/v2-will-ferrell.png',
+    thumbnail: '/thumbnails/v2-will-ferrell.webp',
     width: 1416,
     height: 788,
   },
@@ -59,7 +59,7 @@ const CLIPS: Clip[] = [
     title: 'BON APPÉTIT',
     category: 'Commercial',
     vimeoId: '201430272',
-    thumbnail: '/thumbnails/v3-bon-appetit.png',
+    thumbnail: '/thumbnails/v3-bon-appetit.webp',
     width: 2868,
     height: 2148,
   },
@@ -67,26 +67,26 @@ const CLIPS: Clip[] = [
     title: 'BRIDES — BALLOON',
     category: 'Commercial',
     vimeoId: '37468879',
-    thumbnail: '/thumbnails/v4-brides-balloon.png',
+    thumbnail: '/thumbnails/v4-brides-balloon.webp',
     width: 3358,
     height: 1936,
   },
   {
     title: 'ANIME NOBU',
     category: 'Promotion',
-    thumbnail: '/thumbnails/v5-nobu.png',
+    thumbnail: '/thumbnails/v5-nobu.webp',
     width: 3438,
     height: 1934,
     // images[0] is the overlay "hero" (large, full width); the rest render
     // as a small thumbnail grid — see GalleryOverlay.
     images: [
-      { src: '/nobu/nobu-7.png', width: 3438, height: 1934 },
-      { src: '/nobu/nobu-1.png', width: 3448, height: 1936 },
-      { src: '/nobu/nobu-2.png', width: 3438, height: 1938 },
-      { src: '/nobu/nobu-3.png', width: 3448, height: 1936 },
-      { src: '/nobu/nobu-4.png', width: 3366, height: 1914 },
-      { src: '/nobu/nobu-6.png', width: 3448, height: 1934 },
-      { src: '/nobu/nobu-5.png', width: 3444, height: 1930 },
+      { src: '/nobu/nobu-7.webp', width: 3438, height: 1934 },
+      { src: '/nobu/nobu-1.webp', width: 3448, height: 1936 },
+      { src: '/nobu/nobu-2.webp', width: 3438, height: 1938 },
+      { src: '/nobu/nobu-3.webp', width: 3448, height: 1936 },
+      { src: '/nobu/nobu-4.webp', width: 3366, height: 1914 },
+      { src: '/nobu/nobu-6.webp', width: 3448, height: 1934 },
+      { src: '/nobu/nobu-5.webp', width: 3444, height: 1930 },
     ],
     description:
       'Anime Nobu (居酒屋のぶ)\n\n' +
@@ -97,7 +97,7 @@ const CLIPS: Clip[] = [
     title: 'BRIDES — WEDDING',
     category: 'Commercial',
     vimeoId: '56465626',
-    thumbnail: '/thumbnails/v6-brides-ladder.png',
+    thumbnail: '/thumbnails/v6-brides-ladder.webp',
     width: 3422,
     height: 1894,
   },
@@ -105,7 +105,7 @@ const CLIPS: Clip[] = [
     title: 'GLAMOUR — BLAKE LIVELY',
     category: 'Commercial',
     vimeoId: '201430213',
-    thumbnail: '/thumbnails/v7-lively.jpeg',
+    thumbnail: '/thumbnails/v7-lively.webp',
     width: 1600,
     height: 899,
   },
@@ -113,7 +113,7 @@ const CLIPS: Clip[] = [
     title: 'JAPAN AIRPORT',
     category: 'Promotion',
     vimeoId: '249631612',
-    thumbnail: '/thumbnails/v8-airport.png',
+    thumbnail: '/thumbnails/v8-airport.webp',
     width: 1600,
     height: 898,
   },
@@ -124,7 +124,7 @@ const CLIPS: Clip[] = [
     title: 'BOMB TAKOYAKI',
     category: 'Social Media',
     vimeoId: '248842352',
-    thumbnail: '/thumbnails/v9-takoyaki.jpeg',
+    thumbnail: '/thumbnails/v9-takoyaki.webp',
     width: 1074,
     height: 1066,
   },
@@ -134,7 +134,7 @@ const CLIPS: Clip[] = [
     title: 'WIRED MAGAZINE',
     category: 'Commercial',
     vimeoId: '25015740',
-    thumbnail: '/thumbnails/v1-wired.png',
+    thumbnail: '/thumbnails/v1-wired.webp',
     width: 1896,
     height: 1052,
   },
@@ -187,6 +187,9 @@ function loadVimeoApi(): Promise<Window['Vimeo'] | null> {
 
 function FeaturedShowcase({ clip }: { clip: Clip & { vimeoId: string } }) {
   const frameRef = useRef<HTMLIFrameElement>(null)
+  // The still shows instantly (28KB webp) and fades out once the film is playing,
+  // so the hero is never blank while Vimeo buffers.
+  const [playing, setPlaying] = useState(false)
 
   useEffect(() => {
     let player: VimeoPlayerLike | null = null
@@ -195,7 +198,9 @@ function FeaturedShowcase({ clip }: { clip: Clip & { vimeoId: string } }) {
     loadVimeoApi().then((vimeo) => {
       if (cancelled || !vimeo || !frameRef.current) return
       player = new vimeo.Player(frameRef.current)
+      player.on('play', () => setPlaying(true))
       player.on('timeupdate', (data) => {
+        if (!cancelled) setPlaying(true)
         if (data.seconds >= SHOWCASE_LOOP_SECONDS) {
           player?.setCurrentTime(0).catch(() => {})
         }
@@ -204,6 +209,7 @@ function FeaturedShowcase({ clip }: { clip: Clip & { vimeoId: string } }) {
 
     return () => {
       cancelled = true
+      player?.off('play')
       player?.off('timeupdate')
     }
   }, [])
@@ -215,6 +221,16 @@ function FeaturedShowcase({ clip }: { clip: Clip & { vimeoId: string } }) {
         src={`https://player.vimeo.com/video/${clip.vimeoId}?background=1&autoplay=1&muted=1&loop=1&autopause=0&app_id=58479`}
         allow="autoplay; fullscreen"
         title={clip.title}
+      />
+      {/* Instant poster (LCP), fades out when the film starts. A plain <img> is
+          intentional: the site is a static export (images unoptimized), so
+          next/image adds no benefit here. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={clip.thumbnail}
+        alt=""
+        aria-hidden="true"
+        className={`work-cover-poster${playing ? ' work-cover-poster--hidden' : ''}`}
       />
       <div className="work-cover-scrim" aria-hidden="true" />
       <div className="work-cover-text">
