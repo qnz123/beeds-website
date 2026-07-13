@@ -174,11 +174,7 @@ export default function Portfolio() {
               2026-07-13; arrows removed at client direction). */}
           <h2 className="fw-journey-stack">
             <span className="fw-journey">We help you visualize your idea</span>
-            {/* Subline — "The Gold Thread" style (Study B, 2026-07-13);
-                copy updated 2026-07-13. */}
-            <span className="fw-journey fw-journey-sub">
-              Without the <span className="fw-journey-em">Guesswork</span>
-            </span>
+            <span className="fw-journey">Without the Guesswork</span>
           </h2>
         </div>
         <div

@@ -126,32 +126,10 @@ h6 {
   text-align: center;
 }
 
-/* Subline — "The Gold Thread" (Study B, 2026-07-13): smaller grey caps, the
-   key words AI / HUMANS picked out in the site's gold accent, gold mid-dot. */
-.fw-journey-sub {
-  font-size: clamp(11px, 1.1vw, 13px);
-  font-weight: 600;
-  letter-spacing: 0.24em;
-  color: #666;
-}
-
-.fw-journey-em {
-  color: #b3a013;
-}
-
-.fw-journey-sep {
-  padding: 0 10px;
-  color: #b3a013;
-}
-
-/* Phones: step both lines down so each holds one row. */
+/* Phones: step the lines down so each holds one row. */
 @media (max-width: 640px) {
   .fw-journey {
     font-size: 17px;
-  }
-  .fw-journey-sub {
-    font-size: 10px;
-    letter-spacing: 0.18em;
   }
 }
 
