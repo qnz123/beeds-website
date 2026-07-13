@@ -588,12 +588,34 @@ export default function VideoPortfolio() {
   const openClip = (clip: Clip, trigger: HTMLButtonElement) => {
     triggerRef.current = trigger
     setActiveClip(clip)
+    // Give the overlay its own history entry so the browser Back button (and the
+    // mobile swipe-back gesture) closes it and returns to this grid — instead of
+    // navigating to the actual previous page.
+    window.history.pushState({ beedsOverlay: true }, '')
   }
 
-  const closeClip = () => {
+  // Actually dismiss: clear state + restore focus to the tile that opened it, so
+  // you land back on the same thumbnail.
+  const dismiss = () => {
     setActiveClip(null)
     triggerRef.current?.focus()
   }
+
+  // ✕ / Esc / backdrop all route here: unwind the pushed history entry; the
+  // popstate listener below then performs the dismiss (single close path,
+  // whether the user hit Back or the close control).
+  const closeClip = () => {
+    window.history.back()
+  }
+
+  // While an overlay is open, a Back navigation (popstate) closes it.
+  useEffect(() => {
+    if (!activeClip) return
+    const onPop = () => dismiss()
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeClip])
 
   const featured = CLIPS[0]
   const gridClips = CLIPS.slice(1)
