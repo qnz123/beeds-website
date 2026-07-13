@@ -173,12 +173,15 @@ export default function Portfolio() {
           {/* "The Flight Path" heading (client-approved Study B, 2026-07-13):
               the three stages joined by hairline arrows — the heading draws
               the journey itself. Emoji removed at client direction. */}
-          <h2 className="fw-journey">
-            <span>Visualize</span>
-            <span className="fw-journey-leg" aria-hidden="true" />
-            <span>Validate</span>
-            <span className="fw-journey-leg" aria-hidden="true" />
-            <span>Launch across all platforms</span>
+          <h2 className="fw-journey-stack">
+            <span className="fw-journey">
+              <span>Snap</span>
+              <span className="fw-journey-leg" aria-hidden="true" />
+              <span>Visualize</span>
+              <span className="fw-journey-leg" aria-hidden="true" />
+              <span>AI Audit</span>
+            </span>
+            <span className="fw-journey">Human Judgment</span>
           </h2>
         </div>
         <div
