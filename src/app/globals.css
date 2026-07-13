@@ -818,6 +818,13 @@ h6 {
   transform: translateY(0);
 }
 
+/* Scroll targets clear the sticky nav so their heading isn't tucked under it. */
+#services,
+#work,
+#contact {
+  scroll-margin-top: 90px;
+}
+
 /* ---- Selected Work — featured cover ("The Cinema Poster", Study C) ----
    V1 plays full-frame at the top of the section: the 16:9 background embed is
    oversized and centered so it cover-crops the viewport-height frame, with a
