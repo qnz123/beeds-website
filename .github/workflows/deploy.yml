@@ -1,0 +1,49 @@
+name: Deploy to HostGator
+
+# Builds the static site and uploads it to HostGator over FTP on every push to
+# main. Set the three FTP secrets in the repo:
+#   Settings → Secrets and variables → Actions → New repository secret
+#     FTP_SERVER    e.g. ftp.beedstu.com  (or the server hostname HostGator gives you)
+#     FTP_USERNAME  your cPanel/FTP username
+#     FTP_PASSWORD  that FTP account's password
+# Adjust `server-dir` below to your site's web root (see notes under it).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build static site
+        run: npm run build # Next.js `output: 'export'` -> ./out
+
+      - name: Deploy to HostGator via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          # The built site to upload:
+          local-dir: ./out/
+          # HostGator web root. For the PRIMARY domain this is usually:
+          #   ./public_html/
+          # If beedstu.com is an ADDON/secondary domain, point it at that
+          # domain's folder instead, e.g. ./public_html/beedstu.com/
+          server-dir: ./public_html/
+          # Only re-uploads changed files (keeps a small state file on the server).
+          # protocol: ftps   # uncomment if your HostGator account requires FTPS

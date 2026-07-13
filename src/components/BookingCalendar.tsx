@@ -164,6 +164,9 @@ const SERVICES = [
   { value: 'market-expansion', label: 'Market Expansion' },
 ]
 
+// Static build: the booking form submits by opening a pre-filled email here.
+const STUDIO_EMAIL = 'booking@beedstu.com'
+
 // Booking horizon: ~6.5 weeks ahead (the footnote says "up to six weeks").
 const HORIZON_DAYS = 45
 
@@ -387,43 +390,33 @@ export default function BookingCalendar() {
       return
     }
 
-    setStatus('loading')
     setErrorNote('')
     // Date and time are optional; an explicit "N/A" dropdown choice and an
-    // untouched blank both record as "N/A" (the API's non-empty-string
-    // contract still holds; the emailed confirmation reads "N/A" too).
+    // untouched blank both read as "N/A".
     const date = form.date && form.date !== 'N/A' ? form.date : 'N/A'
     const time = form.time && form.time !== 'N/A' ? form.time : 'N/A'
-    try {
-      const res = await fetch('/api/bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          service: form.service,
-          date,
-          time,
-          message: form.message,
-        }),
-      })
-      if (!res.ok) throw new Error('Request failed')
-      setConfirmed({
-        name: form.name,
-        email: form.email,
-        service: SERVICES.find((s) => s.value === form.service)?.label ?? form.service,
-        date,
-        time,
-      })
-      setStatus('success')
-      setForm(EMPTY_FORM)
-      setStep('details')
-      setAnimateSteps(false)
-    } catch {
-      // Stay on step 2 with the note intact; let them try again.
-      setStatus('error')
-      setErrorNote('That didn’t go through on our side — please try once more, or write to us at info@beedstu.com.')
-    }
+    const serviceLabel = SERVICES.find((s) => s.value === form.service)?.label ?? form.service
+
+    // Static build — no server. Compose a pre-filled email to the studio and open
+    // the visitor's mail client, then show the confirmation card.
+    const subject = `Session request — ${serviceLabel}`
+    const body = [
+      `Service: ${serviceLabel}`,
+      `Date: ${date}`,
+      `Time: ${time}`,
+      `Name: ${form.name}`,
+      `Email: ${form.email}`,
+      '',
+      form.message.trim() ? `Note: ${form.message.trim()}` : 'Note: —',
+    ].join('\n')
+    const mailto = `mailto:${STUDIO_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+
+    setConfirmed({ name: form.name, email: form.email, service: serviceLabel, date, time })
+    window.location.href = mailto
+    setStatus('success')
+    setForm(EMPTY_FORM)
+    setStep('details')
+    setAnimateSteps(false)
   }
 
   // Return to step 1 with every field preserved (no form reset).
@@ -451,11 +444,13 @@ export default function BookingCalendar() {
 
           {status === 'success' && confirmed ? (
             <div className="booking-info max-w-[640px]">
-              <h3 className="text-2xl mb-3">Consider it noted.</h3>
+              <h3 className="text-2xl mb-3">Almost there.</h3>
               <p className="text-sm leading-[1.8] text-[#666] mb-8">
-                Thank you, {confirmed.name} — we&apos;ve written your request into the book and
-                sent a confirmation to <strong className="text-black">{confirmed.email}</strong>.
-                You&apos;ll hear from us within one business day.
+                Thank you, {confirmed.name} — your email app should have opened with your
+                request ready to send to{' '}
+                <strong className="text-black">{STUDIO_EMAIL}</strong>. Press send and
+                we&apos;ll be in touch within one business day. If nothing opened, just write
+                to us at that address with the details below.
               </p>
 
               <dl className="border-t border-black">
