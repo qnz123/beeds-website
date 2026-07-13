@@ -99,6 +99,50 @@ h6 {
   padding: 64px 40px 32px;
 }
 
+/* "The Flight Path" heading (Study B, 2026-07-13): DISCOVERY ⟶ PLANNING ⟶
+   LAUNCH joined by hairline arrows. Eyebrow language a step larger, so it
+   reads as a diagram title rather than a label. */
+.fw-journey {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  font-size: clamp(13px, 1.4vw, 17px);
+  font-weight: 400;
+  letter-spacing: 3.5px;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.fw-journey-leg {
+  display: inline-block;
+  width: 54px;
+  height: 1px;
+  background: #000;
+  position: relative;
+}
+
+.fw-journey-leg::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: -3px;
+  border-style: solid;
+  border-width: 3.5px 0 3.5px 7px;
+  border-color: transparent transparent transparent #000;
+}
+
+/* Phones: tighten tracking, gaps and arrow legs so the line fits one row. */
+@media (max-width: 640px) {
+  .fw-journey {
+    gap: 10px;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+  }
+  .fw-journey-leg {
+    width: 22px;
+  }
+}
+
 .fw-strip {
   display: flex;
   gap: 26px;
