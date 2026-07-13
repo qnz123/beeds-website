@@ -174,11 +174,11 @@ export default function Portfolio() {
               the three stages joined by hairline arrows — the heading draws
               the journey itself. Emoji removed at client direction. */}
           <h2 className="fw-journey">
-            <span>Discovery</span>
+            <span>Visualize</span>
             <span className="fw-journey-leg" aria-hidden="true" />
-            <span>Planning</span>
+            <span>Validate</span>
             <span className="fw-journey-leg" aria-hidden="true" />
-            <span>Launch</span>
+            <span>Launch across all platforms</span>
           </h2>
         </div>
         <div
