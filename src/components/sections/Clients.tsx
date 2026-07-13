@@ -22,8 +22,9 @@ const clients = [
 ]
 
 export default function Clients() {
+  // Hidden on mobile (client direction); shown from the md breakpoint up.
   return (
-    <section className="bg-[#f5f5f5]">
+    <section className="bg-[#f5f5f5] hidden md:block">
       <h2 className="eyebrow px-10 pt-12 pb-8">Selected Clients</h2>
       <ul className="client-strip">
         {clients.map((client) => (

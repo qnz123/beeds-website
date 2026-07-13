@@ -84,6 +84,12 @@ h6 {
    everything static from the start (see the reduce block below). */
 
 .fw-folio {
+  /* Cap to the width of the four plates (4×400 + 3×26 gap + 2×40 gutter) and
+     center, so on wide desktops the folio sits in the middle with equal side
+     margins instead of hugging the left. Narrower screens are unaffected — the
+     strip still scrolls. */
+  max-width: 1760px;
+  margin-inline: auto;
   transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
