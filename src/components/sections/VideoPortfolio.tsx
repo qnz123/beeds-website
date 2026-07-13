@@ -141,7 +141,17 @@ const CLIPS: Clip[] = [
 ]
 
 function vimeoEmbedSrc(id: string) {
-  return `https://player.vimeo.com/video/${id}?autoplay=1&autopause=0&title=0&byline=0&portrait=0`
+  // Suppress every off-site surface the player URL allows (client-directed
+  // 2026-07-13): no title/byline/portrait links to vimeo.com, no PiP/AirPlay
+  // hand-offs, dnt=1 (no tracking prompt UI), and — on eligible Vimeo plans —
+  // no Vimeo logo or "watch full video on Vimeo" upsell. NOTE: the share/
+  // copy-link buttons and logo are ultimately governed by the VIDEO OWNER's
+  // embed settings on vimeo.com (Video Settings → Embed), not the URL.
+  return (
+    `https://player.vimeo.com/video/${id}` +
+    `?autoplay=1&autopause=0&title=0&byline=0&portrait=0` +
+    `&dnt=1&pip=0&airplay=0&vimeo_logo=0&watch_full_video=0`
+  )
 }
 
 // ---------------------------------------------------------------------------
@@ -218,7 +228,7 @@ function FeaturedShowcase({ clip }: { clip: Clip & { vimeoId: string } }) {
     <div className="work-cover">
       <iframe
         ref={frameRef}
-        src={`https://player.vimeo.com/video/${clip.vimeoId}?background=1&autoplay=1&muted=1&loop=1&autopause=0&app_id=58479`}
+        src={`https://player.vimeo.com/video/${clip.vimeoId}?background=1&autoplay=1&muted=1&loop=1&autopause=0&dnt=1&app_id=58479`}
         allow="autoplay; fullscreen"
         title={clip.title}
       />
