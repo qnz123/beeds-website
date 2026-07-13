@@ -170,18 +170,11 @@ export default function Portfolio() {
     <section id="featured-work" ref={sectionRef} className="pb-14">
       <div ref={folioRef} data-animate={dataAnimate} className="fw-folio">
         <div className="fw-head">
-          {/* "The Flight Path" heading (client-approved Study B, 2026-07-13):
-              the three stages joined by hairline arrows — the heading draws
-              the journey itself. Emoji removed at client direction. */}
+          {/* Flight Path heading (Study B lineage, client-directed copy
+              2026-07-13; arrows removed at client direction). */}
           <h2 className="fw-journey-stack">
-            <span className="fw-journey">
-              <span>Snap</span>
-              <span className="fw-journey-leg" aria-hidden="true" />
-              <span>Visualize</span>
-              <span className="fw-journey-leg" aria-hidden="true" />
-              <span>AI Audit</span>
-            </span>
-            <span className="fw-journey">Human Judgment</span>
+            <span className="fw-journey">Snap. Audit. Sound Impact.</span>
+            <span className="fw-journey">Powered by AI. Guided by Humans</span>
           </h2>
         </div>
         <div
