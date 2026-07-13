@@ -84,12 +84,6 @@ h6 {
    everything static from the start (see the reduce block below). */
 
 .fw-folio {
-  /* Cap to the width of the four plates (4×400 + 3×26 gap + 2×40 gutter) and
-     center, so on wide desktops the folio sits in the middle with equal side
-     margins instead of hugging the left. Narrower screens are unaffected — the
-     strip still scrolls. */
-  max-width: 1760px;
-  margin-inline: auto;
   transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
@@ -111,6 +105,11 @@ h6 {
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   padding: 0 40px 14px;
+  /* Center just the plates on wide desktops (equal side margins); the
+     "Featured Work" label above stays left-aligned. Narrower screens fill the
+     width and scroll as before. */
+  max-width: 1760px;
+  margin-inline: auto;
   /* keep the snap origin on the 40px gutter — without this, mandatory
      snapping swallows the left padding and the first plate sits flush
      against the viewport edge, off the eyebrow's alignment */
