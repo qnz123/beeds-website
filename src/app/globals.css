@@ -124,6 +124,12 @@ h6 {
   letter-spacing: 0.02em;
   text-transform: uppercase;
   text-align: center;
+  /* Crispness: the body's grayscale `antialiased` smoothing visibly thins bold
+     sans strokes (reads soft/grey). Re-enable subpixel rendering + legibility
+     hinting for these two lines only. */
+  -webkit-font-smoothing: subpixel-antialiased;
+  -moz-osx-font-smoothing: auto;
+  text-rendering: optimizeLegibility;
 }
 
 /* Line 2 — thinner stroke than the bold first line. */
