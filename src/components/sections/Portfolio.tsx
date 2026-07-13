@@ -116,7 +116,14 @@ export default function Portfolio() {
     let ticking = false
 
     const collect = () => {
-      anims = section.getAnimations({ subtree: true })
+      // Exclude the "Guesswork" glitter shimmer from the scrub — it should run
+      // continuously rather than freeze between scrolls.
+      anims = section
+        .getAnimations({ subtree: true })
+        .filter((anim) => {
+          const target = anim.effect && 'target' in anim.effect ? anim.effect.target : null
+          return !(target instanceof Element && target.closest('.fw-journey-art'))
+        })
       for (const anim of anims) {
         try {
           anim.pause()
