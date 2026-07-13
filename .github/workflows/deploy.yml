@@ -1,12 +1,12 @@
 name: Deploy to HostGator
 
-# Builds the static site and uploads it to HostGator over FTP on every push to
-# main. Set the three FTP secrets in the repo:
+# Builds the static site and uploads it to HostGator over FTPS on every push to
+# main. Set these three repo secrets:
 #   Settings → Secrets and variables → Actions → New repository secret
-#     FTP_SERVER    e.g. ftp.beedstu.com  (or the server hostname HostGator gives you)
-#     FTP_USERNAME  your cPanel/FTP username
+#     FTP_SERVER    ftp.beedstu.com
+#     FTP_USERNAME  a DEDICATED FTP account whose Directory is set to public_html
+#                   (e.g. deploy@beedstu.com) — see note on server-dir below
 #     FTP_PASSWORD  that FTP account's password
-# Adjust `server-dir` below to your site's web root (see notes under it).
 
 on:
   push:
@@ -32,18 +32,16 @@ jobs:
       - name: Build static site
         run: npm run build # Next.js `output: 'export'` -> ./out
 
-      - name: Deploy to HostGator via FTP
+      - name: Deploy to HostGator via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          # The built site to upload:
+          protocol: ftps # explicit FTPS over port 21 (HostGator supports it)
           local-dir: ./out/
-          # HostGator web root. For the PRIMARY domain this is usually:
-          #   ./public_html/
-          # If beedstu.com is an ADDON/secondary domain, point it at that
-          # domain's folder instead, e.g. ./public_html/beedstu.com/
-          server-dir: ./public_html/
-          # Only re-uploads changed files (keeps a small state file on the server).
-          # protocol: ftps   # uncomment if your HostGator account requires FTPS
+          # The FTP account logs in AT public_html (its Directory is set to
+          # public_html), so the upload root "./" IS the web root. If you instead
+          # use your main cPanel login (lands at /home3/qnz123), change this to
+          # ./public_html/
+          server-dir: ./
