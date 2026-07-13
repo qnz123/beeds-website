@@ -114,9 +114,14 @@ h6 {
   display: flex;
   align-items: center;
   gap: 22px;
-  font-size: clamp(13px, 1.4vw, 17px);
-  font-weight: 400;
-  letter-spacing: 3.5px;
+  /* Modern/bold/clean (client-directed 2026-07-13): the one sans-serif moment
+     on the site — heavy weight, larger, tight tracking. Deliberate contrast
+     with the serif system; the folio is already the site's most designed
+     section. System sans stack: no webfont, loads instantly. */
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: clamp(20px, 2.3vw, 30px);
+  font-weight: 700;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   text-align: center;
 }
@@ -125,7 +130,8 @@ h6 {
    key words AI / HUMANS picked out in the site's gold accent, gold mid-dot. */
 .fw-journey-sub {
   font-size: clamp(11px, 1.1vw, 13px);
-  letter-spacing: 3px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
   color: #666;
 }
 
@@ -138,14 +144,14 @@ h6 {
   color: #b3a013;
 }
 
-/* Phones: tighten tracking so each line holds one row. */
+/* Phones: step both lines down so each holds one row. */
 @media (max-width: 640px) {
   .fw-journey {
-    font-size: 11px;
-    letter-spacing: 1.5px;
+    font-size: 17px;
   }
   .fw-journey-sub {
     font-size: 10px;
+    letter-spacing: 0.18em;
   }
 }
 
