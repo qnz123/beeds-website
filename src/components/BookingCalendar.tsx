@@ -164,8 +164,11 @@ const SERVICES = [
   { value: 'market-expansion', label: 'Market Expansion' },
 ]
 
-// Static build: the booking form submits by opening a pre-filled email here.
+// Static build: the booking form POSTs to a small PHP mailer that runs on
+// HostGator (sends the request to the studio + a confirmation to the visitor).
+// If the POST fails, we fall back to opening the visitor's mail client.
 const STUDIO_EMAIL = 'booking@beedstu.com'
+const BOOKING_ENDPOINT = '/booking-submit.php'
 
 // Booking horizon: ~6.5 weeks ahead (the footnote says "up to six weeks").
 const HORIZON_DAYS = 45
@@ -287,7 +290,7 @@ function Reveal({ i, as: Tag = 'div', className = '', children }: {
   )
 }
 
-const EMPTY_FORM = { service: '', date: '', time: '', name: '', email: '', message: '' }
+const EMPTY_FORM = { service: '', date: '', time: '', name: '', email: '', message: '', company: '' }
 
 export default function BookingCalendar() {
   const [form, setForm] = useState(EMPTY_FORM)
@@ -390,6 +393,7 @@ export default function BookingCalendar() {
       return
     }
 
+    setStatus('loading')
     setErrorNote('')
     // Date and time are optional; an explicit "N/A" dropdown choice and an
     // untouched blank both read as "N/A".
@@ -397,26 +401,50 @@ export default function BookingCalendar() {
     const time = form.time && form.time !== 'N/A' ? form.time : 'N/A'
     const serviceLabel = SERVICES.find((s) => s.value === form.service)?.label ?? form.service
 
-    // Static build — no server. Compose a pre-filled email to the studio and open
-    // the visitor's mail client, then show the confirmation card.
-    const subject = `Session request — ${serviceLabel}`
-    const body = [
-      `Service: ${serviceLabel}`,
-      `Date: ${date}`,
-      `Time: ${time}`,
-      `Name: ${form.name}`,
-      `Email: ${form.email}`,
-      '',
-      form.message.trim() ? `Note: ${form.message.trim()}` : 'Note: —',
-    ].join('\n')
-    const mailto = `mailto:${STUDIO_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    try {
+      // POST to the HostGator PHP mailer — it emails the studio and sends the
+      // visitor a confirmation, both from the beedstu.com address.
+      const res = await fetch(BOOKING_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          service: serviceLabel,
+          date,
+          time,
+          message: form.message,
+          company: form.company, // honeypot — real visitors leave this blank
+        }),
+      })
+      if (!res.ok) throw new Error('Request failed')
 
-    setConfirmed({ name: form.name, email: form.email, service: serviceLabel, date, time })
-    window.location.href = mailto
-    setStatus('success')
-    setForm(EMPTY_FORM)
-    setStep('details')
-    setAnimateSteps(false)
+      setConfirmed({ name: form.name, email: form.email, service: serviceLabel, date, time })
+      setStatus('success')
+      setForm(EMPTY_FORM)
+      setStep('details')
+      setAnimateSteps(false)
+    } catch {
+      // Fallback: open the visitor's mail client so the request still reaches us
+      // (also covers local dev, where there's no PHP to hit).
+      const subject = `Session request — ${serviceLabel}`
+      const body = [
+        `Service: ${serviceLabel}`,
+        `Date: ${date}`,
+        `Time: ${time}`,
+        `Name: ${form.name}`,
+        `Email: ${form.email}`,
+        '',
+        form.message.trim() ? `Note: ${form.message.trim()}` : 'Note: —',
+      ].join('\n')
+      window.location.href = `mailto:${STUDIO_EMAIL}?subject=${encodeURIComponent(
+        subject
+      )}&body=${encodeURIComponent(body)}`
+      setStatus('error')
+      setErrorNote(
+        `We couldn’t submit that automatically, so we’ve opened your email app — just press send. Or write to us at ${STUDIO_EMAIL}.`
+      )
+    }
   }
 
   // Return to step 1 with every field preserved (no form reset).
@@ -444,13 +472,11 @@ export default function BookingCalendar() {
 
           {status === 'success' && confirmed ? (
             <div className="booking-info max-w-[640px]">
-              <h3 className="text-2xl mb-3">Almost there.</h3>
+              <h3 className="text-2xl mb-3">Request received.</h3>
               <p className="text-sm leading-[1.8] text-[#666] mb-8">
-                Thank you, {confirmed.name} — your email app should have opened with your
-                request ready to send to{' '}
-                <strong className="text-black">{STUDIO_EMAIL}</strong>. Press send and
-                we&apos;ll be in touch within one business day. If nothing opened, just write
-                to us at that address with the details below.
+                Thank you, {confirmed.name} — your request is in, and a confirmation is on its
+                way to <strong className="text-black">{confirmed.email}</strong>. We&apos;ll
+                take it from there.
               </p>
 
               <dl className="border-t border-black">
@@ -477,6 +503,18 @@ export default function BookingCalendar() {
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
+              {/* Honeypot: hidden from people, tempting to bots. If filled, the
+                  PHP mailer silently discards the submission. */}
+              <input
+                type="text"
+                name="company"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                value={form.company}
+                onChange={(e) => setForm({ ...form, company: e.target.value })}
+                style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, opacity: 0 }}
+              />
               {step === 'details' ? (
                 <div
                   key="details"
