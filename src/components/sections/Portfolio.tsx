@@ -174,7 +174,15 @@ export default function Portfolio() {
               2026-07-13; arrows removed at client direction). */}
           <h2 className="fw-journey-stack">
             <span className="fw-journey">Snap. Audit. Sound Impact.</span>
-            <span className="fw-journey">Powered by AI. Guided by Humans</span>
+            {/* Subline — "The Gold Thread" (client-approved Study B, 2026-07-13):
+                smaller grey caps with AI / HUMANS in the site's gold accent. */}
+            <span className="fw-journey fw-journey-sub">
+              Powered by <span className="fw-journey-em">AI</span>
+              <span className="fw-journey-sep" aria-hidden="true">
+                ·
+              </span>
+              Guided by <span className="fw-journey-em">Humans</span>
+            </span>
           </h2>
         </div>
         <div
