@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'BEEDS - Creative Agency',
+  title: 'BEEDS',
   description: 'Video content, brand direction, and creative strategy that moves markets in Japan and beyond.',
 }
 

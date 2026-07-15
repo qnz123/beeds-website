@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- BEEDS "Coin Butterfly" mark (approved 2026-07-15). Two Times-serif B's
+       back to back - left one mirrored - spines fused at center, bowls opening
+       outward as wings, knocked OUT of the disc so the letters are transparent
+       and the mark sits on any background. -->
+  <defs>
+    <mask id="wings">
+      <rect width="64" height="64" fill="#fff"/>
+      <text x="20.94" y="43.5" text-anchor="middle" transform="matrix(-1 0 0 1 41.89 0)"
+        font-family="'Times New Roman', Times, serif" font-size="33" fill="#000">B</text>
+      <text x="43.06" y="43.5" text-anchor="middle"
+        font-family="'Times New Roman', Times, serif" font-size="33" fill="#000">B</text>
+    </mask>
+  </defs>
+  <circle cx="32" cy="32" r="30" fill="#808080" mask="url(#wings)"/>
+</svg>
