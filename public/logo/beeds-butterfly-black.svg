@@ -10,10 +10,6 @@
         font-family="'Times New Roman', Times, serif" font-size="33" fill="#000">B</text>
       <text x="43.06" y="43.5" text-anchor="middle"
         font-family="'Times New Roman', Times, serif" font-size="33" fill="#000">B</text>
-      <!-- The waist: the seam's corners taper inward top and bottom, so the
-           fused spines read as a butterfly body between the wings. -->
-      <path d="M28.2 21.2 H35.8 L32 28.2 Z" fill="#fff"/>
-      <path d="M28.2 43.8 H35.8 L32 36.8 Z" fill="#fff"/>
     </mask>
   </defs>
   <circle cx="32" cy="32" r="30" fill="#0a0a0a" mask="url(#wings)"/>
