@@ -7,6 +7,7 @@
 // unchanged except the service slugs, which now speak the folio language.
 
 import { CSSProperties, FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
+import { trackEvent, trackConversion } from '@/lib/analytics'
 
 // ---------------------------------------------------------------------------
 // Timezone-aware, hourly session windows (2026-07-10).
@@ -420,6 +421,11 @@ export default function BookingCalendar() {
       if (!res.ok) throw new Error('Request failed')
 
       setConfirmed({ name: form.name, email: form.email, service: serviceLabel, date, time })
+      // Report the lead: GA4 event for funnel analysis + Google Ads conversion
+      // so the campaign can optimise toward booking requests. Both no-op until
+      // the corresponding env IDs are set (see src/lib/analytics.ts).
+      trackEvent('book_request_submitted', { service: serviceLabel })
+      trackConversion()
       setStatus('success')
       setForm(EMPTY_FORM)
       setStep('details')

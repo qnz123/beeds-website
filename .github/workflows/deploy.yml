@@ -32,6 +32,13 @@ jobs:
 
       - name: Build static site
         run: npm run build # Next.js `output: 'export'` -> ./out
+        env:
+          # NEXT_PUBLIC_ vars are baked into the static HTML at build time, and
+          # the Action never sees the gitignored .env.local. So the GA4 ID comes
+          # from a repo Variable: Settings → Secrets and variables → Actions →
+          # Variables → New variable → NEXT_PUBLIC_GA_ID = G-Q90EH2Q7HF
+          # (Not secret — it ships in the public page source anyway.)
+          NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID }}
 
       - name: Deploy to HostGator via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.6
