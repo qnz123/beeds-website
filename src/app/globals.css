@@ -1377,6 +1377,24 @@ figure[data-animate='visible'] .impact-lift-label {
   display: inline;
 }
 
+/* Hero CTA — house underline-ink link (matches .concierge-cta), jumps to the
+   booking section. Above-the-fold entry point for paid/cold traffic. */
+.hero-cta {
+  display: inline-block;
+  margin-top: 40px;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  color: #000;
+  transition: opacity 0.2s ease;
+}
+
+.hero-cta:hover {
+  opacity: 0.55;
+}
+
 /* ---- Booking — "The Concierge" (client-approved Study 2, 2026-07-09) ----
    Booking as typography: three editorial stanzas of large serif text whose
    controls are native selects/inputs styled as underline blanks (1px black

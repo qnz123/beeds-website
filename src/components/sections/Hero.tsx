@@ -72,30 +72,36 @@ export default function Hero() {
   return (
     <section className="hero min-h-screen flex items-center px-10 py-16">
       <div className="container-x w-full max-w-full">
-        <h1 className="text-5xl leading-[1.2] mb-10">
-          <span className="typewriter-text">{typed[0]}</span>
-          {activeLine === 0 && (
-            <span
-              className={`typewriter-cursor ${cursorBlinkOut ? 'blinking-out' : ''}`}
-              style={{ opacity: cursorVisible ? 1 : 0 }}
-            />
-          )}
-        </h1>
-        <h1 className="text-5xl leading-[1.2] mb-16">
-          <span className="typewriter-text">{typed[1]}</span>
-          {activeLine === 1 && (
-            <span
-              className={`typewriter-cursor ${cursorBlinkOut ? 'blinking-out' : ''}`}
-              style={{ opacity: cursorVisible ? 1 : 0 }}
-            />
-          )}
+        <h1 className="text-5xl leading-[1.2]">
+          <div className="mb-10">
+            <span className="typewriter-text">{typed[0]}</span>
+            {activeLine === 0 && (
+              <span
+                className={`typewriter-cursor ${cursorBlinkOut ? 'blinking-out' : ''}`}
+                style={{ opacity: cursorVisible ? 1 : 0 }}
+              />
+            )}
+          </div>
+          <div className="mb-16">
+            <span className="typewriter-text">{typed[1]}</span>
+            {activeLine === 1 && (
+              <span
+                className={`typewriter-cursor ${cursorBlinkOut ? 'blinking-out' : ''}`}
+                style={{ opacity: cursorVisible ? 1 : 0 }}
+              />
+            )}
+          </div>
         </h1>
 
         <p className="text-base max-w-[600px] leading-[1.8]">
-          Your story is your brand. BEEDS ensures every creative asset is on point. Our AI engine
-          audits tone and relevance. Combine judgement through human creative strategists weave in
-          local nuance, patterns and governance.
+          Your story is your brand. BEEDS keeps every creative asset on point — our AI engine
+          audits tone and relevance while human strategists weave in local nuance, pattern, and
+          governance.
         </p>
+
+        <a href="#contact" className="hero-cta">
+          Let&apos;s connect →
+        </a>
       </div>
     </section>
   )
