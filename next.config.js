@@ -1,15 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // Static HTML export — emits an `out/` folder of plain .html + assets that the
-  // GitHub Action uploads to HostGator. There is no server, so the booking form
-  // submits via a mailto: link (see BookingCalendar.tsx), not an API route.
-  output: 'export',
+  // Runs natively on Vercel (no static export) so /api routes work — the booking
+  // form posts to /api/bookings (Resend email), not the old HostGator PHP mailer.
   images: {
-    // The default Next image optimizer needs a server; static export serves originals.
+    // Still unoptimized for now: enabling Next's optimizer requires remotePatterns
+    // for i.vimeocdn.com (Vimeo thumbnails). Easy follow-up once the move settles.
     unoptimized: true,
   },
-  // Directory-style URLs so every route is a real index.html: /about/ -> about/index.html.
+  // Directory-style URLs (/about/), preserved from the previous host so existing
+  // links and search-indexed URLs don't 301-churn after the migration.
   trailingSlash: true,
 }
 

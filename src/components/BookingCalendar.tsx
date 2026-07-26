@@ -169,7 +169,7 @@ const SERVICES = [
 // HostGator (sends the request to the studio + a confirmation to the visitor).
 // If the POST fails, we fall back to opening the visitor's mail client.
 const STUDIO_EMAIL = 'booking@beedstu.com'
-const BOOKING_ENDPOINT = '/booking-submit.php'
+const BOOKING_ENDPOINT = '/api/bookings'
 
 // Booking horizon: ~6.5 weeks ahead (the footnote says "up to six weeks").
 const HORIZON_DAYS = 45
@@ -403,8 +403,8 @@ export default function BookingCalendar() {
     const serviceLabel = SERVICES.find((s) => s.value === form.service)?.label ?? form.service
 
     try {
-      // POST to the HostGator PHP mailer — it emails the studio and sends the
-      // visitor a confirmation, both from the beedstu.com address.
+      // POST to the /api/bookings serverless route (Resend) — it emails the
+      // studio and sends the visitor a confirmation, both from beedstu.com.
       const res = await fetch(BOOKING_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
