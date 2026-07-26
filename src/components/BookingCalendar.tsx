@@ -169,7 +169,9 @@ const SERVICES = [
 // HostGator (sends the request to the studio + a confirmation to the visitor).
 // If the POST fails, we fall back to opening the visitor's mail client.
 const STUDIO_EMAIL = 'booking@beedstu.com'
-const BOOKING_ENDPOINT = '/api/bookings'
+// Trailing slash required: next.config.js has trailingSlash:true, so posting to
+// `/api/bookings` triggers a 308 redirect that breaks the browser fetch.
+const BOOKING_ENDPOINT = '/api/bookings/'
 
 // Booking horizon: ~6.5 weeks ahead (the footnote says "up to six weeks").
 const HORIZON_DAYS = 45
