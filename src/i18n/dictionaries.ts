@@ -70,6 +70,7 @@ type Dict = {
     lede: string // '\n' marks intentional line breaks
     disclaimer: string
   }
+  svc: { heading: string; clients: string }
 }
 
 const en: Dict = {
@@ -127,6 +128,7 @@ const en: Dict = {
     lede: 'Creative consulting doesn’t end with recommendations. It continues through production. This is what happens when strategy is transformed into stories, experiences, and results.',
     disclaimer: 'Figures are demonstration purposes.',
   },
+  svc: { heading: 'Our Services', clients: 'Selected Clients' },
 }
 
 // --- 日本語（下書き：ネイティブ確認待ち / DRAFT — pending native review） ---
@@ -194,6 +196,7 @@ const ja: Dict = {
     lede: 'クリエイティブコンサルティングは、提案で終わりません。\nその先の制作まで伴走します。\n戦略を、心を動かすストーリーや体験、そして成果へと形にしていく。',
     disclaimer: '数値はデモンストレーション用のサンプルです。',
   },
+  svc: { heading: 'サービス', clients: '主なクライアント' },
 }
 
 const dictionaries: Record<Locale, Dict> = { en, ja }

@@ -3,16 +3,45 @@ import Navigation from '@/components/Navigation'
 import Services from '@/components/sections/Services'
 import Footer from '@/components/Footer'
 
+const aboutTitle = 'About - BEEDS'
+const aboutDescription =
+  'The BEEDS journey — built since 2012, from typography and print in San Francisco and New York to a diverse creative team across New York and Tokyo.'
+
 export const metadata: Metadata = {
-  title: 'About - BEEDS',
-  description:
-    'The BEEDS journey — built since 2012, from typography and print in San Francisco and New York to a diverse creative team across New York and Tokyo.',
+  title: aboutTitle,
+  description: aboutDescription,
+  alternates: {
+    canonical: '/about/',
+    languages: { en: '/about', ja: '/ja/about', 'x-default': '/about' },
+  },
+  openGraph: {
+    title: aboutTitle,
+    description: aboutDescription,
+    url: '/about/',
+    siteName: 'BEEDS',
+    images: [
+      {
+        url: '/logo/beeds-butterfly-black.png',
+        width: 1024,
+        height: 1024,
+        alt: 'BEEDS',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: aboutTitle,
+    description: aboutDescription,
+    images: ['/logo/beeds-butterfly-black.png'],
+  },
 }
 
 export default function AboutPage() {
   return (
     <>
-      <Navigation />
+      <Navigation switchHref="/ja/about" />
       <main>
         {/* Lede */}
         <section className="pt-24 pb-20 px-10">

@@ -9,7 +9,9 @@
 // tab at a time; proper tab semantics; reduced motion skips the crossfade.
 
 import { Fragment, useState } from 'react'
-import { frames } from './folioData'
+import { getFrames } from './folioData'
+import type { Locale } from '@/i18n/config'
+import { getDictionary } from '@/i18n/dictionaries'
 
 // Phrases that wear the yellow brush highlight inside the service panel copy.
 const HIGHLIGHT_PHRASES = [
@@ -48,14 +50,16 @@ const selectedClients = [
   'Wise',
 ]
 
-export default function Services() {
+export default function Services({ lang = 'en' as Locale }: { lang?: Locale }) {
   const [active, setActive] = useState(0)
+  const frames = getFrames(lang)
   const frame = frames[active]
+  const t = getDictionary(lang).svc
 
   return (
     <section id="services" className="bg-white py-20 px-10 border-t border-black">
       <div className="container-x">
-        <h2 className="eyebrow mb-12">Our Services</h2>
+        <h2 className="eyebrow mb-12">{t.heading}</h2>
 
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-x-16 gap-y-14">
           <div>
@@ -111,7 +115,7 @@ export default function Services() {
           {/* Selected Clients — editorial sidebar in the right column,
               set off by a vertical hairline on desktop. */}
           <aside className="lg:border-l lg:border-black lg:pl-12">
-            <h3 className="eyebrow mb-6">Selected Clients</h3>
+            <h3 className="eyebrow mb-6">{t.clients}</h3>
             <ul className="text-sm leading-[2.2]">
               {selectedClients.map((client) => (
                 <li key={client}>{client}</li>
