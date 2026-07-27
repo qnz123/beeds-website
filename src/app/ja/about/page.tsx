@@ -95,7 +95,7 @@ export default function AboutPageJa() {
               <div>
                 <h3 className="eyebrow text-[#666] mb-2">Backbone — Since 2012</h3>
                 <p className="text-sm leading-[1.7] text-[#666]">
-                  2012年。タイポグラフィ、エディトリアルデザイン、プレゼンテーション。すべては、「伝える」ことから始まりました。サンフランシスコとニューヨークで培ったコミュニケーションデザインが、BEEDSの原点です。
+                  2012年。タイポグラフィ、エディトリアルデザイン、プレゼンテーション。すべては、「伝える」ことから始まりました。サンフランシスコとニューヨークで培ったコミュニケーションデザイン。
                 </p>
               </div>
             </div>
@@ -111,7 +111,7 @@ export default function AboutPageJa() {
               <div>
                 <h3 className="eyebrow text-[#666] mb-2">New York · Tokyo</h3>
                 <p className="text-sm leading-[1.7] text-[#666]">
-                  異なる文化は、新しい視点を生みます。BEEDSはニューヨークと東京を拠点に、多様な市場とカルチャーを横断しながらブランドを支援しています。APAC、北米、中東。市場が変われば、伝わり方も変わる。だから私たちは、ローカルの文脈を理解し、
+                  異なる文化は、新しい視点を生みます。ニューヨークと東京を拠点に、多様な市場とカルチャーを横断しながらブランドを支援しています。APAC、北米、中東。市場が変われば、伝わり方も変わる。だから私たちは、ローカルの文脈を理解し、
                   <span className="brush-highlight">世界で機能するクリエイティブ</span>
                   を設計します。
                 </p>
@@ -123,7 +123,7 @@ export default function AboutPageJa() {
               <div>
                 <h3 className="eyebrow text-[#666] mb-2">AI × Human</h3>
                 <p className="text-sm leading-[1.7] text-[#666]">
-                  AIは、可能性を広げます。人は、意味を与えます。BEEDSは、AIによる分析と、人の創造性・文化理解・ブランドガバナンスを融合し、スピードと品質を両立します。効率化のためだけではなく、本質的な価値を生み出すために。
+                  AIは、可能性を広げます。人は、意味を与えます。AIによる分析と、人の創造性・文化理解・ブランドガバナンスを融合し、スピードと品質を両立します。効率化のためだけではなく、本質的な価値を生み出すために。
                 </p>
               </div>
             </div>
