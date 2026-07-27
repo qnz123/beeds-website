@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import Analytics from '@/components/Analytics'
+import StructuredData from '@/components/StructuredData'
 
 // Falls back to the production domain if NEXT_PUBLIC_SITE_URL isn't set in
 // the deploy environment; update the env var (or this default) if the
@@ -9,7 +10,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://beedstu.com'
 
 const title = 'BEEDS — Creative Strategy, AI Enablement & Production'
 const description =
-  "Tokyo/New York creative studio since 2012 — creative strategy, AI enablement, production, and APAC/U.S. market expansion for Condé Nast, Verizon, Nestlé, Victoria's Secret, and Shangri-La."
+  'Innovation-first media studio pairing human strategists with AI to keep every brand on point — creative strategy, video production, and platforms across Tokyo and the U.S.'
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -66,6 +67,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <Analytics />
+        <StructuredData />
         {children}
       </body>
     </html>
