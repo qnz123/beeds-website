@@ -1,0 +1,77 @@
+import type { Locale } from './config'
+
+// Central copy dictionary. English is source; Japanese is a DRAFT transcreation
+// (polite です/ます register) — flagged for native review before it's considered
+// final. Brand taglines are intentionally kept in English on both locales.
+//
+// Phase 1 covers the site chrome (nav, footer) and the hero. Other homepage
+// sections (folio, impact, booking concierge) are added in later phases.
+
+type Dict = {
+  nav: {
+    work: string
+    about: string
+    services: string
+    contact: string
+  }
+  hero: {
+    line1: string
+    line2: string
+    body: string
+    cta: string
+  }
+  footer: {
+    contact: string
+    businessEmail: string
+    information: string
+    rights: string
+    location: string
+  }
+}
+
+const en: Dict = {
+  nav: { work: 'Work', about: 'About', services: 'Services', contact: 'Contact' },
+  hero: {
+    line1: 'SMALL FRAMES',
+    line2: 'BIG IMPACT',
+    body: 'Your story is your brand. BEEDS keeps every creative asset on point — our AI engine audits tone and relevance while human strategists weave in local nuance, pattern, and governance.',
+    cta: "Let's connect →",
+  },
+  footer: {
+    contact: 'Contact',
+    businessEmail: 'Business Email —',
+    information: 'Information',
+    rights: 'All Rights Reserved',
+    location: 'Tokyo, Japan',
+  },
+}
+
+// --- 日本語（下書き：ネイティブ確認待ち / DRAFT — pending native review） ---
+const ja: Dict = {
+  nav: {
+    work: '制作実績',
+    about: '私たちについて',
+    services: 'サービス',
+    contact: 'お問い合わせ',
+  },
+  hero: {
+    // Brand tagline kept in English by design — decide if you want a JA version.
+    line1: 'SMALL FRAMES',
+    line2: 'BIG IMPACT',
+    body: 'あなたのストーリーが、ブランドになる。BEEDSは、すべてのクリエイティブアセットを的確に整えます。AIエンジンがトーンと関連性を分析し、人のストラテジストが土地ならではのニュアンス・パターン・ガバナンスを織り込みます。',
+    cta: 'ご相談はこちら →',
+  },
+  footer: {
+    contact: 'お問い合わせ',
+    businessEmail: 'ビジネスメール —',
+    information: '会社情報',
+    rights: '無断転載を禁じます',
+    location: '東京, 日本',
+  },
+}
+
+const dictionaries: Record<Locale, Dict> = { en, ja }
+
+export function getDictionary(locale: Locale): Dict {
+  return dictionaries[locale] ?? dictionaries.en
+}

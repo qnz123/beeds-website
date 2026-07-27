@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-
-const LINES = ['SMALL FRAMES', 'BIG IMPACT']
+import type { Locale } from '@/i18n/config'
+import { getDictionary } from '@/i18n/dictionaries'
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
@@ -14,8 +14,11 @@ function charDelay() {
   return Math.random() * 30 + 40 // moderate
 }
 
-export default function Hero() {
-  const [typed, setTyped] = useState<string[]>(LINES.map(() => ''))
+export default function Hero({ lang = 'en' }: { lang?: Locale }) {
+  const t = getDictionary(lang).hero
+  const LINES = [t.line1, t.line2]
+
+  const [typed, setTyped] = useState<string[]>(['', ''])
   const [activeLine, setActiveLine] = useState(0)
   const [cursorVisible, setCursorVisible] = useState(true)
   const [cursorBlinkOut, setCursorBlinkOut] = useState(false)
@@ -67,7 +70,8 @@ export default function Hero() {
     return () => {
       cancelled.current = true
     }
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang])
 
   return (
     <section className="hero min-h-screen flex items-center px-10 py-16">
@@ -93,14 +97,10 @@ export default function Hero() {
           </div>
         </h1>
 
-        <p className="text-base max-w-[600px] leading-[1.8]">
-          Your story is your brand. BEEDS keeps every creative asset on point — our AI engine
-          audits tone and relevance while human strategists weave in local nuance, pattern, and
-          governance.
-        </p>
+        <p className="text-base max-w-[600px] leading-[1.8]">{t.body}</p>
 
         <a href="#contact" className="hero-cta">
-          Let&apos;s connect →
+          {t.cta}
         </a>
       </div>
     </section>

@@ -1,25 +1,19 @@
-import Navigation from '@/components/Navigation'
-import Hero from '@/components/sections/Hero'
-import Portfolio from '@/components/sections/Portfolio'
-import Clients from '@/components/sections/Clients'
-import VideoPortfolio from '@/components/sections/VideoPortfolio'
-import Impact from '@/components/sections/Impact'
-import BookingCalendar from '@/components/BookingCalendar'
-import Footer from '@/components/Footer'
+import type { Metadata } from 'next'
+import HomeContent from '@/components/HomeContent'
+
+// English homepage (default locale, at the root). hreflang alternates tell
+// Google about the Japanese counterpart at /ja.
+export const metadata: Metadata = {
+  alternates: {
+    canonical: '/',
+    languages: {
+      en: '/',
+      ja: '/ja',
+      'x-default': '/',
+    },
+  },
+}
 
 export default function Home() {
-  return (
-    <>
-      <Navigation />
-      <main>
-        <Hero />
-        <VideoPortfolio />
-        <Portfolio />
-        <Clients />
-        <Impact />
-        <BookingCalendar />
-      </main>
-      <Footer />
-    </>
-  )
+  return <HomeContent lang="en" />
 }

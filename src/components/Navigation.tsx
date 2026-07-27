@@ -2,30 +2,54 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import type { Locale } from '@/i18n/config'
+import { getDictionary } from '@/i18n/dictionaries'
 
-const navLinks = [
-  { label: 'Work', href: '/#work' },
-  { label: 'About', href: '/about' },
-  { label: 'Services', href: '/about#services' },
-  { label: 'Contact', href: '/#contact' },
-]
-
-export default function Navigation() {
+// Locale-aware nav. `lang` picks the copy; `switchHref` is the counterpart URL
+// for the language toggle (the other-language version of the current page).
+// Defaults keep the existing English pages working unchanged.
+export default function Navigation({
+  lang = 'en',
+  switchHref = '/ja',
+}: {
+  lang?: Locale
+  switchHref?: string
+}) {
   const [isOpen, setIsOpen] = useState(false)
+  const t = getDictionary(lang).nav
+  const isJa = lang === 'ja'
+  const home = isJa ? '/ja' : '/'
+
+  const navLinks = [
+    { label: t.work, href: isJa ? '/ja/#work' : '/#work' },
+    { label: t.about, href: isJa ? '/ja/about' : '/about' },
+    { label: t.services, href: isJa ? '/ja/about#services' : '/about#services' },
+    { label: t.contact, href: isJa ? '/ja/#contact' : '/#contact' },
+  ]
+
+  // Toggle shows the OTHER language's name and links to its URL.
+  const toggleLabel = isJa ? 'English' : '日本語'
 
   return (
     <nav className="nav sticky top-0 z-50">
       <div>
-        <Link href="/">BEEDS</Link>
+        <Link href={home}>BEEDS</Link>
       </div>
 
       {/* Desktop Navigation */}
-      <div className="hidden md:flex gap-10">
+      <div className="hidden md:flex gap-10 items-center">
         {navLinks.map((link) => (
           <Link key={link.href} href={link.href}>
             {link.label}
           </Link>
         ))}
+        <Link
+          href={switchHref}
+          className="text-[#666]"
+          aria-label={`Switch language to ${toggleLabel}`}
+        >
+          {toggleLabel}
+        </Link>
       </div>
 
       {/* Mobile Menu Button */}
@@ -45,6 +69,9 @@ export default function Navigation() {
               {link.label}
             </Link>
           ))}
+          <Link href={switchHref} className="text-[#666]" onClick={() => setIsOpen(false)}>
+            {toggleLabel}
+          </Link>
         </div>
       )}
     </nav>
