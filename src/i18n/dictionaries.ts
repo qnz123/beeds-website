@@ -53,10 +53,11 @@ const en: Dict = {
 // --- 日本語（下書き：ネイティブ確認待ち / DRAFT — pending native review） ---
 const ja: Dict = {
   nav: {
-    work: '制作実績',
-    about: '私たちについて',
-    services: 'サービス',
-    contact: 'お問い合わせ',
+    // Client direction: keep the top nav tabs in English on the JA site too.
+    work: 'Work',
+    about: 'About',
+    services: 'Services',
+    contact: 'Contact',
   },
   hero: {
     // Brand tagline kept in English by design — decide if you want a JA version.
