@@ -266,7 +266,10 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
               </Fragment>
             ))}
           </p>
-          <StatsGrid stats={resultStats} columnsClass="grid-cols-1 md:grid-cols-3" />
+          <StatsGrid
+            stats={resultStats.map((s, i) => ({ ...s, label: t.stats[i] ?? s.label }))}
+            columnsClass="grid-cols-1 md:grid-cols-3"
+          />
           <div className="max-w-[720px]">
             <ChannelLiftChart />
           </div>

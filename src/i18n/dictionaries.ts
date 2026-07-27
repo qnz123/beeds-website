@@ -69,6 +69,7 @@ type Dict = {
   impact: {
     lede: string // '\n' marks intentional line breaks
     disclaimer: string
+    stats: string[] // the three stat-callout labels, in order
   }
   svc: { heading: string; clients: string }
 }
@@ -127,6 +128,11 @@ const en: Dict = {
   impact: {
     lede: 'Creative consulting doesn’t end with recommendations. It continues through production. This is what happens when strategy is transformed into stories, experiences, and results.',
     disclaimer: 'Figures are demonstration purposes.',
+    stats: [
+      'Average engagement lift across client channels',
+      'Increase in monthly content output',
+      'Faster time-to-launch on new campaigns',
+    ],
   },
   svc: { heading: 'Our Services', clients: 'Selected Clients' },
 }
@@ -195,6 +201,11 @@ const ja: Dict = {
   impact: {
     lede: 'クリエイティブコンサルティングは、提案で終わりません。\nその先の制作まで伴走します。\n戦略を、心を動かすストーリーや体験、そして成果へと形にしていく。',
     disclaimer: '数値はデモンストレーション用のサンプルです。',
+    stats: [
+      'クライアントチャネル全体での平均エンゲージメント向上',
+      '月間コンテンツ制作量の増加',
+      '新規キャンペーンの立ち上げ時間の短縮',
+    ],
   },
   svc: { heading: 'サービス', clients: '主なクライアント' },
 }
