@@ -13,7 +13,7 @@ import type { Locale } from '@/i18n/config'
 // Portfolio folio, and the BookingCalendar concierge. Still English: the Impact
 // section (later phase).
 export default function HomeContent({ lang = 'en' as Locale }: { lang?: Locale }) {
-  const switchHref = lang === 'ja' ? '/' : '/ja'
+  const switchHref = lang === 'ja' ? '/' : '/ja/'
 
   return (
     <>

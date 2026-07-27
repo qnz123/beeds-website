@@ -9,10 +9,10 @@ export const metadata: Metadata = {
   description:
     '人のストラテジストとAIを融合し、すべてのブランドアセットを的確に。東京とアメリカで、クリエイティブ戦略・映像制作・プラットフォームを提供するイノベーション主導のメディアスタジオ。',
   alternates: {
-    canonical: '/ja',
+    canonical: '/ja/',
     languages: {
       en: '/',
-      ja: '/ja',
+      ja: '/ja/',
       'x-default': '/',
     },
   },
@@ -20,8 +20,11 @@ export const metadata: Metadata = {
     title: 'BEEDS — クリエイティブ戦略・AI活用・映像制作',
     description:
       '人のストラテジストとAIを融合し、すべてのブランドアセットを的確に。東京とアメリカのメディアスタジオ、BEEDS。',
-    url: '/ja',
+    url: '/ja/',
+    siteName: 'BEEDS',
+    type: 'website',
     locale: 'ja_JP',
+    images: [{ url: '/logo/beeds-butterfly-black.png', width: 1024, height: 1024, alt: 'BEEDS' }],
   },
 }
 

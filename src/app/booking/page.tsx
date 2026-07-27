@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description: bookingDescription,
   alternates: {
     canonical: '/booking/',
-    languages: { en: '/booking', ja: '/ja/booking', 'x-default': '/booking' },
+    languages: { en: '/booking/', ja: '/ja/booking/', 'x-default': '/booking/' },
   },
   openGraph: {
     title: bookingTitle,
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
 export default function BookingPage() {
   return (
     <>
-      <Navigation switchHref="/ja/booking" />
+      <Navigation switchHref="/ja/booking/" />
       <main>
         <BookingCalendar />
       </main>

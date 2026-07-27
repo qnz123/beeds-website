@@ -15,16 +15,24 @@ export const metadata: Metadata = {
   title,
   description,
   alternates: {
-    canonical: '/ja/about',
-    languages: { en: '/about', ja: '/ja/about', 'x-default': '/about' },
+    canonical: '/ja/about/',
+    languages: { en: '/about/', ja: '/ja/about/', 'x-default': '/about/' },
   },
-  openGraph: { title, description, url: '/ja/about', locale: 'ja_JP', type: 'website' },
+  openGraph: {
+    title,
+    description,
+    url: '/ja/about/',
+    siteName: 'BEEDS',
+    type: 'website',
+    locale: 'ja_JP',
+    images: [{ url: '/logo/beeds-butterfly-black.png', width: 1024, height: 1024, alt: 'BEEDS' }],
+  },
 }
 
 export default function AboutPageJa() {
   return (
     <>
-      <Navigation lang="ja" switchHref="/about" />
+      <Navigation lang="ja" switchHref="/about/" />
       <main>
         {/* Lede */}
         <section className="pt-24 pb-20 px-10">

@@ -10,16 +10,24 @@ export const metadata: Metadata = {
   title,
   description,
   alternates: {
-    canonical: '/ja/booking',
-    languages: { en: '/booking', ja: '/ja/booking', 'x-default': '/booking' },
+    canonical: '/ja/booking/',
+    languages: { en: '/booking/', ja: '/ja/booking/', 'x-default': '/booking/' },
   },
-  openGraph: { title, description, url: '/ja/booking', locale: 'ja_JP', type: 'website' },
+  openGraph: {
+    title,
+    description,
+    url: '/ja/booking/',
+    siteName: 'BEEDS',
+    type: 'website',
+    locale: 'ja_JP',
+    images: [{ url: '/logo/beeds-butterfly-black.png', width: 1024, height: 1024, alt: 'BEEDS' }],
+  },
 }
 
 export default function BookingPageJa() {
   return (
     <>
-      <Navigation lang="ja" switchHref="/booking" />
+      <Navigation lang="ja" switchHref="/booking/" />
       <main>
         <BookingCalendar lang="ja" />
       </main>

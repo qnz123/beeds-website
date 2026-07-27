@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description: aboutDescription,
   alternates: {
     canonical: '/about/',
-    languages: { en: '/about', ja: '/ja/about', 'x-default': '/about' },
+    languages: { en: '/about/', ja: '/ja/about/', 'x-default': '/about/' },
   },
   openGraph: {
     title: aboutTitle,
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <>
-      <Navigation switchHref="/ja/about" />
+      <Navigation switchHref="/ja/about/" />
       <main>
         {/* Lede */}
         <section className="pt-24 pb-20 px-10">

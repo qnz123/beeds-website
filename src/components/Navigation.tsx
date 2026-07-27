@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 
@@ -37,6 +37,13 @@ export default function Navigation({
     document.cookie = `NEXT_LOCALE=${targetLocale}; path=/; max-age=31536000; samesite=lax`
   }
 
+  // Keep the document language in sync with the page locale. The root layout
+  // renders a single <html lang> for all routes, so on the client we correct it
+  // to the actual locale (screen readers announce JA content with a JA engine).
+  useEffect(() => {
+    document.documentElement.lang = lang
+  }, [lang])
+
   return (
     <nav className="nav sticky top-0 z-50">
       <div>
@@ -50,14 +57,18 @@ export default function Navigation({
             {link.label}
           </Link>
         ))}
-        <Link
+        {/* Plain <a>, NOT next/link: a Link would prefetch switchHref, and the
+            middleware redirects a prefetched "/" to "/ja" and caches it, so the
+            JA→EN toggle would bounce back to Japanese. A full navigation sets the
+            cookie first, then re-runs middleware with it. */}
+        <a
           href={switchHref}
           className="text-[#666]"
           aria-label={`Switch language to ${toggleLabel}`}
           onClick={rememberChoice}
         >
           {toggleLabel}
-        </Link>
+        </a>
       </div>
 
       {/* Mobile Menu Button */}
@@ -77,7 +88,7 @@ export default function Navigation({
               {link.label}
             </Link>
           ))}
-          <Link
+          <a
             href={switchHref}
             className="text-[#666]"
             onClick={() => {
@@ -86,7 +97,7 @@ export default function Navigation({
             }}
           >
             {toggleLabel}
-          </Link>
+          </a>
         </div>
       )}
     </nav>

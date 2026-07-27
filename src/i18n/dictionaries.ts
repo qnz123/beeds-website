@@ -56,6 +56,7 @@ type Dict = {
     ctaSending: string
     ctaAnother: string
     errorFields: string
+    errorMailto: string // uses {email} placeholder
     noteBefore: string
     noteAfter: string
     successHeading: string
@@ -118,6 +119,8 @@ const en: Dict = {
     ctaSending: 'Sending…',
     ctaAnother: 'Request another session →',
     errorFields: 'That still needs a service, your name, and an email we can reply to.',
+    errorMailto:
+      'We couldn’t submit that automatically, so we’ve opened your email app — just press send. Or write to us at {email}.',
     noteBefore: 'Weekdays only · times shown in your timezone (',
     noteAfter: ') · we hold sessions from our Tokyo studio.',
     successHeading: 'Request received.',
@@ -194,6 +197,8 @@ const ja: Dict = {
     ctaSending: '送信中…',
     ctaAnother: '別のセッションを予約する →',
     errorFields: 'サービス、お名前、ご連絡用のメールアドレスをご入力ください。',
+    errorMailto:
+      '自動送信できませんでした。メールアプリを開きましたので、そのまま送信してください。または {email} までご連絡ください。',
     noteBefore: '平日のみ・時間はお使いのタイムゾーン（',
     noteAfter: '）で表示・セッションは東京スタジオより承ります。',
     successHeading: 'リクエストを受け付けました。',

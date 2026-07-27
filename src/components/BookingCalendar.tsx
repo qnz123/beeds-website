@@ -321,7 +321,14 @@ export default function BookingCalendar({ lang = 'en' as Locale }: { lang?: Loca
   const [animateSteps, setAnimateSteps] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  const dateGroups = useMemo(() => buildDateGroups(), [])
+  // Built client-side only: buildDateGroups() calls new Date(), so computing it
+  // during SSR/build would (a) mismatch hydration and (b) freeze the earliest
+  // bookable date to build time. Empty on first render (placeholder + N/A only),
+  // filled on mount — mirrors the tz refine-on-mount pattern below.
+  const [dateGroups, setDateGroups] = useState<ReturnType<typeof buildDateGroups>>([])
+  useEffect(() => {
+    setDateGroups(buildDateGroups())
+  }, [])
   const { ref, dataAnimate } = useInView<HTMLDivElement>(0.2)
 
   // When the second leaf appears, move focus into the optional-note field so
@@ -431,7 +438,7 @@ export default function BookingCalendar({ lang = 'en' as Locale }: { lang?: Loca
       // Report the lead: GA4 event for funnel analysis + Google Ads conversion
       // so the campaign can optimise toward booking requests. Both no-op until
       // the corresponding env IDs are set (see src/lib/analytics.ts).
-      trackEvent('book_request_submitted', { service: serviceLabel })
+      trackEvent('book_request_submitted', { service: form.service })
       trackConversion()
       setStatus('success')
       setForm(EMPTY_FORM)
@@ -454,9 +461,7 @@ export default function BookingCalendar({ lang = 'en' as Locale }: { lang?: Loca
         subject
       )}&body=${encodeURIComponent(body)}`
       setStatus('error')
-      setErrorNote(
-        `We couldn’t submit that automatically, so we’ve opened your email app — just press send. Or write to us at ${STUDIO_EMAIL}.`
-      )
+      setErrorNote(t.errorMailto.replace('{email}', STUDIO_EMAIL))
     }
   }
 
@@ -591,6 +596,7 @@ export default function BookingCalendar({ lang = 'en' as Locale }: { lang?: Loca
                       type="text"
                       placeholder={t.phName}
                       size={12}
+                      autoComplete="name"
                       aria-label="Your name"
                       value={form.name}
                       onChange={set('name')}
@@ -601,6 +607,7 @@ export default function BookingCalendar({ lang = 'en' as Locale }: { lang?: Loca
                       type="email"
                       placeholder={t.phEmail}
                       size={16}
+                      autoComplete="email"
                       aria-label="Email"
                       value={form.email}
                       onChange={set('email')}

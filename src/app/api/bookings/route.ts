@@ -149,8 +149,11 @@ export async function POST(req: NextRequest) {
     console.error('Studio notification failed:', notification.reason)
   }
 
-  // Only if BOTH fail do we signal an error (client then shows the mailto fallback).
-  if (confirmation.status === 'rejected' && notification.status === 'rejected') {
+  // The studio notification is the ONLY channel that delivers the lead (no DB),
+  // so if it fails we must signal an error — the client then falls back to a
+  // mailto and the request still reaches the studio. A failed visitor
+  // confirmation alone doesn't lose the lead, so that stays a success.
+  if (notification.status === 'rejected') {
     return NextResponse.json({ error: 'Send failed' }, { status: 500 })
   }
 
