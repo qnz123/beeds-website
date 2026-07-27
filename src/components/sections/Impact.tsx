@@ -151,7 +151,8 @@ function StatsGrid({ stats, columnsClass }: { stats: StatDatum[]; columnsClass: 
 }
 
 /** Grouped bar chart (before / after) used for the per-channel lift illustration. */
-function ChannelLiftChart() {
+function ChannelLiftChart({ lang = 'en' as Locale }: { lang?: Locale }) {
+  const t = getDictionary(lang).impact
   const width = 600
   const height = 240
   const padTop = 34
@@ -174,11 +175,11 @@ function ChannelLiftChart() {
       <div className="flex items-center gap-5 mb-3 text-xs text-[#666]">
         <span className="flex items-center gap-2">
           <span style={{ width: 10, height: 10, background: BASE_GREY, display: 'inline-block' }} />
-          Before
+          {t.before}
         </span>
         <span className="flex items-center gap-2">
           <span style={{ width: 10, height: 10, background: ACCENT, display: 'inline-block' }} />
-          After
+          {t.after}
         </span>
       </div>
       <svg
@@ -239,7 +240,7 @@ function ChannelLiftChart() {
                 fill="#666"
                 fontFamily="'Times New Roman', Times, serif"
               >
-                {c.name}
+                {t.channels[i] ?? c.name}
               </text>
             </g>
           )
@@ -271,7 +272,7 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
             columnsClass="grid-cols-1 md:grid-cols-3"
           />
           <div className="max-w-[720px]">
-            <ChannelLiftChart />
+            <ChannelLiftChart lang={lang} />
           </div>
         </div>
 

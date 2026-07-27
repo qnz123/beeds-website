@@ -70,6 +70,9 @@ type Dict = {
     lede: string // '\n' marks intentional line breaks
     disclaimer: string
     stats: string[] // the three stat-callout labels, in order
+    channels: string[] // bar-chart channel names, in order
+    before: string
+    after: string
   }
   svc: { heading: string; clients: string }
 }
@@ -133,6 +136,9 @@ const en: Dict = {
       'Increase in monthly content output',
       'Faster time-to-launch on new campaigns',
     ],
+    channels: ['Organic Search', 'Paid Social', 'Search Ads', 'Email'],
+    before: 'Before',
+    after: 'After',
   },
   svc: { heading: 'Our Services', clients: 'Selected Clients' },
 }
@@ -206,6 +212,9 @@ const ja: Dict = {
       '月間コンテンツ制作量の増加',
       '新規キャンペーンの立ち上げ時間の短縮',
     ],
+    channels: ['オーガニック検索', '有料ソーシャル', '検索広告', 'メール'],
+    before: '導入前',
+    after: '導入後',
   },
   svc: { heading: 'サービス', clients: '主なクライアント' },
 }
