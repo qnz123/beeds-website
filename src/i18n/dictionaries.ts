@@ -27,6 +27,8 @@ type Dict = {
     rights: string
     location: string
   }
+  work: { heading: string }
+  clients: { heading: string }
 }
 
 const en: Dict = {
@@ -44,6 +46,8 @@ const en: Dict = {
     rights: 'All Rights Reserved',
     location: 'Tokyo, Japan',
   },
+  work: { heading: 'Selected Work' },
+  clients: { heading: 'Selected Clients' },
 }
 
 // --- 日本語（下書き：ネイティブ確認待ち / DRAFT — pending native review） ---
@@ -68,6 +72,8 @@ const ja: Dict = {
     rights: '無断転載を禁じます',
     location: '東京, 日本',
   },
+  work: { heading: '制作実績' },
+  clients: { heading: '主なクライアント' },
 }
 
 const dictionaries: Record<Locale, Dict> = { en, ja }

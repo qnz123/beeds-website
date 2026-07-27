@@ -29,6 +29,13 @@ export default function Navigation({
 
   // Toggle shows the OTHER language's name and links to its URL.
   const toggleLabel = isJa ? 'English' : '日本語'
+  const targetLocale = isJa ? 'en' : 'ja'
+
+  // Persist the manual choice so the detection middleware respects it and
+  // doesn't redirect the visitor back on their next visit to the root.
+  const rememberChoice = () => {
+    document.cookie = `NEXT_LOCALE=${targetLocale}; path=/; max-age=31536000; samesite=lax`
+  }
 
   return (
     <nav className="nav sticky top-0 z-50">
@@ -47,6 +54,7 @@ export default function Navigation({
           href={switchHref}
           className="text-[#666]"
           aria-label={`Switch language to ${toggleLabel}`}
+          onClick={rememberChoice}
         >
           {toggleLabel}
         </Link>
@@ -69,7 +77,14 @@ export default function Navigation({
               {link.label}
             </Link>
           ))}
-          <Link href={switchHref} className="text-[#666]" onClick={() => setIsOpen(false)}>
+          <Link
+            href={switchHref}
+            className="text-[#666]"
+            onClick={() => {
+              rememberChoice()
+              setIsOpen(false)
+            }}
+          >
             {toggleLabel}
           </Link>
         </div>

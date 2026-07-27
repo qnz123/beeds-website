@@ -9,9 +9,9 @@ import Footer from '@/components/Footer'
 import type { Locale } from '@/i18n/config'
 
 // Shared homepage, rendered by both the English root (`/`) and Japanese (`/ja`)
-// routes. Phase 1: nav, hero, and footer are localized; the remaining sections
-// (VideoPortfolio, Portfolio, Clients, Impact, BookingCalendar) still render
-// English and will be localized in later phases.
+// routes. Localized so far: nav, hero, footer, VideoPortfolio + Clients headings.
+// Still English (later phases): Portfolio folio copy, Impact, and the
+// BookingCalendar concierge (which needs Japanese word-order restructuring).
 export default function HomeContent({ lang = 'en' as Locale }: { lang?: Locale }) {
   const switchHref = lang === 'ja' ? '/' : '/ja'
 
@@ -20,9 +20,9 @@ export default function HomeContent({ lang = 'en' as Locale }: { lang?: Locale }
       <Navigation lang={lang} switchHref={switchHref} />
       <main>
         <Hero lang={lang} />
-        <VideoPortfolio />
+        <VideoPortfolio lang={lang} />
         <Portfolio />
-        <Clients />
+        <Clients lang={lang} />
         <Impact />
         <BookingCalendar />
       </main>

@@ -8,6 +8,8 @@
 // block of globals.css.
 
 import Image from 'next/image'
+import type { Locale } from '@/i18n/config'
+import { getDictionary } from '@/i18n/dictionaries'
 
 // `width`/`height` are the PNGs' intrinsic pixel dims; `ink` is the rendered
 // logo height in px, tuned per mark for optical balance (the two-line
@@ -21,11 +23,11 @@ const clients = [
   { name: "Victoria's Secret", src: '/clients/victorias-secret.png', width: 300, height: 89, ink: 36 },
 ]
 
-export default function Clients() {
+export default function Clients({ lang = 'en' as Locale }: { lang?: Locale }) {
   // Hidden on mobile (client direction); shown from the md breakpoint up.
   return (
     <section className="bg-[#f5f5f5] hidden md:block">
-      <h2 className="eyebrow px-10 pt-12 pb-8">Selected Clients</h2>
+      <h2 className="eyebrow px-10 pt-12 pb-8">{getDictionary(lang).clients.heading}</h2>
       <ul className="client-strip">
         {clients.map((client) => (
           <li key={client.name} className="client-cell">

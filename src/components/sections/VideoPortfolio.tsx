@@ -2,6 +2,8 @@
 
 import Image from 'next/image'
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import type { Locale } from '@/i18n/config'
+import { getDictionary } from '@/i18n/dictionaries'
 
 type GalleryImage = {
   src: string
@@ -195,7 +197,13 @@ function loadVimeoApi(): Promise<Window['Vimeo'] | null> {
   })
 }
 
-function FeaturedShowcase({ clip }: { clip: Clip & { vimeoId: string } }) {
+function FeaturedShowcase({
+  clip,
+  lang = 'en',
+}: {
+  clip: Clip & { vimeoId: string }
+  lang?: Locale
+}) {
   const frameRef = useRef<HTMLIFrameElement>(null)
   // The still shows instantly (28KB webp) and fades out once the film is playing,
   // so the hero is never blank while Vimeo buffers.
@@ -244,7 +252,7 @@ function FeaturedShowcase({ clip }: { clip: Clip & { vimeoId: string } }) {
       />
       <div className="work-cover-scrim" aria-hidden="true" />
       <div className="work-cover-text">
-        <span className="eyebrow work-cover-eyebrow">Selected Work</span>
+        <span className="eyebrow work-cover-eyebrow">{getDictionary(lang).work.heading}</span>
         <h2 className="work-cover-title">{clip.title}</h2>
         {/* Services credit: CSS-only content (non-selectable, non-searchable),
             same protection as the grid captions. */}
@@ -541,7 +549,10 @@ function GalleryOverlay({
         <div className="gallery-overlay-content">
           <header className="gallery-overlay-header">
             <div className="eyebrow mb-4">{clip.category}</div>
-            <h1 className="text-3xl leading-[1.4]">{heading}</h1>
+            {/* h2, not h1: this overlay renders on top of the homepage without
+                unmounting Hero's h1, so a second top-level h1 here would give
+                the document two — see Beeds.md SEO notes. */}
+            <h2 className="text-3xl leading-[1.4]">{heading}</h2>
           </header>
 
           <div className="gallery-overlay-hero">
@@ -591,7 +602,7 @@ function GalleryOverlay({
   )
 }
 
-export default function VideoPortfolio() {
+export default function VideoPortfolio({ lang = 'en' as Locale }: { lang?: Locale }) {
   const [activeClip, setActiveClip] = useState<Clip | null>(null)
   const triggerRef = useRef<HTMLButtonElement | null>(null)
 
@@ -635,7 +646,7 @@ export default function VideoPortfolio() {
       {/* V1 opens the section as the full-frame cinema poster; its grid tile
           is replaced by the showcase. Grid slots stay v2…v9 so the CSS-only
           caption classes keep matching their clips. */}
-      {isVideoClip(featured) && <FeaturedShowcase clip={featured} />}
+      {isVideoClip(featured) && <FeaturedShowcase clip={featured} lang={lang} />}
 
       <div className="video-grid video-grid--below-cover">
         {gridClips.map((clip, i) => (
