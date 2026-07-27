@@ -148,11 +148,11 @@ const ja: Dict = {
   clients: { heading: '主なクライアント' },
   booking: {
     heading: 'セッションのご予約',
-    // 「[service]のセッションを[date] [time]に希望します。」
+    // 「[service]のセッションを[date] [time]にします。」
     s1pre: '',
     s1afterService: 'のセッションを',
     s1betweenDateTime: ' ',
-    s1afterTime: 'に希望します。',
+    s1afterTime: 'にします。',
     // 「名前は[name]、ご連絡先は[email]です。」
     s2pre: '名前は',
     s2mid: '、ご連絡先は',
