@@ -53,6 +53,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified,
       changeFrequency: 'monthly',
       priority: 0.8,
+      alternates: { languages: { en: `${siteUrl}/booking/`, ja: `${siteUrl}/ja/booking/` } },
+    },
+    {
+      url: `${siteUrl}/ja/booking/`,
+      lastModified,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+      alternates: { languages: { en: `${siteUrl}/booking/`, ja: `${siteUrl}/ja/booking/` } },
     },
   ]
 }
