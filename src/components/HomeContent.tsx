@@ -23,7 +23,7 @@ export default function HomeContent({ lang = 'en' as Locale }: { lang?: Locale }
         <VideoPortfolio lang={lang} />
         <Portfolio lang={lang} />
         <Clients lang={lang} />
-        <Impact />
+        <Impact lang={lang} />
         <BookingCalendar lang={lang} />
       </main>
       <Footer lang={lang} />

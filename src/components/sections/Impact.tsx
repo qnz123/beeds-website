@@ -3,7 +3,9 @@
 // Illustrative placeholder data — replace with real research/consulting figures
 // before launch. Kept as top-of-file consts per the project's section convention.
 
-import { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
+import type { Locale } from '@/i18n/config'
+import { getDictionary } from '@/i18n/dictionaries'
 
 const ACCENT = '#ccb718' // restrained accent for "growth" marks, used sparingly
 const BASE_GREY = '#ccc' // baseline / comparison marks
@@ -247,8 +249,9 @@ function ChannelLiftChart() {
   )
 }
 
-export default function Impact() {
+export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
   const block2 = useInView<HTMLDivElement>(0.25)
+  const t = getDictionary(lang).impact
 
   return (
     <section id="impact" className="bg-white py-20 px-10 border-t border-black">
@@ -256,9 +259,12 @@ export default function Impact() {
         {/* Results of Creative Consulting */}
         <div ref={block2.ref} className="impact-reveal" data-animate={block2.dataAnimate}>
           <p className="text-2xl leading-[1.55] max-w-[780px] mb-12">
-            Creative consulting doesn&apos;t end with recommendations. It continues through
-            production. This is what happens when strategy is transformed into stories,
-            experiences, and results.
+            {t.lede.split('\n').map((line, i) => (
+              <Fragment key={i}>
+                {i > 0 && <br />}
+                {line}
+              </Fragment>
+            ))}
           </p>
           <StatsGrid stats={resultStats} columnsClass="grid-cols-1 md:grid-cols-3" />
           <div className="max-w-[720px]">
@@ -266,7 +272,7 @@ export default function Impact() {
           </div>
         </div>
 
-        <p className="text-xs text-[#999] mt-16">Figures are demonstration purposes.</p>
+        <p className="text-xs text-[#999] mt-16">{t.disclaimer}</p>
       </div>
     </section>
   )

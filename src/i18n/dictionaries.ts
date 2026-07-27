@@ -66,6 +66,10 @@ type Dict = {
     lblDate: string
     lblTime: string
   }
+  impact: {
+    lede: string // '\n' marks intentional line breaks
+    disclaimer: string
+  }
 }
 
 const en: Dict = {
@@ -118,6 +122,10 @@ const en: Dict = {
     lblService: 'Service',
     lblDate: 'Date',
     lblTime: 'Time',
+  },
+  impact: {
+    lede: 'Creative consulting doesn’t end with recommendations. It continues through production. This is what happens when strategy is transformed into stories, experiences, and results.',
+    disclaimer: 'Figures are demonstration purposes.',
   },
 }
 
@@ -181,6 +189,10 @@ const ja: Dict = {
     lblService: 'サービス',
     lblDate: '日付',
     lblTime: '時間',
+  },
+  impact: {
+    lede: 'クリエイティブコンサルティングは、提案で終わりません。\nその先の制作まで伴走します。\n戦略を、心を動かすストーリーや体験、そして成果へと形にしていく。',
+    disclaimer: '数値はデモンストレーション用のサンプルです。',
   },
 }
 
