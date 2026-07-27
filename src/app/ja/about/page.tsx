@@ -89,7 +89,9 @@ export default function AboutPageJa() {
               <div>
                 <h3 className="eyebrow text-[#666] mb-2">Production</h3>
                 <p className="text-sm leading-[1.7] text-[#666]">
-                  美しいだけでは、人は動きません。私たちがつくるのは、ブランドが選ばれる理由です。戦略を起点に、コンセプトを磨き、映像、デザイン、デジタル体験へと展開する。制作は、アイデアを形にする工程ではなく、ブランドの価値を実装するプロセスだと考えています。
+                  美しいだけでは、人は動きません。私たちがつくるのは、
+                  <span className="brush-highlight">ブランドが選ばれる理由</span>
+                  です。戦略を起点に、コンセプトを磨き、映像、デザイン、デジタル体験へと展開する。制作は、アイデアを形にする工程ではなく、ブランドの価値を実装するプロセスだと考えています。
                 </p>
               </div>
               <div>
@@ -111,7 +113,9 @@ export default function AboutPageJa() {
               <div>
                 <h3 className="eyebrow text-[#666] mb-2">New York · Tokyo</h3>
                 <p className="text-sm leading-[1.7] text-[#666]">
-                  異なる文化は、新しい視点を生みます。BEEDSはニューヨークと東京を拠点に、多様な市場とカルチャーを横断しながらブランドを支援しています。APAC、北米、中東。市場が変われば、伝わり方も変わる。だから私たちは、ローカルの文脈を理解し、世界で機能するクリエイティブを設計します。
+                  異なる文化は、新しい視点を生みます。BEEDSはニューヨークと東京を拠点に、多様な市場とカルチャーを横断しながらブランドを支援しています。APAC、北米、中東。市場が変われば、伝わり方も変わる。だから私たちは、ローカルの文脈を理解し、
+                  <span className="brush-highlight">世界で機能するクリエイティブ</span>
+                  を設計します。
                 </p>
               </div>
             </div>
