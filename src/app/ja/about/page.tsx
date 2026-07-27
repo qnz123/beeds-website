@@ -105,7 +105,7 @@ export default function AboutPageJa() {
               <div>
                 <h3 className="eyebrow text-[#666] mb-2">2013 — Transform</h3>
                 <p className="text-sm leading-[1.7] text-[#666]">
-                  2013年。私たちは、印刷からデジタルへ、映像へ、そして体験へと表現の領域を広げました。Web、アプリケーション、映像、AR。メディアは変わっても、本質は変わりません。伝わること。心を動かすこと。
+                  2013年。印刷からデジタルへ、映像へ、そして体験へと表現の領域を広げました。Web、アプリケーション、映像、AR。メディアは変わっても、本質は変わりません。伝わること。心を動かすこと。
                 </p>
               </div>
               <div>
