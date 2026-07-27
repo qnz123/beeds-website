@@ -89,9 +89,7 @@ export default function AboutPageJa() {
               <div>
                 <h3 className="eyebrow text-[#666] mb-2">Production</h3>
                 <p className="text-sm leading-[1.7] text-[#666]">
-                  美しいだけでは、人は動きません。私たちがつくるのは、
-                  <span className="brush-highlight">ブランドが選ばれる理由</span>
-                  です。戦略を起点に、コンセプトを磨き、映像、デザイン、デジタル体験へと展開する。制作は、アイデアを形にする工程ではなく、ブランドの価値を実装するプロセスだと考えています。
+                  美しいだけでは、人は動きません。戦略を起点に、コンセプトを磨き、映像、デザイン、デジタル体験へと展開する。制作は、アイデアを形にする工程ではなく、ブランドの価値を実装するプロセスだと考えています。
                 </p>
               </div>
               <div>
