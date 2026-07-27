@@ -17,7 +17,8 @@
 // Styles live in the "Featured Work — The Folio" block of globals.css.
 
 import { useEffect, useRef, useState } from 'react'
-import { frames, type FrameDatum } from './folioData'
+import { getFrames, type FrameDatum } from './folioData'
+import type { Locale } from '@/i18n/config'
 
 // ---------------------------------------------------------------------------
 // Scroll-reveal hook — mirrors `useInView` in Impact.tsx / `useRevealOnScroll`
@@ -100,45 +101,68 @@ function ScrambleWord({ word }: { word: string }) {
     setColor('rgb(255,255,255)')
 
     let raf = 0
+    let fallback = 0
+
+    const runReveal = () => {
+      const start = performance.now()
+      let lastShuffle = 0
+
+      const tick = (now: number) => {
+        const t = Math.min(1, (now - start) / SCRAMBLE_MS)
+        // Ease-out cubic: fast at first, smoothly decelerating to rest.
+        const eased = 1 - Math.pow(1 - t, 3)
+        // 1) color: white -> black, same (eased) clock as the letters
+        const v = Math.round(255 * (1 - eased))
+        setColor(t >= 1 ? null : `rgb(${v},${v},${v})`)
+        // 2) letters: lock in left-to-right; the rest keep shuffling at a
+        //    cadence that stretches as the effect winds down.
+        const shuffleEvery = SHUFFLE_MIN_MS + (SHUFFLE_MAX_MS - SHUFFLE_MIN_MS) * eased
+        if (now - lastShuffle >= shuffleEvery || t >= 1) {
+          lastShuffle = now
+          const locked = Math.floor(eased * word.length)
+          const current = word
+            .split('')
+            .map((ch, i) => (i < locked || t >= 1 ? ch : pool[Math.floor(Math.random() * pool.length)]))
+            .join('')
+          setDisplay(t >= 1 ? word : current)
+        }
+        if (t < 1) raf = requestAnimationFrame(tick)
+      }
+      raf = requestAnimationFrame(tick)
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting || startedRef.current) return
         startedRef.current = true
         observer.disconnect()
-
-        const start = performance.now()
-        let lastShuffle = 0
-        let current = display
-
-        const tick = (now: number) => {
-          const t = Math.min(1, (now - start) / SCRAMBLE_MS)
-          // Ease-out cubic: fast at first, smoothly decelerating to rest.
-          const eased = 1 - Math.pow(1 - t, 3)
-          // 1) color: white -> black, same (eased) clock as the letters
-          const v = Math.round(255 * (1 - eased))
-          setColor(t >= 1 ? null : `rgb(${v},${v},${v})`)
-          // 2) letters: lock in left-to-right; the rest keep shuffling at a
-          //    cadence that stretches as the effect winds down.
-          const shuffleEvery = SHUFFLE_MIN_MS + (SHUFFLE_MAX_MS - SHUFFLE_MIN_MS) * eased
-          if (now - lastShuffle >= shuffleEvery || t >= 1) {
-            lastShuffle = now
-            const locked = Math.floor(eased * word.length)
-            current = word
-              .split('')
-              .map((ch, i) => (i < locked || t >= 1 ? ch : pool[Math.floor(Math.random() * pool.length)]))
-              .join('')
-            setDisplay(t >= 1 ? word : current)
-          }
-          if (t < 1) raf = requestAnimationFrame(tick)
-        }
-        raf = requestAnimationFrame(tick)
+        clearTimeout(fallback)
+        runReveal()
       },
       { threshold: 0.6 }
     )
     observer.observe(node)
+
+    // Safety net: the "waiting" state above has no time limit of its own —
+    // it sits as a random jumble of the word's own letters (often without a
+    // capital first letter) until 60% of this span scrolls into view. A
+    // real visitor who never scrolls it that far, or an automated
+    // screenshot/SEO crawler that renders once and never scrolls at all,
+    // would otherwise be stuck looking at illegible text forever instead of
+    // "Guesswork" — which reads as broken placeholder copy, not a tease.
+    // Force the reveal after a short delay if the scroll trigger hasn't
+    // fired yet.
+    fallback = window.setTimeout(() => {
+      if (startedRef.current) return
+      startedRef.current = true
+      observer.disconnect()
+      runReveal()
+    }, 2500)
+
     return () => {
       observer.disconnect()
       cancelAnimationFrame(raf)
+      clearTimeout(fallback)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [word])
@@ -176,7 +200,8 @@ function FolioFrame({ frame }: { frame: FrameDatum }) {
   )
 }
 
-export default function Portfolio() {
+export default function Portfolio({ lang = 'en' as Locale }: { lang?: Locale }) {
+  const frames = getFrames(lang)
   const sectionRef = useRef<HTMLElement>(null)
   const { ref: folioRef, dataAnimate } = useInView<HTMLDivElement>(0.15)
 

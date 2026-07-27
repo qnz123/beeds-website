@@ -4,6 +4,7 @@
 // inside the /about Services section (MiniFolio.tsx).
 
 import type { CSSProperties, ReactNode } from 'react'
+import type { Locale } from '@/i18n/config'
 
 export type FrameDatum = {
   num: string
@@ -146,3 +147,50 @@ export const frames: FrameDatum[] = [
     markStyle: { left: '-10%', top: '12%' },
   },
 ]
+
+// Japanese copy per frame (client-supplied). Only the text differs; the marks,
+// fields, numerals and specimen words are shared. `category` is the small
+// eyebrow/tab label, `title` the heading, `blurb`/`about` the description.
+type FrameText = Pick<FrameDatum, 'category' | 'title' | 'blurb' | 'about'>
+
+const jaFrameText: FrameText[] = [
+  {
+    category: 'ブランド戦略・クリエイティブディレクション',
+    title: 'クリエイティブ戦略コンサルティング',
+    blurb: 'ブランドのポジショニングを明確にし、伝えたい価値を磨き上げ、共感を生むクリエイティブ戦略を設計します。',
+    about: [
+      'ブランドのポジショニングを明確にし、伝えたい価値を磨き上げ、共感を生むクリエイティブ戦略を設計します。',
+    ],
+  },
+  {
+    category: 'AI研修・チームエンパワーメント',
+    title: 'AI導入支援',
+    blurb: '実践的なAIワークフローやハンズオンワークショップを通じて、チームの創造性と生産性を最大限に引き出します。',
+    about: [
+      '実践的なAIワークフローやハンズオンワークショップを通じて、チームの創造性と生産性を最大限に引き出します。',
+    ],
+  },
+  {
+    category: 'エンドツーエンドのコンテンツプロダクション',
+    title: 'コンテンツ制作',
+    blurb: '企画・コンセプト設計から撮影、編集、納品まで、一貫したクリエイティブ制作を提供します。',
+    about: [
+      '企画・コンセプト設計から撮影、編集、納品まで、一貫したクリエイティブ制作を提供します。',
+    ],
+  },
+  {
+    category: 'APAC・米国市場へのグロース戦略',
+    title: '海外市場展開支援',
+    blurb: 'スタートアップから企業まで、APACおよび米国市場への進出・成長を、ローカライズ戦略とクリエイティブの力で支援します。',
+    about: [
+      'スタートアップから企業まで、APACおよび米国市場への進出・成長を、ローカライズ戦略とクリエイティブの力で支援します。',
+    ],
+  },
+]
+
+// Returns the four frames with locale-appropriate text merged over the shared
+// visual data. English is the base; `ja` overlays the client-supplied copy.
+export function getFrames(locale: Locale = 'en'): FrameDatum[] {
+  if (locale !== 'ja') return frames
+  return frames.map((f, i) => ({ ...f, ...jaFrameText[i] }))
+}
