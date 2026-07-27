@@ -8,6 +8,8 @@
 
 import { CSSProperties, FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import { trackEvent, trackConversion } from '@/lib/analytics'
+import type { Locale } from '@/i18n/config'
+import { getDictionary } from '@/i18n/dictionaries'
 
 // ---------------------------------------------------------------------------
 // Timezone-aware, hourly session windows (2026-07-10).
@@ -295,7 +297,10 @@ function Reveal({ i, as: Tag = 'div', className = '', children }: {
 
 const EMPTY_FORM = { service: '', date: '', time: '', name: '', email: '', message: '', company: '' }
 
-export default function BookingCalendar() {
+export default function BookingCalendar({ lang = 'en' as Locale }: { lang?: Locale }) {
+  const t = getDictionary(lang).booking
+  // Localized service labels; the value/slug stays fixed for the API.
+  const services = SERVICES.map((s, i) => ({ value: s.value, label: t.services[i] ?? s.label }))
   const [form, setForm] = useState(EMPTY_FORM)
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorNote, setErrorNote] = useState('')
@@ -386,7 +391,7 @@ export default function BookingCalendar() {
       const { service, name, email } = form
       if (!service || !name.trim() || !/^\S+@\S+\.\S+$/.test(email.trim())) {
         setStatus('error')
-        setErrorNote('That still needs a service, your name, and an email we can reply to.')
+        setErrorNote(t.errorFields)
         return
       }
       setStatus('idle')
@@ -402,7 +407,7 @@ export default function BookingCalendar() {
     // untouched blank both read as "N/A".
     const date = form.date && form.date !== 'N/A' ? form.date : 'N/A'
     const time = form.time && form.time !== 'N/A' ? form.time : 'N/A'
-    const serviceLabel = SERVICES.find((s) => s.value === form.service)?.label ?? form.service
+    const serviceLabel = services.find((s) => s.value === form.service)?.label ?? form.service
 
     try {
       // POST to the /api/bookings serverless route (Resend) — it emails the
@@ -476,22 +481,24 @@ export default function BookingCalendar() {
     <section id="contact" className="bg-light py-20 px-10">
       <div className="container-x">
         <div ref={ref} className="concierge" data-animate={dataAnimate}>
-          <Reveal i={0} as="h2" className="eyebrow mb-16">Book A Session</Reveal>
+          <Reveal i={0} as="h2" className="eyebrow mb-16">{t.heading}</Reveal>
 
           {status === 'success' && confirmed ? (
             <div className="booking-info max-w-[640px]">
-              <h3 className="text-2xl mb-3">Request received.</h3>
+              <h3 className="text-2xl mb-3">{t.successHeading}</h3>
               <p className="text-sm leading-[1.8] text-[#666] mb-8">
-                Thank you, {confirmed.name} — your request is in, and a confirmation is on its
-                way to <strong className="text-black">{confirmed.email}</strong>. We&apos;ll
-                take it from there.
+                {t.successThanks}
+                {confirmed.name}
+                {t.successMid}
+                <strong className="text-black">{confirmed.email}</strong>
+                {t.successEnd}
               </p>
 
               <dl className="border-t border-black">
                 {[
-                  ['Service', confirmed.service],
-                  ['Date', confirmed.date],
-                  ['Time', confirmed.time],
+                  [t.lblService, confirmed.service],
+                  [t.lblDate, confirmed.date],
+                  [t.lblTime, confirmed.time],
                 ].map(([label, value]) => (
                   <div
                     key={label}
@@ -506,7 +513,7 @@ export default function BookingCalendar() {
               </dl>
 
               <button type="button" className="concierge-cta" onClick={handleBookAnother}>
-                Request another session →
+                {t.ctaAnother}
               </button>
             </div>
           ) : (
@@ -529,7 +536,7 @@ export default function BookingCalendar() {
                   className={animateSteps ? 'cg-step cg-step--anim' : 'cg-step'}
                 >
                   <Reveal i={1} as="p" className="sentence">
-                    I&rsquo;d like a{' '}
+                    {t.s1pre}
                     <select
                       className="blank"
                       aria-label="Service"
@@ -537,12 +544,12 @@ export default function BookingCalendar() {
                       onChange={set('service')}
                       data-empty={form.service ? undefined : ''}
                     >
-                      <option value="" disabled>service</option>
-                      {SERVICES.map((s) => (
+                      <option value="" disabled>{t.phService}</option>
+                      {services.map((s) => (
                         <option key={s.value} value={s.value}>{s.label}</option>
                       ))}
-                    </select>{' '}
-                    session on{' '}
+                    </select>
+                    {t.s1afterService}
                     <select
                       className="blank"
                       aria-label="Date (optional)"
@@ -550,8 +557,8 @@ export default function BookingCalendar() {
                       onChange={setDate}
                       data-empty={form.date ? undefined : ''}
                     >
-                      <option value="">date</option>
-                      <option value="N/A">N/A</option>
+                      <option value="">{t.phDate}</option>
+                      <option value="N/A">{t.na}</option>
                       {dateGroups.map((g) => (
                         <optgroup key={g.month} label={g.month}>
                           {g.options.map((o) => (
@@ -559,8 +566,8 @@ export default function BookingCalendar() {
                           ))}
                         </optgroup>
                       ))}
-                    </select>{' '}
-                    at{' '}
+                    </select>
+                    {t.s1betweenDateTime}
                     <select
                       className="blank"
                       aria-label="Time, shown in your local timezone (optional)"
@@ -568,46 +575,48 @@ export default function BookingCalendar() {
                       onChange={set('time')}
                       data-empty={form.time ? undefined : ''}
                     >
-                      <option value="">time</option>
-                      <option value="N/A">N/A</option>
-                      {timeOptions.map((t) => (
-                        <option key={t.value} value={t.value}>{t.label}</option>
+                      <option value="">{t.phTime}</option>
+                      <option value="N/A">{t.na}</option>
+                      {timeOptions.map((o) => (
+                        <option key={o.value} value={o.value}>{o.label}</option>
                       ))}
-                    </select>.
+                    </select>
+                    {t.s1afterTime}
                   </Reveal>
 
                   <Reveal i={2} as="p" className="sentence">
-                    My name is{' '}
+                    {t.s2pre}
                     <input
                       className="blank"
                       type="text"
-                      placeholder="your name"
+                      placeholder={t.phName}
                       size={12}
                       aria-label="Your name"
                       value={form.name}
                       onChange={set('name')}
-                    />{' '}
-                    and you can reach me at{' '}
+                    />
+                    {t.s2mid}
                     <input
                       className="blank"
                       type="email"
-                      placeholder="email address"
+                      placeholder={t.phEmail}
                       size={16}
                       aria-label="Email"
                       value={form.email}
                       onChange={set('email')}
-                    />.
+                    />
+                    {t.s2end}
                   </Reveal>
 
                   <Reveal i={3}>
                     <button type="submit" className="concierge-cta">
-                      Send the request →
+                      {t.ctaSend}
                     </button>
                     {status === 'error' && errorNote && (
                       <p className="concierge-error" role="status">{errorNote}</p>
                     )}
                     <p className="concierge-note">
-                      Weekdays only · times shown in your timezone ({tz}) · we hold sessions from our Tokyo studio.
+                      {t.noteBefore}{tz}{t.noteAfter}
                     </p>
                   </Reveal>
                 </div>
@@ -617,12 +626,12 @@ export default function BookingCalendar() {
                   className={animateSteps ? 'cg-step cg-step--anim' : 'cg-step'}
                 >
                   <p className="sentence sentence--soft">
-                    The project, idea, or challenge I&rsquo;d like to talk about:{' '}
+                    {t.s3pre}
                     <textarea
                       ref={textareaRef}
                       className="blank blank--area"
                       rows={1}
-                      placeholder="optional — a line or two is plenty"
+                      placeholder={t.phMessage}
                       aria-label="Your project, idea, or challenge (optional)"
                       value={form.message}
                       onChange={set('message')}
@@ -632,10 +641,10 @@ export default function BookingCalendar() {
 
                   <div className="concierge-actions">
                     <button type="button" className="concierge-back" onClick={handleBack}>
-                      ← back
+                      {t.ctaBack}
                     </button>
                     <button type="submit" className="concierge-cta" disabled={status === 'loading'}>
-                      {status === 'loading' ? 'Sending…' : 'Submit'}
+                      {status === 'loading' ? t.ctaSending : t.ctaSubmit}
                     </button>
                   </div>
                   {status === 'error' && errorNote && (
