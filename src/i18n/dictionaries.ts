@@ -165,7 +165,7 @@ const ja: Dict = {
     na: '指定なし',
     phName: 'お名前',
     phEmail: 'メールアドレス',
-    phMessage: '任意 — 一言でも大丈夫です',
+    phMessage: '任意',
     ctaSend: 'リクエストを送る →',
     ctaBack: '← 戻る',
     ctaSubmit: '送信する',
