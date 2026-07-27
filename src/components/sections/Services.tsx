@@ -13,20 +13,30 @@ import { getFrames } from './folioData'
 import type { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 
-// Phrases that wear the yellow brush highlight inside the service panel copy.
-const HIGHLIGHT_PHRASES = [
-  'walk away with practical skills',
-  'commercials, APPS, films, AI-powered content, digital platforms, and e-commerce websites',
-]
+// Phrases that wear the yellow brush highlight inside the service panel copy —
+// per locale. The Japanese phrases mirror the English ones in meaning: the
+// "practical skills" payoff (AI) and the deliverables list (Production). Each
+// must be an exact substring of the corresponding paragraph in folioData.
+const HIGHLIGHT_PHRASES: Record<Locale, string[]> = {
+  en: [
+    'walk away with practical skills',
+    'commercials, APPS, films, AI-powered content, digital platforms, and e-commerce websites',
+  ],
+  ja: [
+    '仕事に活かせる実践力',
+    '映像制作、アプリケーション開発、AIコンテンツ、デジタルプラットフォーム、ECサイト構築',
+  ],
+}
 
 // Wraps any highlighted phrases found in a paragraph with .brush-highlight,
 // leaving the rest as plain text. Returns a React node ready to render.
-function renderWithHighlights(paragraph: string) {
+function renderWithHighlights(paragraph: string, phrases: string[]) {
+  if (phrases.length === 0) return paragraph
   const pattern = new RegExp(
-    `(${HIGHLIGHT_PHRASES.map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`
+    `(${phrases.map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`
   )
   return paragraph.split(pattern).map((part, i) =>
-    HIGHLIGHT_PHRASES.includes(part) ? (
+    phrases.includes(part) ? (
       <span key={i} className="brush-highlight">
         {part}
       </span>
@@ -106,7 +116,7 @@ export default function Services({ lang = 'en' as Locale }: { lang?: Locale }) {
                   key={paragraph.slice(0, 24)}
                   className="text-sm leading-[1.8] text-[#666] max-w-[600px] mb-4 last:mb-0"
                 >
-                  {renderWithHighlights(paragraph)}
+                  {renderWithHighlights(paragraph, HIGHLIGHT_PHRASES[lang])}
                 </p>
               ))}
             </div>
