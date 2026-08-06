@@ -39,31 +39,6 @@ export const metadata: Metadata = {
   },
 }
 
-// A design-trend entry: our human read on a movement — title + point of view.
-type TrendEntry = {
-  trend: string
-  take: string
-}
-
-const TRENDS: TrendEntry[] = [
-  {
-    trend: 'Scroll as narrative',
-    take: 'The scrollbar has become the storyline. The best product pages no longer stack sections — they choreograph a reveal, letting a single object turn, open, and explain itself as you move. Pacing is the new layout.',
-  },
-  {
-    trend: 'Type with a pulse',
-    take: 'Brutalist, kinetic typography is back with intent — oversized, confident, and in motion. Words slam, snap, and marquee across the frame, carrying the brand’s attitude before a single product shot loads. The typeface is the campaign.',
-  },
-  {
-    trend: 'The quiet product',
-    take: 'At the other pole, restraint sells. Ingredient-led, lowercase, pastel calm — space and softness signal quality and let the product breathe. Minimalism here is not empty; it is edited.',
-  },
-  {
-    trend: 'One bold dimension',
-    take: 'Real-time 3D has left the tech demo and entered flagship retail — a single hero object you can turn, configure, and inhabit in the browser. Used with restraint, one dimensional moment does what a hundred photos can’t.',
-  },
-]
-
 export default function ExplorePage() {
   return (
     <>
@@ -93,24 +68,6 @@ export default function ExplorePage() {
 
             {/* Point-of-view notice (light editorial, scroll-revealed) */}
             <TrendNote />
-
-            <div className="border-t border-black">
-              {TRENDS.map((entry) => (
-                <article
-                  key={entry.trend}
-                  className="py-8 border-b border-black"
-                >
-                  <div className="max-w-[760px]">
-                    <h3 className="text-2xl md:text-3xl leading-[1.2] mb-3">
-                      {entry.trend}
-                    </h3>
-                    <p className="text-sm leading-[1.7] text-[#666]">
-                      {entry.take}
-                    </p>
-                  </div>
-                </article>
-              ))}
-            </div>
           </div>
         </section>
       </main>
