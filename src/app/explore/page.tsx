@@ -51,10 +51,6 @@ export default function ExplorePage() {
             <h1 className="text-[23px] leading-[1.35] md:text-5xl md:leading-[1.2] max-w-[900px]">
               What’s moving people online — and the work that proves it.
             </h1>
-            <p className="mt-8 text-sm md:text-base leading-[1.7] text-[#666] max-w-[640px]">
-              A running notebook of the trends shaping digital brands, paired with
-              live studies you can scroll through. Part journal, part playground.
-            </p>
           </div>
         </section>
 

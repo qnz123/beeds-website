@@ -274,8 +274,6 @@ export default function StudyShowcase() {
       <div className="container-x">
         <h2 className="eyebrow mb-3">Interactive Studies</h2>
         <p className="text-sm leading-[1.6] text-[#666] max-w-[560px] mb-10">
-          Three fictional brands, three design universes — each a working
-          demonstration of scroll choreography, typography, and motion.{' '}
           <span className="brush-highlight">Hover a frame</span> to watch it play
           from top to bottom
           {granted ? ', or click to open the full review.' : '.'}

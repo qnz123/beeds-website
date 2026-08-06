@@ -33,7 +33,6 @@ export default function TrendNote() {
 
   return (
     <div ref={ref} className={`trend-note${inView ? ' is-in' : ''}`}>
-      <p className="eyebrow trend-note-label">A note on trends</p>
       <p className="trend-note-lede">
         Trends are trends.{' '}
         <span className="trend-note-stay">Some stay.</span>{' '}
