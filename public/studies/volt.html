@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOLT — VX-1 Over-Ear</title>
+<meta name="description" content="VOLT VX-1 — over-ear headphones taken apart by scrolling. A fictional brutalist design study.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blk: #0c0c0c;
+    --acid: #d8ff00;
+    --wht: #fafafa;
+    --mid: #666;
+    --dim: #8a8a8a;
+    --line: #222;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { background: var(--blk); }
+
+  body {
+    background: var(--blk);
+    color: var(--wht);
+    font-family: 'Space Mono', monospace;
+    font-weight: 400;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  main, section { position: relative; }
+
+  img, svg { display: block; max-width: 100%; }
+
+  a { color: inherit; }
+
+  button { font-family: inherit; }
+
+  h1, h2 {
+    font-family: 'Archivo Black', sans-serif;
+    font-weight: 400;
+    text-transform: uppercase;
+    color: var(--wht);
+  }
+
+  :focus-visible { outline: 2px solid var(--acid); outline-offset: 4px; }
+
+  .skip-link {
+    position: absolute;
+    left: -999px;
+    top: 0;
+    background: var(--acid);
+    color: var(--blk);
+    padding: .75rem 1.25rem;
+    z-index: 1000;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+  }
+  .skip-link:focus { left: 1rem; top: 1rem; }
+
+  /* ---------- Nav ---------- */
+  .site-header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem clamp(1.25rem, 4vw, 3rem);
+    background: rgba(12, 12, 12, .88);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .wordmark {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 1rem;
+    letter-spacing: .05em;
+    color: var(--wht);
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+  .nav-links { display: flex; gap: 2rem; }
+  .nav-links a {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--dim);
+    text-decoration: none;
+    transition: color .25s;
+  }
+  .nav-links a:hover { color: var(--acid); }
+
+  /* ---------- Marquee (shared by hero + footer) ---------- */
+  .marquee {
+    overflow: hidden;
+    width: 100%;
+    border-block: 1px solid #222;
+    padding: .75rem 0;
+  }
+  .marquee span {
+    display: inline-block;
+    white-space: nowrap;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .marquee span { animation: slide 18s linear infinite; }
+  }
+  @keyframes slide { to { transform: translateX(-50%); } }
+
+  /* ---------- 01 Hero ---------- */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8rem clamp(1.25rem, 4vw, 3rem) 5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  #hero h1 {
+    font-size: 28vw;
+    line-height: .8;
+    letter-spacing: -0.02em;
+    color: var(--acid);
+    margin-top: 3rem;
+  }
+  .hero-visual {
+    width: min(460px, 62vw);
+    margin: -9vw auto 0;
+    position: relative;
+    z-index: 2;
+  }
+  .hero-visual svg { width: 100%; height: auto; overflow: visible; }
+  .hero-tag {
+    position: absolute;
+    left: clamp(1.25rem, 4vw, 3rem);
+    bottom: 2rem;
+    max-width: 22ch;
+    text-align: left;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+
+  /* ---------- 02 Manifesto ---------- */
+  #manifesto { padding: 9rem clamp(1.25rem, 4vw, 3rem); text-align: center; }
+  .line { overflow: hidden; }
+  .line .inner {
+    display: block;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(3rem, 10vw, 8rem);
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--wht);
+  }
+  .line:nth-child(2) .inner { color: var(--acid); }
+
+  /* ---------- 03 Teardown ---------- */
+  #teardown {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6rem clamp(1.25rem, 4vw, 3rem);
+    overflow: hidden;
+  }
+  .teardown-stage {
+    position: relative;
+    width: min(560px, 82vmin);
+    aspect-ratio: 400 / 320;
+  }
+  .hp-svg { width: 100%; height: 100%; overflow: visible; }
+  .callout {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    max-width: 190px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--wht);
+  }
+  .callout--right { flex-direction: row-reverse; text-align: right; }
+  .callout .leader { width: 30px; height: 1px; background: var(--acid); flex: 0 0 30px; }
+  .callout[data-step="0"] { top: 2%; left: -4%; }
+  .callout[data-step="1"] { top: 2%; right: -4%; }
+  .callout[data-step="2"] { bottom: 6%; left: -8%; }
+  .callout[data-step="3"] { bottom: 6%; right: -8%; }
+
+  /* ---------- 04 Sound ---------- */
+  #sound {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: var(--blk);
+  }
+  #sound::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background:
+      repeating-linear-gradient(90deg, rgba(216,255,0,.12) 0 6px, transparent 6px 10px),
+      url('https://images.unsplash.com/photo-1558811916-51c8d56d29c6?fm=jpg&q=80&w=2000&auto=format&fit=crop') center/cover no-repeat;
+    background-size: auto, cover;
+    transform: scale(1.12);
+  }
+  #sound::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: linear-gradient(rgba(12,12,12,.72), rgba(12,12,12,.86));
+  }
+  #wave { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 1; }
+  .sound-copy { position: relative; z-index: 2; text-align: center; padding: 0 1.5rem; }
+  .sound-copy p {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(2rem, 6vw, 4rem);
+    line-height: 1.15;
+    text-transform: uppercase;
+    color: var(--wht);
+  }
+  .sound-copy p.acid { color: var(--acid); }
+
+  /* ---------- 05 Specs ---------- */
+  #specs { padding: 9rem clamp(1.25rem, 4vw, 3rem); max-width: 900px; margin: 0 auto; position: relative; overflow: hidden; }
+  .specs-watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 22vw;
+    line-height: 1;
+    color: var(--mid);
+    opacity: .08;
+    white-space: nowrap;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .spec-table { width: 100%; border-collapse: collapse; position: relative; z-index: 1; }
+  .spec-table tr { border-bottom: 1px solid var(--line); transition: background .2s, color .2s; }
+  .spec-table th, .spec-table td { text-align: left; padding: 1.15rem .5rem; font-weight: 400; }
+  .spec-table th {
+    color: var(--dim);
+    width: 40%;
+    font-size: 13px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  .spec-table td {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(1.6rem, 4vw, 3rem);
+    text-transform: uppercase;
+    color: var(--wht);
+  }
+  .spec-table tr:hover { background: var(--acid); }
+  .spec-table tr:hover th, .spec-table tr:hover td { color: var(--blk); }
+
+  /* ---------- 06 Drop 002 ---------- */
+  #drop002 { padding: 9rem clamp(1.25rem, 4vw, 3rem); text-align: center; }
+  .drop-block { max-width: 640px; margin: 0 auto; }
+  #drop002 h2 { font-size: clamp(2.5rem, 6vw, 4rem); margin-bottom: .75rem; }
+  .drop-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 1.5rem;
+  }
+  .stat {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: .05em;
+    color: var(--acid);
+    margin-bottom: 2.5rem;
+  }
+  .hp-visual { width: min(300px, 66vw); margin: 0 auto 2.5rem; }
+  .hp-visual svg { width: 100%; height: auto; overflow: visible; }
+  .colorway-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .colorway {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--wht);
+    padding: .75rem 1.5rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color .25s, color .25s;
+  }
+  .colorway:hover, .colorway.active { border-color: var(--acid); color: var(--acid); }
+
+  /* ---------- 07 Buy ---------- */
+  #buy { padding: 9rem clamp(1.25rem, 4vw, 3rem) 11rem; text-align: center; }
+  #buy h2 { font-size: clamp(2.5rem, 7vw, 5rem); margin-bottom: 2.25rem; }
+  .cta {
+    background: var(--acid);
+    color: var(--blk);
+    border: none;
+    padding: 1.1rem 2.5rem;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity .25s;
+  }
+  .cta:hover { opacity: .85; }
+  .cta:disabled { opacity: .85; cursor: default; }
+
+  #buybar {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem clamp(1.25rem, 4vw, 3rem);
+    background: var(--blk);
+    border-top: 1px solid var(--acid);
+  }
+  #buybar span {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--wht);
+  }
+  #buybar .cta { padding: .65rem 1.25rem; font-size: 12px; }
+
+  /* ---------- Footer ---------- */
+  footer { border-top: 1px solid var(--line); padding-bottom: 5.5rem; } /* clears the fixed #buybar in every mode */
+  .footer-disclaimer {
+    padding: 2rem clamp(1.25rem, 4vw, 3rem);
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--dim);
+  }
+
+  /* ---------- Backdrop Ken-Burns motion ---------- */
+  @media (prefers-reduced-motion: no-preference) {
+    #sound::before { animation: voltKbB 60s ease-in-out infinite alternate; }
+  }
+  @keyframes voltKbB { from { transform: scale(1.11) translate3d(0,0,0); } to { transform: scale(1.15) translate3d(1.2%,0.9%,0); } }
+
+  /* ---------- Responsive (breakpoint 900px) ---------- */
+  @media (max-width: 900px) {
+    .nav-links { display: none; }
+
+    #hero { padding: 7rem 1.25rem 4rem; }
+    #hero h1 { font-size: 24vw; }
+    .hero-visual { width: min(300px, 68vw); margin-top: -13vw; }
+    .hero-tag { position: static; margin: 2rem auto 0; text-align: center; }
+
+    #teardown { min-height: auto; padding: 5rem 1.25rem; flex-direction: column; }
+    .teardown-stage { width: min(300px, 78vw); margin: 0 auto 2.5rem; }
+    .callout {
+      position: static;
+      max-width: none;
+      margin: 0 0 1.25rem;
+      flex-direction: row;
+      text-align: left;
+    }
+    .callout--right { flex-direction: row; text-align: left; }
+
+    #sound { min-height: 70vh; padding: 5rem 1.25rem; }
+
+    .specs-watermark { font-size: 34vw; }
+
+    #buy { padding: 7rem 1.25rem 9rem; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <a href="#hero" class="wordmark">VOLT</a>
+  <nav class="nav-links" aria-label="Primary">
+    <a href="#teardown">Teardown</a>
+    <a href="#sound">Sound</a>
+    <a href="#specs">Specs</a>
+    <a href="#drop002">Drop</a>
+    <a href="#buy">Buy</a>
+  </nav>
+</header>
+
+<main id="main">
+
+<!-- 01 · HERO -->
+<section id="hero">
+  <div class="marquee" aria-hidden="true"><span>VX-1 — DROP 002 — 42MM DRIVERS — 40 HOURS — VX-1 — DROP 002 — 42MM DRIVERS — 40 HOURS — VX-1 — DROP 002 — 42MM DRIVERS — 40 HOURS — VX-1 — DROP 002 — 42MM DRIVERS — 40 HOURS — </span></div>
+  <h1>VOLT</h1>
+  <div class="hero-visual">
+    <svg viewBox="0 0 400 320" aria-hidden="true" focusable="false">
+      <path d="M80,160 A120,120 0 0 1 320,160" fill="none" stroke="var(--wht)" stroke-width="3" stroke-linecap="round"/>
+      <path d="M80,170 A120,120 0 0 1 320,170" fill="none" stroke="var(--wht)" stroke-width="3" stroke-linecap="round" stroke-opacity=".6"/>
+      <rect x="60" y="160" width="70" height="95" rx="20" fill="none" stroke="var(--wht)" stroke-width="3" stroke-linecap="round"/>
+      <rect x="73" y="150" width="14" height="20" fill="none" stroke="var(--wht)" stroke-width="3" stroke-linecap="round"/>
+      <ellipse class="cup-fill" data-cup="l" cx="95" cy="207.5" rx="22" ry="32" fill="#1a1a1a"/>
+      <path d="M66,250 Q48,275 60,300" fill="none" stroke="var(--wht)" stroke-width="3" stroke-linecap="round"/>
+      <rect x="270" y="160" width="70" height="95" rx="20" fill="none" stroke="var(--wht)" stroke-width="3" stroke-linecap="round"/>
+      <rect x="313" y="150" width="14" height="20" fill="none" stroke="var(--wht)" stroke-width="3" stroke-linecap="round"/>
+      <ellipse class="cup-fill" data-cup="r" cx="305" cy="207.5" rx="22" ry="32" fill="#1a1a1a"/>
+    </svg>
+  </div>
+  <p class="hero-tag">VX-1 OVER-EAR. LOUD, DONE PROPERLY. — $349</p>
+</section>
+
+<!-- 02 · MANIFESTO -->
+<section id="manifesto">
+  <div class="line"><span class="inner">BASS THAT</span></div>
+  <div class="line"><span class="inner">REARRANGES</span></div>
+  <div class="line"><span class="inner">FURNITURE.</span></div>
+</section>
+
+<!-- 03 · TEARDOWN -->
+<section id="teardown">
+  <div class="teardown-stage">
+    <svg class="hp-svg" viewBox="0 0 400 320" aria-hidden="true" focusable="false">
+      <g id="hp" style="transform-origin:center;">
+        <g id="hp-band">
+          <path d="M80,160 A120,120 0 0 1 320,160" fill="none" stroke="var(--wht)" stroke-width="3" stroke-linecap="round"/>
+          <path d="M80,170 A120,120 0 0 1 320,170" fill="none" stroke="var(--wht)" stroke-width="3" stroke-linecap="round" stroke-opacity=".6"/>
+        </g>
+        <g id="hp-left">
+          <rect x="60" y="160" width="70" height="95" rx="20" fill="none" stroke="var(--wht)" stroke-width="3" stroke-linecap="round"/>
+          <rect x="73" y="150" width="14" height="20" fill="none" stroke="var(--wht)" stroke-width="3" stroke-linecap="round"/>
+          <ellipse id="cup-l-fill" class="cup-fill" data-cup="l" cx="95" cy="207.5" rx="22" ry="32" fill="#1a1a1a"/>
+          <path d="M66,250 Q48,275 60,300" fill="none" stroke="var(--wht)" stroke-width="3" stroke-linecap="round"/>
+        </g>
+        <g id="hp-right">
+          <rect x="270" y="160" width="70" height="95" rx="20" fill="none" stroke="var(--wht)" stroke-width="3" stroke-linecap="round"/>
+          <rect x="313" y="150" width="14" height="20" fill="none" stroke="var(--wht)" stroke-width="3" stroke-linecap="round"/>
+          <ellipse id="cup-r-fill" class="cup-fill" data-cup="r" cx="305" cy="207.5" rx="22" ry="32" fill="#1a1a1a"/>
+        </g>
+      </g>
+    </svg>
+    <div class="callout" data-step="0">
+      <span class="leader" aria-hidden="true"></span>
+      <span>42MM DRIVER — TITANIUM-COATED. ZERO FLEX.</span>
+    </div>
+    <div class="callout callout--right" data-step="1">
+      <span class="leader" aria-hidden="true"></span>
+      <span>MEMORY-FOAM CUSHION — SEALS LIKE A VAULT.</span>
+    </div>
+    <div class="callout" data-step="2">
+      <span class="leader" aria-hidden="true"></span>
+      <span>FORGED HINGE — RATED FOR 100K FOLDS.</span>
+    </div>
+    <div class="callout callout--right" data-step="3">
+      <span class="leader" aria-hidden="true"></span>
+      <span>40H CELL — TEN MINUTES = FIVE HOURS.</span>
+    </div>
+  </div>
+</section>
+
+<!-- 04 · SOUND -->
+<section id="sound">
+  <canvas id="wave" aria-hidden="true"></canvas>
+  <div class="sound-copy">
+    <p>SCROLL FASTER.</p>
+    <p class="acid">IT GETS LOUDER.</p>
+  </div>
+</section>
+
+<!-- 05 · SPECS -->
+<section id="specs">
+  <span class="specs-watermark" aria-hidden="true">VX-1</span>
+  <table class="spec-table">
+    <tbody>
+      <tr><th scope="row">DRIVERS</th><td>42MM</td></tr>
+      <tr><th scope="row">BATTERY</th><td>40H</td></tr>
+      <tr><th scope="row">ANC</th><td>−32DB</td></tr>
+      <tr><th scope="row">WEIGHT</th><td>254G</td></tr>
+      <tr><th scope="row">PORT</th><td>USB-C</td></tr>
+      <tr><th scope="row">BLUETOOTH</th><td>5.4</td></tr>
+      <tr><th scope="row">PRICE</th><td>$349</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 06 · DROP 002 -->
+<section id="drop002">
+  <div class="drop-block">
+    <h2>DROP 002.</h2>
+    <p class="drop-sub">500 UNITS. THEN NOTHING.</p>
+    <span class="stat" data-count="137" data-suffix=" LEFT">137 LEFT</span>
+    <div class="hp-visual">
+      <svg viewBox="0 0 400 320" aria-hidden="true" focusable="false">
+        <path d="M80,160 A120,120 0 0 1 320,160" fill="none" stroke="var(--wht)" stroke-width="3" stroke-linecap="round"/>
+        <path d="M80,170 A120,120 0 0 1 320,170" fill="none" stroke="var(--wht)" stroke-width="3" stroke-linecap="round" stroke-opacity=".6"/>
+        <rect x="60" y="160" width="70" height="95" rx="20" fill="none" stroke="var(--wht)" stroke-width="3" stroke-linecap="round"/>
+        <rect x="73" y="150" width="14" height="20" fill="none" stroke="var(--wht)" stroke-width="3" stroke-linecap="round"/>
+        <ellipse class="cup-fill" data-cup="l" cx="95" cy="207.5" rx="22" ry="32" fill="#1a1a1a"/>
+        <path d="M66,250 Q48,275 60,300" fill="none" stroke="var(--wht)" stroke-width="3" stroke-linecap="round"/>
+        <rect x="270" y="160" width="70" height="95" rx="20" fill="none" stroke="var(--wht)" stroke-width="3" stroke-linecap="round"/>
+        <rect x="313" y="150" width="14" height="20" fill="none" stroke="var(--wht)" stroke-width="3" stroke-linecap="round"/>
+        <ellipse class="cup-fill" data-cup="r" cx="305" cy="207.5" rx="22" ry="32" fill="#1a1a1a"/>
+      </svg>
+    </div>
+    <div class="colorway-buttons" role="group" aria-label="Colorway">
+      <button class="colorway" type="button" data-name="ACID" data-fill="#d8ff00">ACID</button>
+      <button class="colorway" type="button" data-name="BONE" data-fill="#e8e4da">BONE</button>
+      <button class="colorway active" type="button" data-name="FULL BLACK" data-fill="#1a1a1a">FULL BLACK</button>
+    </div>
+  </div>
+</section>
+
+<!-- 07 · BUY -->
+<section id="buy">
+  <h2>TAKE THE VX-1.</h2>
+  <button class="cta" type="button">ADD TO CART — $349</button>
+</section>
+
+</main>
+
+<div id="buybar">
+  <span>VX-1 — $349</span>
+  <button class="cta" type="button">ADD TO CART — $349</button>
+</div>
+
+<footer>
+  <div class="marquee" aria-hidden="true"><span>VOLT IS A FICTIONAL BRAND — DESIGN STUDY — VOLT IS A FICTIONAL BRAND — DESIGN STUDY — VOLT IS A FICTIONAL BRAND — DESIGN STUDY — VOLT IS A FICTIONAL BRAND — DESIGN STUDY — </span></div>
+  <p class="footer-disclaimer"><a href="/explore/">← All studies</a></p>
+  <p class="footer-disclaimer">© 2026 VOLT. Built as a code-drawn design study.</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(function () {
+  var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var mobile  = matchMedia('(max-width: 900px)').matches;
+  var enhance = !reduced && window.gsap && window.ScrollTrigger;
+  if (!enhance) return; // static page stands on its own
+  gsap.registerPlugin(ScrollTrigger);
+
+  if (window.Lenis) {
+    var lenis = new Lenis();
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add(function (t) { lenis.raf(t * 1000); });
+    gsap.ticker.lagSmoothing(0);
+    window.__lenis = lenis;
+  }
+
+  // S2 helpers
+  function reveal(targets, vars) {
+    gsap.utils.toArray(targets).forEach(function (el) {
+      gsap.fromTo(el, { y: 40, opacity: 0 },
+        Object.assign({ y: 0, opacity: 1, duration: 0.9, ease: 'power2.out',
+          scrollTrigger: { trigger: el, start: 'top 82%' } }, vars || {}));
+    });
+  }
+  function countUp(el) {
+    var end = parseFloat(el.dataset.count), obj = { v: 0 };
+    gsap.to(obj, { v: end, duration: 1.4, ease: 'power1.out',
+      scrollTrigger: { trigger: el, start: 'top 85%' },
+      onUpdate: function () { el.textContent = Math.round(obj.v) + (el.dataset.suffix || ''); } });
+  }
+  function whenVisible(el, startFn, stopFn) {
+    new IntersectionObserver(function (entries) {
+      entries[0].isIntersecting ? startFn() : stopFn();
+    }, { threshold: 0.05 }).observe(el);
+  }
+
+  function initManifesto(mobile) {
+    gsap.set('.line .inner', { yPercent: 110 });
+    gsap.utils.toArray('.line').forEach(function (line) {
+      gsap.to(line.querySelector('.inner'), {
+        yPercent: 0, duration: .7, ease: 'power4.out',
+        scrollTrigger: { trigger: line, start: 'top 75%' }
+      });
+    });
+  }
+
+  function initTeardown(mobile) {
+    if (mobile) { reveal('.callout'); return; }
+    gsap.set('.callout', { opacity: 0, x: -16 });
+    var tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '#teardown',
+        start: 'top top',
+        end: '+=300%',
+        scrub: .5,
+        pin: true
+      }
+    });
+    tl.to('#hp', { rotate: -18, scale: 1.15, duration: 2 }, 0)
+      .to('#hp-left',  { x: -70, rotate: -10, duration: 2 }, 0.8)
+      .to('#hp-right', { x: 70,  rotate: 10,  duration: 2 }, 0.8);
+    ['0','1','2','3'].forEach(function (s, i) {
+      tl.to('.callout[data-step="' + s + '"]', { opacity: 1, x: 0, duration: .5 }, 1 + i * .8);
+    });
+    tl.to('#hp-left, #hp-right', { x: 0, rotate: 0, duration: 1.5 }, '+=0.4')
+      .to('#hp', { rotate: 0, scale: 1, duration: 1.5 }, '<');
+  }
+
+  function initWave(mobile) {
+    var canvas = document.getElementById('wave');
+    var section = document.getElementById('sound');
+    if (!canvas || !section) return;
+    var ctx = canvas.getContext('2d');
+    var w = 0, h = 0, barCount = 0, raf = null, t = 0, amp = 0, rand = [];
+    var lastY = window.scrollY, fallbackDelta = 0;
+
+    function size() {
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = canvas.clientWidth;
+      h = canvas.clientHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      barCount = Math.floor(w / 10);
+      rand = [];
+      for (var i = 0; i < barCount; i++) rand.push(Math.random());
+    }
+
+    function frame() {
+      t += 16;
+      var y = window.scrollY;
+      fallbackDelta = y - lastY;
+      lastY = y;
+      var velocity = window.__lenis ? window.__lenis.velocity : fallbackDelta;
+      var a = Math.min(Math.abs(velocity), 60);
+      amp += (a - amp) * 0.08;
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = '#d8ff00';
+      for (var i = 0; i < barCount; i++) {
+        var barH = Math.abs((8 + amp * rand[i]) * Math.sin(t * 0.004 + i * 0.35));
+        ctx.fillRect(i * 10, h / 2 - barH / 2, 6, barH);
+      }
+      raf = requestAnimationFrame(frame);
+    }
+
+    function start() { if (raf) return; size(); frame(); }
+    function stop() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
+
+    window.addEventListener('resize', function () { if (raf) size(); });
+    whenVisible(section, start, stop);
+  }
+
+  function initBuybar(mobile) {
+    gsap.set('#buybar', { yPercent: 110 });
+    function show() { gsap.to('#buybar', { yPercent: 0, duration: .4, ease: 'power3.out' }); }
+    function hide() { gsap.to('#buybar', { yPercent: 110, duration: .4, ease: 'power3.out' }); }
+    ScrollTrigger.create({ trigger: '#manifesto', start: 'top center', onEnter: show, onLeaveBack: hide });
+  }
+
+  function initMisc() {
+    reveal('.spec-table tr');
+    reveal('.drop-block');
+    gsap.utils.toArray('.stat').forEach(countUp);
+  }
+
+  [initManifesto, initTeardown, initWave, initBuybar, initMisc].forEach(function (fn) {
+    try { fn(mobile); } catch (e) { console.error('[init]', fn.name, e); }
+  });
+})();
+</script>
+
+<!-- Colorway + CTA handlers: plain JS, outside the enhancement gate. Must work without GSAP/ScrollTrigger. -->
+<script>
+(function () {
+  var colorwayButtons = document.querySelectorAll('.colorway');
+  colorwayButtons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      colorwayButtons.forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      var fill = btn.getAttribute('data-fill');
+      document.querySelectorAll('.cup-fill[data-cup="l"]').forEach(function (el) { el.setAttribute('fill', fill); });
+      document.querySelectorAll('.cup-fill[data-cup="r"]').forEach(function (el) { el.setAttribute('fill', fill); });
+    });
+  });
+
+  document.querySelectorAll('.cta').forEach(function (btn) {
+    var original = btn.textContent;
+    btn.addEventListener('click', function () {
+      btn.textContent = 'IN CART. (DEMO.)';
+      btn.disabled = true;
+      setTimeout(function () {
+        btn.textContent = original;
+        btn.disabled = false;
+      }, 2000);
+    });
+  });
+})();
+</script>
+</body>
+</html>

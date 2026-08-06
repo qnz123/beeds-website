@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AURA — skin, remembered.</title>
+<meta name="description" content="AURA — a fictional botanical serum, argued one drop at a time. A design study.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Karla:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bone: #f7f4ef;
+    --ink: #1a1a18;
+    --blush: #e8c4c4;
+    --sage: #b7c4b1;
+    --lilac: #cdc3dd;
+    --body: #5a564e;
+    --line: #e5e0d6;
+    --outline: #d8d2c4;
+    --muted: #6e695f;
+    --drop-bg: #f2ece4;
+    --gold: #c9a15a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { background: var(--bone); }
+
+  body {
+    background: var(--bone);
+    color: var(--ink);
+    font-family: 'Karla', sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  main, section { position: relative; }
+
+  img, svg { display: block; max-width: 100%; }
+
+  a { color: inherit; }
+
+  button { font-family: inherit; }
+
+  h1, h2, h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    color: var(--ink);
+  }
+
+  p { color: var(--body); }
+
+  :focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+
+  .skip-link {
+    position: absolute;
+    left: -999px;
+    top: 0;
+    background: var(--ink);
+    color: var(--bone);
+    padding: .75rem 1.25rem;
+    z-index: 1000;
+    font-size: 12px;
+    letter-spacing: .05em;
+  }
+  .skip-link:focus { left: 1rem; top: 1rem; }
+
+  /* ---------- Nav ---------- */
+  .site-header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem clamp(1.25rem, 4vw, 3rem);
+    background: rgba(247, 244, 239, .86);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .wordmark {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 1.15rem;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 2.25rem; }
+  .nav-links a {
+    font-family: 'Karla', sans-serif;
+    font-size: 12px;
+    letter-spacing: .05em;
+    color: var(--body);
+    text-decoration: none;
+    transition: color .25s;
+  }
+  .nav-links a:hover { color: var(--ink); }
+
+  section { scroll-margin-top: 90px; }
+
+  /* ---------- 01 Hero ---------- */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8rem clamp(1.25rem, 4vw, 3rem) 6rem;
+    position: relative;
+    overflow: hidden;
+    background-color: var(--bone);
+  }
+  /* Slow Ken-Burns water-ripple backdrop (motion added only when motion-safe);
+     translucent bone overlay keeps the blob + type dominant; solid --bone shows
+     if the image fails to load. */
+  #hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: url('https://images.unsplash.com/photo-1759185408853-45d428437c5b?fm=jpg&q=80&w=2000&auto=format&fit=crop') center / cover no-repeat;
+    transform: scale(1.12);
+  }
+  #hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(rgba(247, 244, 239, 0.85), rgba(247, 244, 239, 0.93));
+  }
+  #hero > * { position: relative; z-index: 2; }
+  .hero-stage {
+    position: relative;
+    width: min(560px, 88vw);
+    aspect-ratio: 1 / 1.15;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2.5rem;
+  }
+  .blob {
+    position: absolute;
+    width: 78%;
+    aspect-ratio: 1 / 1;
+    left: 50%;
+    top: 46%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle at 35% 30%, var(--blush), var(--lilac));
+    border-radius: 42% 58% 55% 45% / 55% 44% 56% 45%;
+    filter: blur(60px);
+    z-index: 0;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .blob { animation: drift 18s ease-in-out infinite; }
+    @keyframes drift {
+      0%, 100% {
+        border-radius: 42% 58% 55% 45% / 55% 44% 56% 45%;
+        transform: translate(-50%, -50%) rotate(0deg);
+      }
+      33% {
+        border-radius: 55% 45% 42% 58% / 45% 55% 45% 55%;
+        transform: translate(-46%, -54%) rotate(4deg);
+      }
+      66% {
+        border-radius: 58% 42% 48% 52% / 50% 60% 40% 50%;
+        transform: translate(-54%, -46%) rotate(-4deg);
+      }
+    }
+  }
+  .bottle-svg { position: relative; z-index: 1; width: min(220px, 46vw); }
+  .hero-copy h1 {
+    font-weight: 300;
+    font-size: clamp(2.6rem, 6vw, 5rem);
+    line-height: 1.05;
+    margin-bottom: 1.5rem;
+  }
+  .hero-sub {
+    font-family: 'Karla', sans-serif;
+    color: var(--body);
+    max-width: 42ch;
+    margin: 0 auto;
+    font-size: 1.05rem;
+  }
+  .scroll-cue {
+    margin-top: 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .85rem;
+  }
+  .scroll-cue span {
+    font-family: 'Karla', sans-serif;
+    font-size: 11px;
+    letter-spacing: .2em;
+    color: var(--muted);
+  }
+  .cue-line { width: 1px; height: 44px; background: var(--outline); }
+
+  /* ---------- 02 The Drop ---------- */
+  #drop {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bone);
+    overflow: hidden;
+  }
+  .drop-inner {
+    position: relative;
+    width: min(480px, 82vw);
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .ripples { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .ripple {
+    fill: none;
+    stroke: var(--blush);
+    stroke-width: 1.5;
+    opacity: 1;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .drop-svg {
+    position: absolute;
+    top: 6%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 28px;
+    height: 40px;
+    overflow: visible; /* UA default clips svg:not(:root); the drop travels well past its viewBox */
+  }
+  .caption {
+    position: absolute;
+    bottom: 4%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
+    max-width: 80vw;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(1.2rem, 2.6vw, 1.6rem);
+    color: var(--ink);
+    text-align: center;
+  }
+
+  /* ---------- 03 Actives ---------- */
+  #actives { padding: 9rem clamp(1.25rem, 4vw, 3rem); }
+  #actives h2 {
+    font-weight: 300;
+    font-size: clamp(2rem, 4vw, 3rem);
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+  .actives-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    max-width: 1150px;
+    margin: 0 auto;
+  }
+  .active-card {
+    position: relative;
+    background: var(--bone);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 3rem 1.75rem;
+    text-align: center;
+    overflow: hidden;
+  }
+  .card-blob {
+    position: absolute;
+    width: 150%;
+    aspect-ratio: 1 / 1;
+    top: -35%;
+    left: -25%;
+    border-radius: 50%;
+    filter: blur(46px);
+    opacity: .55;
+    z-index: 0;
+  }
+  .active-card:nth-child(1) .card-blob { background: var(--blush); }
+  .active-card:nth-child(2) .card-blob { background: var(--sage); }
+  .active-card:nth-child(3) .card-blob { background: var(--lilac); }
+  .active-card .stat {
+    position: relative;
+    z-index: 1;
+    display: block;
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: clamp(3rem, 6vw, 4.5rem);
+    color: var(--ink);
+    line-height: 1;
+  }
+  .active-card h3 {
+    position: relative;
+    z-index: 1;
+    font-weight: 500;
+    font-size: 1.3rem;
+    margin: .75rem 0 .6rem;
+  }
+  .active-card p {
+    position: relative;
+    z-index: 1;
+    font-size: .95rem;
+    max-width: 26ch;
+    margin: 0 auto;
+  }
+
+  /* ---------- 04 The Ritual ---------- */
+  #ritual {
+    position: relative;
+    min-height: 100vh;
+    /* No-JS fallback: overflow-x stays scrollable so all 3 panels remain reachable
+       by manual horizontal scroll when GSAP isn't driving the track. initRitual()
+       switches this to hidden once the pinned scrub takes over. */
+    overflow-x: auto;
+    overflow-y: hidden;
+    background: var(--bone);
+  }
+  .track {
+    display: flex;
+    align-items: center;
+    height: 100vh;
+  }
+  .ritual-panel {
+    position: relative;
+    flex: 0 0 80vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 4rem;
+  }
+  .ritual-num {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    font-family: 'Fraunces', serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-size: min(28vw, 15rem);
+    line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--outline);
+    text-stroke: 1px var(--outline);
+  }
+  .ritual-panel h3 {
+    position: relative;
+    z-index: 1;
+    font-weight: 400;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    margin-bottom: 1rem;
+  }
+  .ritual-panel p {
+    position: relative;
+    z-index: 1;
+    font-size: 1.05rem;
+    max-width: 30ch;
+    margin: 0 auto;
+  }
+
+  /* ---------- 05 Texture ---------- */
+  #texture {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 28% 32%, var(--blush) 0%, transparent 58%),
+      radial-gradient(circle at 72% 62%, var(--sage) 0%, transparent 58%),
+      radial-gradient(circle at 50% 84%, var(--lilac) 0%, transparent 52%),
+      var(--bone);
+  }
+  #fluid {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .texture-line {
+    position: relative;
+    z-index: 1;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(1.5rem, 4vw, 2.6rem);
+    color: var(--ink);
+    text-align: center;
+    max-width: 20ch;
+    padding: 0 1.5rem;
+  }
+
+  /* ---------- 06 Results ---------- */
+  #results { padding: 9rem clamp(1.25rem, 4vw, 3rem); max-width: 760px; margin: 0 auto; }
+  #results h2 {
+    font-weight: 300;
+    font-size: clamp(2rem, 4vw, 3rem);
+    text-align: center;
+    margin-bottom: 3.5rem;
+  }
+  .bars { display: flex; flex-direction: column; gap: 2.75rem; }
+  .bar-track {
+    position: relative;
+    height: 8px;
+    border-bottom: 1px solid var(--outline);
+  }
+  .bar-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 8px;
+    border-radius: 999px;
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+  .bar-label {
+    display: block;
+    margin-top: .75rem;
+    font-family: 'Karla', sans-serif;
+    font-size: 1rem;
+    color: var(--ink);
+  }
+  .footnote {
+    margin-top: 3rem;
+    font-family: 'Karla', sans-serif;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  /* ---------- 07 Purchase ---------- */
+  #purchase {
+    padding: 9rem clamp(1.25rem, 4vw, 3rem) 6rem;
+    position: relative;
+    overflow: hidden;
+    background-color: var(--bone);
+  }
+  /* Slow Ken-Burns creamy-silk backdrop for the closing/shop section — same
+     treatment as the hero, drifting the opposite direction for variety. */
+  #purchase::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: url('https://images.unsplash.com/photo-1753945967432-5a520d796e1f?fm=jpg&q=80&w=2000&auto=format&fit=crop') center / cover no-repeat;
+    transform: scale(1.11);
+  }
+  #purchase::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(rgba(247, 244, 239, 0.87), rgba(247, 244, 239, 0.94));
+  }
+  #purchase > * { position: relative; z-index: 2; }
+
+  /* Slow drift for both texture backdrops — only when the visitor allows motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    #hero::before     { animation: auraKbA 55s ease-in-out infinite alternate; }
+    #purchase::before { animation: auraKbB 60s ease-in-out infinite alternate; }
+  }
+  @keyframes auraKbA {
+    from { transform: scale(1.12) translate3d(0, 0, 0); }
+    to   { transform: scale(1.16) translate3d(-1.2%, -0.9%, 0); }
+  }
+  @keyframes auraKbB {
+    from { transform: scale(1.11) translate3d(0, 0, 0); }
+    to   { transform: scale(1.15) translate3d(1.2%, 0.9%, 0); }
+  }
+  .purchase-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    align-items: center;
+  }
+  .purchase-visual svg { width: 100%; max-width: 300px; margin: 0 auto; }
+  .purchase-copy h2 {
+    font-weight: 300;
+    font-size: clamp(1.7rem, 3.4vw, 2.3rem);
+    margin-bottom: 2.25rem;
+    line-height: 1.3;
+  }
+  .toggle { display: flex; gap: .75rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .toggle-btn {
+    background: transparent;
+    border: 1px solid var(--outline);
+    color: var(--ink);
+    padding: .85rem 1.5rem;
+    border-radius: 999px;
+    font-family: 'Karla', sans-serif;
+    font-size: .85rem;
+    letter-spacing: .02em;
+    cursor: pointer;
+    transition: background .25s, color .25s, border-color .25s;
+  }
+  .toggle-btn.active { background: var(--ink); color: var(--bone); border-color: var(--ink); }
+  .price-line {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+  }
+  .cta {
+    background: var(--ink);
+    color: var(--bone);
+    border: none;
+    padding: 1.1rem 2.5rem;
+    border-radius: 999px;
+    font-family: 'Karla', sans-serif;
+    font-size: .9rem;
+    letter-spacing: .04em;
+    cursor: pointer;
+    transition: opacity .25s;
+  }
+  .cta:hover { opacity: .85; }
+  .cta:disabled { opacity: .85; cursor: default; }
+
+  /* ---------- Footer ---------- */
+  footer { padding: 4rem clamp(1.25rem, 4vw, 3rem) 3rem; border-top: 1px solid var(--line); }
+  .footer-links {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+    font-family: 'Karla', sans-serif;
+    font-size: 12px;
+    letter-spacing: .05em;
+  }
+  .footer-links a { color: var(--body); text-decoration: none; }
+  .footer-links a:hover { color: var(--ink); }
+  .footer-disclaimer { font-family: 'Karla', sans-serif; font-size: 12px; color: var(--body); }
+
+  /* ---------- Responsive (breakpoint 900px) ---------- */
+  @media (max-width: 900px) {
+    .nav-links { display: none; }
+
+    #hero { min-height: auto; padding: 7rem 1.25rem 4rem; }
+    .hero-stage { width: min(420px, 78vw); margin-bottom: 2rem; }
+
+    #drop { min-height: auto; padding: 6rem 1.25rem; }
+    .drop-inner { width: min(340px, 82vw); }
+
+    .actives-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+
+    #ritual { min-height: auto; }
+    .track { flex-direction: column; height: auto; }
+    .ritual-panel { flex: none; width: 100%; padding: 4rem 1.5rem; }
+    .ritual-num { font-size: 26vw; }
+
+    #texture { min-height: 70vh; padding: 4rem 1.25rem; }
+
+    .purchase-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+    .purchase-visual { order: -1; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">skip to content</a>
+
+<header class="site-header">
+  <a href="#hero" class="wordmark">aura</a>
+  <nav class="nav-links" aria-label="Primary">
+    <a href="#actives">actives</a>
+    <a href="#ritual">ritual</a>
+    <a href="#results">results</a>
+    <a href="#purchase">shop</a>
+  </nav>
+</header>
+
+<main id="main">
+
+<!-- 01 · HERO -->
+<section id="hero">
+  <div class="hero-stage">
+    <div class="blob" aria-hidden="true"></div>
+    <svg class="bottle-svg hero-line" viewBox="0 0 200 320" aria-hidden="true" focusable="false">
+      <rect x="60" y="90" width="80" height="210" rx="18" fill="#ffffff" fill-opacity=".55" stroke="#c9c2b4" stroke-width="1.25"/>
+      <rect x="64" y="150" width="72" height="142" rx="10" fill="#f0d9a8" fill-opacity=".5"/>
+      <line x1="72" y1="112" x2="72" y2="232" stroke="#ffffff" stroke-opacity=".5" stroke-width="2"/>
+      <line x1="126" y1="132" x2="126" y2="212" stroke="#ffffff" stroke-opacity=".5" stroke-width="2"/>
+      <rect x="78" y="40" width="44" height="52" rx="8" fill="#1a1a18"/>
+      <ellipse cx="100" cy="33" rx="15" ry="12" fill="#1a1a18"/>
+      <line x1="100" y1="92" x2="100" y2="210" stroke="#8a857b" stroke-width="1.5"/>
+      <text x="100" y="232" text-anchor="middle" font-family="'Fraunces', serif" font-size="18" fill="#1a1a18">aura</text>
+      <text x="100" y="248" text-anchor="middle" font-family="'Karla', sans-serif" font-size="6" letter-spacing="2" fill="#1a1a18">daily barrier serum</text>
+    </svg>
+  </div>
+  <div class="hero-copy">
+    <h1 class="hero-line">skin, remembered.</h1>
+    <p class="hero-sub hero-line">a daily barrier serum. twelve percent niacinamide, nothing it doesn't need.</p>
+  </div>
+  <div class="scroll-cue hero-line">
+    <span>scroll slowly</span>
+    <span class="cue-line" aria-hidden="true"></span>
+  </div>
+</section>
+
+<!-- 02 · THE DROP -->
+<section id="drop">
+  <div class="drop-inner">
+    <svg class="ripples" viewBox="0 0 400 400" aria-hidden="true" focusable="false">
+      <circle class="ripple" cx="200" cy="150" r="30"/>
+      <circle class="ripple" cx="200" cy="150" r="52"/>
+      <circle class="ripple" cx="200" cy="150" r="76"/>
+    </svg>
+    <svg class="drop-svg" viewBox="0 0 28 40" aria-hidden="true" focusable="false">
+      <g class="drop">
+        <path d="M14 0C14 0 26 21 26 28A12 12 0 1 1 2 28C2 21 14 0 14 0Z" fill="var(--gold)"/>
+        <ellipse cx="11" cy="24" rx="3" ry="4" fill="#ffffff" opacity=".4"/>
+      </g>
+    </svg>
+    <p class="caption">one drop carries the entire argument.</p>
+  </div>
+</section>
+
+<!-- 03 · ACTIVES -->
+<section id="actives">
+  <h2>what's in — and why</h2>
+  <div class="actives-grid">
+    <div class="active-card">
+      <div class="card-blob" aria-hidden="true"></div>
+      <span class="stat" data-count="12" data-suffix="%">12%</span>
+      <h3>niacinamide</h3>
+      <p>brightens, refines, calms the noise.</p>
+    </div>
+    <div class="active-card">
+      <div class="card-blob" aria-hidden="true"></div>
+      <span class="stat" data-count="4" data-suffix="%">4%</span>
+      <h3>squalane</h3>
+      <p>the lipid your skin already knows.</p>
+    </div>
+    <div class="active-card">
+      <div class="card-blob" aria-hidden="true"></div>
+      <span class="stat" data-count="2" data-suffix="%">2%</span>
+      <h3>ceramide complex</h3>
+      <p>mortar for the barrier's brickwork.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 04 · THE RITUAL -->
+<section id="ritual">
+  <div class="track">
+    <div class="ritual-panel">
+      <span class="ritual-num" aria-hidden="true">01</span>
+      <h3>cleanse</h3>
+      <p>warm water. clean hands. nothing else.</p>
+    </div>
+    <div class="ritual-panel">
+      <span class="ritual-num" aria-hidden="true">02</span>
+      <h3>three drops</h3>
+      <p>pressed, not rubbed, into damp skin.</p>
+    </div>
+    <div class="ritual-panel">
+      <span class="ritual-num" aria-hidden="true">03</span>
+      <h3>press</h3>
+      <p>palms flat. thirty seconds. done.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 05 · TEXTURE -->
+<section id="texture">
+  <canvas id="fluid" aria-hidden="true"></canvas>
+  <p class="texture-line">weightless is not a texture. it's a decision.</p>
+</section>
+
+<!-- 06 · RESULTS -->
+<section id="results">
+  <h2>measured, not promised.</h2>
+  <div class="bars">
+    <div class="bar-row">
+      <div class="bar-track">
+        <div class="bar-fill" style="width:89%; background: var(--blush);"></div>
+      </div>
+      <span class="bar-label">89% felt smoother</span>
+    </div>
+    <div class="bar-row">
+      <div class="bar-track">
+        <div class="bar-fill" style="width:84%; background: var(--sage);"></div>
+      </div>
+      <span class="bar-label">84% felt calmer</span>
+    </div>
+    <div class="bar-row">
+      <div class="bar-track">
+        <div class="bar-fill" style="width:100%; background: var(--lilac);"></div>
+      </div>
+      <span class="bar-label">in 14 days</span>
+    </div>
+  </div>
+  <p class="footnote">independent panel, n=42 — illustrative figures for this design study.</p>
+</section>
+
+<!-- 07 · PURCHASE -->
+<section id="purchase">
+  <div class="purchase-grid">
+    <div class="purchase-visual">
+      <svg viewBox="0 0 200 320" aria-hidden="true" focusable="false">
+        <rect x="60" y="90" width="80" height="210" rx="18" fill="#ffffff" fill-opacity=".55" stroke="#c9c2b4" stroke-width="1.25"/>
+        <rect x="64" y="150" width="72" height="142" rx="10" fill="#f0d9a8" fill-opacity=".5"/>
+        <line x1="72" y1="112" x2="72" y2="232" stroke="#ffffff" stroke-opacity=".5" stroke-width="2"/>
+        <line x1="126" y1="132" x2="126" y2="212" stroke="#ffffff" stroke-opacity=".5" stroke-width="2"/>
+        <rect x="78" y="40" width="44" height="52" rx="8" fill="#1a1a18"/>
+        <ellipse cx="100" cy="33" rx="15" ry="12" fill="#1a1a18"/>
+        <line x1="100" y1="92" x2="100" y2="210" stroke="#8a857b" stroke-width="1.5"/>
+        <text x="100" y="232" text-anchor="middle" font-family="'Fraunces', serif" font-size="18" fill="#1a1a18">aura</text>
+        <text x="100" y="248" text-anchor="middle" font-family="'Karla', sans-serif" font-size="6" letter-spacing="2" fill="#1a1a18">daily barrier serum</text>
+      </svg>
+    </div>
+    <div class="purchase-copy">
+      <h2>aura — daily barrier serum, 30 ml</h2>
+      <div class="toggle" role="group" aria-label="purchase option">
+        <button class="toggle-btn active" type="button" data-mode="one-time" data-price="$58">one-time · $58</button>
+        <button class="toggle-btn" type="button" data-mode="subscribe" data-price="$46/mo">subscribe · $46/mo</button>
+      </div>
+      <p class="price-line">$58</p>
+      <button class="cta" type="button">add to routine</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <nav class="footer-links" aria-label="Footer">
+    <a href="/explore/">← All studies</a>
+    <a href="#hero">aura</a>
+    <a href="#actives">actives</a>
+    <a href="#ritual">ritual</a>
+    <a href="#purchase">shop</a>
+  </nav>
+  <p class="footer-disclaimer">aura is a fictional brand created as a design study. © 2026.</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(function () {
+  var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var mobile  = matchMedia('(max-width: 900px)').matches;
+  var enhance = !reduced && window.gsap && window.ScrollTrigger;
+  if (!enhance) return; // static page stands on its own
+  gsap.registerPlugin(ScrollTrigger);
+
+  if (window.Lenis) {
+    var lenis = new Lenis();
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add(function (t) { lenis.raf(t * 1000); });
+    gsap.ticker.lagSmoothing(0);
+    window.__lenis = lenis;
+  }
+
+  // S2 helpers
+  function reveal(targets, vars) {
+    gsap.utils.toArray(targets).forEach(function (el) {
+      gsap.fromTo(el, { y: 40, opacity: 0 },
+        Object.assign({ y: 0, opacity: 1, duration: 0.9, ease: 'power2.out',
+          scrollTrigger: { trigger: el, start: 'top 82%' } }, vars || {}));
+    });
+  }
+  function countUp(el) {
+    var end = parseFloat(el.dataset.count), obj = { v: 0 };
+    gsap.to(obj, { v: end, duration: 1.4, ease: 'power1.out',
+      scrollTrigger: { trigger: el, start: 'top 85%' },
+      onUpdate: function () { el.textContent = Math.round(obj.v) + (el.dataset.suffix || ''); } });
+  }
+  function whenVisible(el, startFn, stopFn) {
+    new IntersectionObserver(function (entries) {
+      entries[0].isIntersecting ? startFn() : stopFn();
+    }, { threshold: 0.05 }).observe(el);
+  }
+
+  function initHero() {
+    gsap.from('.hero-line', { y: 60, opacity: 0, duration: 1, stagger: 0.12, ease: 'power2.out' });
+  }
+
+  function initDrop(mobile) {
+    if (mobile) { reveal('#drop .caption'); return; }
+
+    gsap.set('.ripple', { scale: 0, opacity: 0 });
+    gsap.set('.drop', { y: -40 });
+    gsap.set('.caption', { opacity: 0, y: 20 });
+
+    var tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '#drop',
+        start: 'top top',
+        end: '+=250%',
+        scrub: 0.6,
+        pin: true
+      }
+    });
+
+    tl.to('.drop', { y: 110, duration: 4, ease: 'power2.in' }, 0)                                  // falls ~150 stage px, lands at ripple origin
+      .to('.drop', { scaleY: 0.6, scaleX: 1.4, opacity: 0, duration: 0.5, ease: 'power1.out' }, 4)  // lands: squash + fade
+      .to('.ripple', { scale: 3.2, opacity: 0.65, duration: 1, stagger: 0.8, ease: 'power1.out' }, 4.1)
+      .to('.ripple', { opacity: 0, duration: 1.2, stagger: 0.8 }, 5)
+      .to('#drop', { backgroundColor: '#f2ece4', duration: 2 }, 4.5)                                // one-off bg crossfade
+      .to('.caption', { opacity: 1, y: 0, duration: 1.5 }, 7.3);
+  }
+
+  function initRitual(mobile) {
+    if (mobile) { reveal('.ritual-panel'); return; }
+    var ritualSection = document.getElementById('ritual');
+    if (ritualSection) ritualSection.style.overflowX = 'hidden'; // pin+scrub takes over from the no-JS scroll fallback
+    var track = document.querySelector('.track');
+    if (!track) return;
+    gsap.to(track, {
+      x: function () { return -(track.scrollWidth - window.innerWidth); },
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '#ritual',
+        start: 'top top',
+        end: '+=200%',
+        scrub: 0.5,
+        pin: true,
+        invalidateOnRefresh: true
+      }
+    });
+  }
+
+  function initFluid() {
+    var canvas = document.getElementById('fluid');
+    var section = document.getElementById('texture');
+    if (!canvas || !section) return;
+    var ctx = canvas.getContext('2d');
+    var w = 0, h = 0, raf = null, t = 0;
+    var colors = ['#e8c4c4', '#b7c4b1', '#cdc3dd'];
+
+    function size() {
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = canvas.clientWidth;
+      h = canvas.clientHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function frame() {
+      t += 16;
+      ctx.fillStyle = '#f7f4ef';
+      ctx.fillRect(0, 0, w, h);
+      colors.forEach(function (color, i) {
+        var cx = w / 2 + Math.sin(t * 0.00021 + i * 2.1) * w * 0.3;
+        var cy = h / 2 + Math.cos(t * 0.00017 + i * 2.1) * h * 0.3;
+        var r = Math.max(w, h) * 0.45;
+        var grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+        grad.addColorStop(0, color);
+        grad.addColorStop(1, 'transparent');
+        ctx.globalAlpha = 0.35;
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+      });
+      ctx.globalAlpha = 1;
+      raf = requestAnimationFrame(frame);
+    }
+
+    function start() {
+      if (raf) return;
+      size();
+      frame();
+    }
+    function stop() {
+      if (raf) { cancelAnimationFrame(raf); raf = null; }
+    }
+
+    window.addEventListener('resize', function () { if (raf) size(); });
+    whenVisible(section, start, stop);
+  }
+
+  function initResults() {
+    gsap.set('.bar-fill', { scaleX: 0 });
+    gsap.utils.toArray('.bar-fill').forEach(function (el) {
+      gsap.to(el, {
+        scaleX: 1, duration: 1.2, ease: 'power2.out',
+        scrollTrigger: { trigger: el, start: 'top 85%' }
+      });
+    });
+    reveal('.active-card');
+    reveal('#results h2, #results .footnote');
+    reveal('#purchase .purchase-visual, #purchase .purchase-copy');
+    gsap.utils.toArray('.stat').forEach(countUp);
+  }
+
+  [initHero, initDrop, initRitual, initFluid, initResults].forEach(function (fn) {
+    try { fn(mobile); } catch (e) { console.error('[init]', fn.name, e); }
+  });
+})();
+</script>
+
+<!-- Toggle + CTA handlers: plain JS, outside the enhancement gate. Must work without GSAP/ScrollTrigger. -->
+<script>
+(function () {
+  var toggleButtons = document.querySelectorAll('.toggle-btn');
+  var priceLine = document.querySelector('.price-line');
+
+  toggleButtons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      toggleButtons.forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      if (priceLine) priceLine.textContent = btn.getAttribute('data-price');
+    });
+  });
+
+  var cta = document.querySelector('.cta');
+  if (cta) {
+    var original = cta.textContent;
+    cta.addEventListener('click', function () {
+      cta.textContent = 'added — demo only';
+      cta.disabled = true;
+      setTimeout(function () {
+        cta.textContent = original;
+        cta.disabled = false;
+      }, 2000);
+    });
+  }
+})();
+</script>
+</body>
+</html>

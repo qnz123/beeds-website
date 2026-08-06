@@ -1634,3 +1634,109 @@ textarea.blank:focus {
     padding: 20px;
   }
 }
+
+/* ---- Explore — "A note on trends" editorial notice ----
+   Replaces the earlier black panel with a light, hairline-framed statement in
+   the house paper aesthetic. A restrained scroll-reveal (guarded by
+   prefers-reduced-motion) draws the two underlines in: one solid ("stay"), one
+   broken ("break") — the idea made visible. */
+.trend-note {
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+  padding: clamp(2.5rem, 6vw, 4rem) 0;
+  margin-bottom: 3rem;
+}
+
+.trend-note-label {
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.trend-note-lede {
+  font-size: clamp(1.9rem, 5vw, 3.25rem);
+  line-height: 1.18;
+  letter-spacing: -0.01em;
+  max-width: 16ch;
+}
+
+.trend-note-stay,
+.trend-note-break {
+  position: relative;
+  white-space: nowrap;
+}
+
+.trend-note-stay::after,
+.trend-note-break::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.1em;
+  height: 2px;
+  transform-origin: left center;
+}
+
+.trend-note-stay::after {
+  background: #000;
+}
+
+.trend-note-break::after {
+  background-image: linear-gradient(90deg, #000 55%, transparent 0);
+  background-size: 12px 2px;
+  background-repeat: repeat-x;
+}
+
+.trend-note-body {
+  margin-top: 2rem;
+  max-width: 640px;
+  font-size: 0.95rem;
+  line-height: 1.85;
+  color: #444;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .trend-note-lede,
+  .trend-note-body {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .trend-note-body {
+    transition-delay: 0.12s;
+  }
+  .trend-note-stay::after,
+  .trend-note-break::after {
+    transform: scaleX(0);
+    transition: transform 0.7s ease 0.28s;
+  }
+  .trend-note.is-in .trend-note-lede,
+  .trend-note.is-in .trend-note-body {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .trend-note.is-in .trend-note-stay::after,
+  .trend-note.is-in .trend-note-break::after {
+    transform: scaleX(1);
+  }
+}
+
+/* Explore — the single gated call-to-action. A proper bordered button (sharp
+   corners, hairline border, inverts to ink on hover) so it reads as THE action
+   on the page: request access to the full studies. */
+.deck-cta {
+  display: inline-block;
+  padding: 14px 28px;
+  border: 1px solid #000;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #000;
+  background: transparent;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.deck-cta:hover,
+.deck-cta:focus-visible {
+  background: #000;
+  color: #f5f5f5;
+}

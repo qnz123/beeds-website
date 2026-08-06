@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MERIDIAN — Calibre One</title>
+<meta name="description" content="MERIDIAN Calibre One — a 41mm automatic watch, taken apart by scrolling. A fictional design study.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* v2 — "Espresso & Cognac": warm dark luxury (was near-black #0a0a0a). */
+    --bg: #191310;      /* deep espresso, not black */
+    --panel: #241b14;   /* raised warm panel */
+    --gold: #c9a96a;    /* champagne — primary accent */
+    --cognac: #a9743f;  /* leather/cognac — secondary warm accent */
+    --text: #efe7db;    /* warm cream */
+    --muted: #9a8a76;   /* warm taupe */
+    --line: #33271d;    /* espresso hairline */
+    --blued: #2d4a5e;   /* blued-steel detail (kept for horological authenticity) */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { background: var(--bg); }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+
+  main, section { position: relative; }
+
+  img, svg { display: block; max-width: 100%; }
+
+  a { color: inherit; }
+
+  button { font-family: inherit; }
+
+  h1, h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  p { color: var(--muted); }
+
+  :focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+
+  .skip-link {
+    position: absolute;
+    left: -999px;
+    top: 0;
+    background: var(--gold);
+    color: var(--bg);
+    padding: .75rem 1.25rem;
+    z-index: 1000;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+  }
+  .skip-link:focus { left: 1rem; top: 1rem; }
+
+  .eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .2em;
+    color: var(--muted);
+  }
+
+  /* ---------- Nav ---------- */
+  .site-header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem clamp(1.25rem, 4vw, 3rem);
+    background: rgba(10, 10, 10, .9);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
+  }
+  .wordmark {
+    font-family: 'Italiana', serif;
+    letter-spacing: .35em;
+    font-size: 1rem;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 2.25rem; }
+  .nav-links a {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .15em;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color .25s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+
+  /* ---------- 01 Hero ---------- */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 8rem clamp(1.25rem, 4vw, 3rem) 6rem;
+    position: relative;
+    overflow: hidden;
+    background-color: var(--bg);
+  }
+  /* Slow Ken-Burns dark-marble backdrop (motion added only when motion-safe);
+     espresso overlay keeps the watch + type dominant; solid --bg shows if the
+     image fails to load. */
+  #hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: url('https://images.unsplash.com/photo-1526648856597-c2b6745ad7bd?fm=jpg&q=80&w=2000&auto=format&fit=crop') center / cover no-repeat;
+    transform: scale(1.12);
+  }
+  #hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(rgba(25, 19, 16, 0.86), rgba(25, 19, 16, 0.93));
+  }
+  #hero > * { position: relative; z-index: 2; }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    max-width: 1300px;
+    margin: 0 auto;
+    align-items: center;
+    width: 100%;
+  }
+  .hero-copy .eyebrow { margin-bottom: 1.5rem; }
+  .hero-copy h1 {
+    font-size: clamp(3rem, 7vw, 6.5rem);
+    line-height: 1.03;
+    margin-bottom: 1.75rem;
+  }
+  .hero-sub {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    color: var(--muted);
+    max-width: 44ch;
+    font-size: 1.05rem;
+    line-height: 1.75;
+  }
+  .hero-visual { display: flex; justify-content: center; }
+  .hero-visual svg { width: 100%; max-width: 460px; }
+  .scroll-cue {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .85rem;
+  }
+  .scroll-cue span {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .cue-line { width: 1px; height: 48px; background: var(--gold); }
+
+  /* ---------- 02 Exploded ---------- */
+  #exploded {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6rem clamp(1.25rem, 4vw, 3rem);
+    overflow: hidden;
+  }
+  .stage-wrap {
+    position: relative;
+    width: min(640px, 86vmin);
+    aspect-ratio: 1 / 1;
+  }
+  .stage-svg { width: 100%; height: 100%; overflow: visible; }
+  .callout {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    max-width: 210px;
+  }
+  .callout--right { flex-direction: row-reverse; text-align: right; }
+  .callout .leader { width: 38px; height: 1px; background: var(--gold); flex: 0 0 38px; }
+  .callout .callout-text { display: flex; flex-direction: column; gap: .2rem; }
+  .callout .label {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .15em;
+    color: var(--gold);
+  }
+  .callout .note {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--text);
+  }
+  .callout[data-part="crystal"] { top: 5%; left: 2%; }
+  .callout[data-part="bezel"]   { top: 5%; right: 2%; }
+  .callout[data-part="hands"]   { top: 36%; left: -2%; }
+  .callout[data-part="dial"]    { top: 36%; right: -2%; }
+  .callout[data-part="plate"]   { bottom: 24%; left: 2%; }
+  .callout[data-part="balance"] { bottom: 24%; right: 2%; }
+  .callout[data-part="caseback"]{ bottom: 2%; left: 50%; transform: translateX(-50%); }
+
+  /* ---------- 03 Materials ---------- */
+  #materials { padding: 9rem clamp(1.25rem, 4vw, 3rem); }
+  .materials-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: start;
+  }
+  .materials-grid h2 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 2.5rem; }
+  .stats-row { display: flex; gap: 3rem; flex-wrap: wrap; }
+  .stat-item { display: flex; flex-direction: column; gap: .4rem; }
+  .stat {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    color: var(--gold);
+    line-height: 1;
+  }
+  .stat-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .materials-copy p {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1.85;
+    max-width: 48ch;
+    margin-bottom: 1.5rem;
+  }
+  .materials-copy p:last-child { margin-bottom: 0; }
+
+  /* ---------- 04 Movement ---------- */
+  #movement { background: var(--panel); padding: 9rem clamp(1.25rem, 4vw, 3rem); }
+  .movement-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: center;
+  }
+  .balance-visual svg { width: 100%; max-width: 380px; margin: 0 auto; }
+  .movement-copy h2 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 1.5rem; }
+  .movement-copy p {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1.85;
+    max-width: 46ch;
+  }
+
+  /* ---------- 05 Manifesto ---------- */
+  #manifesto {
+    padding: 10rem clamp(1.25rem, 4vw, 3rem);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    background-color: var(--bg);
+  }
+  #manifesto::before {
+    content: '';
+    position: absolute; inset: 0; z-index: 0;
+    background: url('https://images.unsplash.com/photo-1571829604981-ea159f94e5ad?fm=jpg&q=80&w=1800&auto=format&fit=crop') center / cover no-repeat;
+    transform: scale(1.11);
+  }
+  #manifesto::after {
+    content: '';
+    position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(rgba(25, 19, 16, 0.78), rgba(25, 19, 16, 0.88));
+  }
+  #manifesto > * { position: relative; z-index: 2; }
+
+  /* Slow drift for both texture backdrops — only when the visitor allows motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    #hero::before { animation: kenburnsA 55s ease-in-out infinite alternate; }
+    #manifesto::before { animation: kenburnsB 60s ease-in-out infinite alternate; }
+  }
+  @keyframes kenburnsA {
+    from { transform: scale(1.12) translate3d(0, 0, 0); }
+    to   { transform: scale(1.16) translate3d(-1.2%, -0.9%, 0); }
+  }
+  @keyframes kenburnsB {
+    from { transform: scale(1.11) translate3d(0, 0, 0); }
+    to   { transform: scale(1.15) translate3d(1.2%, 0.9%, 0); }
+  }
+  .manifesto-wrap { max-width: 900px; margin: 0 auto; }
+  .rule { height: 1px; background: var(--gold); width: min(500px, 70%); margin: 0 auto; }
+  .rule-a { margin-bottom: 3rem; }
+  .rule-b { margin-top: 3rem; }
+  .quote {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(2rem, 5vw, 4rem);
+    line-height: 1.3;
+    color: var(--text);
+  }
+  .attribution {
+    margin-top: 2rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ---------- 06 Colorways ---------- */
+  #colorways { padding: 9rem clamp(1.25rem, 4vw, 3rem); text-align: center; }
+  .colorways-wrap { max-width: 640px; margin: 0 auto; }
+  .colorways-wrap h2 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 1rem; }
+  .cw-visual svg { width: 220px; margin: 2rem auto; }
+  .colorway-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 1.75rem;
+    flex-wrap: wrap;
+  }
+  .colorway {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--text);
+    padding: .65rem 1.25rem;
+    border-radius: 999px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color .25s;
+  }
+  .colorway .swatch {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, .25);
+  }
+  .colorway:hover, .colorway.active { border-color: var(--gold); }
+  .cw-name { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; }
+
+  /* ---------- 07 Acquire ---------- */
+  #acquire { padding: 9rem clamp(1.25rem, 4vw, 3rem) 6rem; }
+  .acquire-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: center;
+  }
+  .acquire-visual svg { width: 100%; max-width: 420px; margin: 0 auto; }
+  .spec-table { width: 100%; border-collapse: collapse; margin-bottom: 2rem; font-family: 'Inter', sans-serif; font-size: 14px; }
+  .spec-table tr { border-bottom: 1px solid var(--line); }
+  .spec-table th, .spec-table td { text-align: left; padding: .9rem 0; font-weight: 400; }
+  .spec-table th {
+    color: var(--muted);
+    width: 42%;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: .1em;
+  }
+  .spec-table td { color: var(--text); }
+  .price { font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: var(--gold); margin: 1.5rem 0; }
+  .cta {
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 1rem 2rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background .25s, color .25s;
+  }
+  .cta:hover { background: var(--gold); color: var(--bg); }
+  .cta:disabled { opacity: .85; cursor: default; }
+
+  /* ---------- Footer ---------- */
+  footer { padding: 4rem clamp(1.25rem, 4vw, 3rem) 3rem; border-top: 1px solid var(--line); }
+  .footer-links {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  .footer-links a { color: var(--muted); text-decoration: none; }
+  .footer-links a:hover { color: var(--gold); }
+  .footer-disclaimer { font-family: 'Inter', sans-serif; font-size: 12px; color: var(--muted); }
+
+  /* ---------- Reduced-motion-gated CSS keyframe animation ---------- */
+  @media (prefers-reduced-motion: no-preference) {
+    .second-hand {
+      transform-box: view-box;
+      transform-origin: 200px 200px;
+      animation: sweep 60s linear infinite;
+    }
+    @keyframes sweep { to { transform: rotate(360deg); } }
+
+    .balance {
+      transform-box: view-box;
+      animation: osc .45s ease-in-out infinite alternate;
+    }
+    @keyframes osc { from { rotate: -20deg; } to { rotate: 20deg; } }
+  }
+
+  /* ---------- Responsive (breakpoint 900px) ---------- */
+  @media (max-width: 900px) {
+    .nav-links { display: none; }
+
+    #hero { min-height: auto; flex-direction: column; padding: 7rem 1.25rem 4rem; }
+    .hero-grid { grid-template-columns: 1fr; text-align: center; }
+    .hero-visual { order: -1; margin-bottom: 2rem; }
+    .hero-visual svg { max-width: 280px; }
+    .hero-sub { margin: 0 auto; }
+    .scroll-cue { position: static; left: auto; bottom: auto; transform: none; margin-top: 3rem; }
+
+    #exploded { min-height: auto; padding: 6rem 1.25rem; flex-direction: column; overflow: visible; }
+    .stage-wrap {
+      width: min(300px, 78vw);
+      height: auto;
+      aspect-ratio: auto;
+      margin: 0 auto 3rem;
+    }
+    .stage-svg { width: min(300px, 78vw); height: min(300px, 78vw); }
+    .callout {
+      position: static;
+      max-width: none;
+      margin: 0 0 1.5rem;
+      flex-direction: row;
+      text-align: left;
+      transform: none;
+    }
+    .callout .leader { display: none; }
+
+    .materials-grid, .movement-grid, .acquire-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+    .acquire-visual { order: -1; }
+    .stats-row { gap: 2rem; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- shared SVG defs (steel gradient reused across every watch drawing) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="steelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2b2b2b"/>
+      <stop offset="100%" stop-color="#4a4a4a"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<header class="site-header">
+  <a href="#hero" class="wordmark">MERIDIAN</a>
+  <nav class="nav-links" aria-label="Primary">
+    <a href="#hero">Calibre One</a>
+    <a href="#materials">Materials</a>
+    <a href="#movement">Movement</a>
+    <a href="#acquire">Acquire</a>
+  </nav>
+</header>
+
+<main id="main">
+
+<!-- 01 · HERO -->
+<section id="hero">
+  <div class="hero-grid">
+    <div class="hero-copy">
+      <div class="eyebrow hero-line">AUTOMATIC · 41 MM · SERIES OF 500</div>
+      <h1 class="hero-line">Time, measured in devotion.</h1>
+      <p class="hero-sub hero-line">The Calibre One. A 41-millimetre automatic, assembled by hand and regulated in six positions.</p>
+    </div>
+    <div class="hero-visual">
+      <svg viewBox="0 0 400 400" aria-hidden="true" focusable="false">
+        <!-- caseback -->
+        <circle cx="200" cy="200" r="178" fill="#181818" stroke="var(--gold)" stroke-width="1"/>
+
+        <!-- movement plate -->
+        <circle cx="200" cy="200" r="160" fill="#161616"/>
+        <g stroke="#3d3a34" stroke-width="1" stroke-opacity=".08">
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(0 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(30 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(60 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(90 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(120 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(150 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(180 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(210 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(240 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(270 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(300 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(330 200 200)"/>
+        </g>
+
+        <!-- balance wheel -->
+        <circle cx="270" cy="150" r="26" fill="none" stroke="var(--gold)" stroke-width="2"/>
+        <g stroke="var(--gold)" stroke-width="1.5">
+          <line x1="270" y1="150" x2="270" y2="128" transform="rotate(0 270 150)"/>
+          <line x1="270" y1="150" x2="270" y2="128" transform="rotate(120 270 150)"/>
+          <line x1="270" y1="150" x2="270" y2="128" transform="rotate(240 270 150)"/>
+        </g>
+        <path d="M 270.0,146.0 L 271.32,145.93 L 272.68,146.31 L 273.92,147.15 L 274.88,148.41 L 275.42,150.0 L 275.42,151.76 L 274.84,153.52 L 273.68,155.07 L 272.02,156.23 L 270.0,156.83 L 267.8,156.77 L 265.65,155.99 L 263.78,154.52 L 262.42,152.46 L 261.75,150.0 L 261.88,147.36 L 262.87,144.82 L 264.65,142.64 L 267.1,141.08 L 270.0,140.33 L 273.07,140.54 L 276.02,141.72 L 278.51,143.82 L 280.27,146.66 L 281.08,150.0 L 280.81,153.51 L 279.43,156.85 L 277.01,159.65 L 273.78,161.62 L 270.0,162.5 L 266.05,162.16 L 262.32,160.57 L 259.2,157.85 L 257.03,154.21 L 256.08,150.0 L 256.49,145.61 L 258.28,141.49 L 261.32,138.05 L 265.35,135.69 L 270.0,134.67 L 274.83,135.15 L 279.35,137.14 L 283.09,140.49 L 285.66,144.91 L 286.75,150.0 L 286.2,155.26 L 284.01,160.18 L 280.35,164.24 L 275.53,167.01 L 270.0,168.17 L 264.3,167.55 L 258.99,165.16 L 254.62,161.18 L 251.64,155.96 L 250.42,150.0 L 251.11,143.86 L 253.7,138.16 L 257.99,133.47 L 263.6,130.3 L 270.0,129.0" fill="none" stroke="var(--gold)" stroke-width="1"/>
+
+        <!-- dial -->
+        <circle cx="200" cy="200" r="150" fill="#101010"/>
+        <circle cx="200" cy="200" r="147" fill="none" stroke="var(--gold)" stroke-width="4" stroke-opacity=".4" stroke-dasharray="1.2 14.19"/>
+        <g fill="var(--gold)">
+          <rect x="199" y="58" width="2" height="14" transform="rotate(0 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(30 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(60 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(90 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(120 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(150 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(180 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(210 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(240 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(270 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(300 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(330 200 200)"/>
+        </g>
+        <text x="200" y="102" text-anchor="middle" font-family="'Italiana', serif" font-size="11" letter-spacing="4" fill="var(--gold)">MERIDIAN</text>
+        <text x="200" y="114" text-anchor="middle" font-family="'Italiana', serif" font-size="6" letter-spacing="4" fill="var(--muted)">CALIBRE ONE</text>
+
+        <!-- hands -->
+        <rect x="197" y="130" width="6" height="70" rx="1" fill="var(--blued)" transform="rotate(305 200 200)"/>
+        <rect x="198" y="95" width="4" height="105" rx="1" fill="var(--blued)" transform="rotate(60 200 200)"/>
+        <line class="second-hand" x1="200" y1="200" x2="200" y2="80" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="200" cy="200" r="5" fill="var(--gold)"/>
+
+        <!-- bezel -->
+        <circle cx="200" cy="200" r="161.5" fill="none" stroke="url(#steelGrad)" stroke-width="13"/>
+
+        <!-- crystal -->
+        <circle cx="200" cy="200" r="150" fill="#ffffff" opacity=".04"/>
+        <path d="M 106.0,165.8 A 100,100 0 0 1 142.6,118.1" fill="none" stroke="#ffffff" stroke-width="20" stroke-linecap="round" opacity=".12"/>
+      </svg>
+    </div>
+  </div>
+  <div class="scroll-cue hero-line">
+    <span>Scroll to disassemble</span>
+    <span class="cue-line" aria-hidden="true"></span>
+  </div>
+</section>
+
+<!-- 02 · EXPLODED -->
+<section id="exploded">
+  <div class="stage-wrap">
+    <svg class="stage-svg" viewBox="0 0 400 400" aria-hidden="true" focusable="false">
+      <!-- Painted back-to-front (caseback behind, crystal in front) so the assembled
+           watch renders correctly; the #p-* ids below are what Step 3's timeline
+           targets — DOM paint order is independent of the part sequence it animates. -->
+      <g id="stage-group">
+      <g id="p-caseback">
+        <circle cx="200" cy="200" r="178" fill="#181818" stroke="var(--gold)" stroke-width="1"/>
+      </g>
+
+      <g id="p-plate">
+        <circle cx="200" cy="200" r="160" fill="#161616"/>
+        <g stroke="#3d3a34" stroke-width="1" stroke-opacity=".08">
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(0 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(30 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(60 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(90 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(120 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(150 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(180 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(210 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(240 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(270 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(300 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(330 200 200)"/>
+        </g>
+      </g>
+
+      <g id="p-balance">
+        <circle cx="270" cy="150" r="26" fill="none" stroke="var(--gold)" stroke-width="2"/>
+        <g stroke="var(--gold)" stroke-width="1.5">
+          <line x1="270" y1="150" x2="270" y2="128" transform="rotate(0 270 150)"/>
+          <line x1="270" y1="150" x2="270" y2="128" transform="rotate(120 270 150)"/>
+          <line x1="270" y1="150" x2="270" y2="128" transform="rotate(240 270 150)"/>
+        </g>
+        <path d="M 270.0,146.0 L 271.32,145.93 L 272.68,146.31 L 273.92,147.15 L 274.88,148.41 L 275.42,150.0 L 275.42,151.76 L 274.84,153.52 L 273.68,155.07 L 272.02,156.23 L 270.0,156.83 L 267.8,156.77 L 265.65,155.99 L 263.78,154.52 L 262.42,152.46 L 261.75,150.0 L 261.88,147.36 L 262.87,144.82 L 264.65,142.64 L 267.1,141.08 L 270.0,140.33 L 273.07,140.54 L 276.02,141.72 L 278.51,143.82 L 280.27,146.66 L 281.08,150.0 L 280.81,153.51 L 279.43,156.85 L 277.01,159.65 L 273.78,161.62 L 270.0,162.5 L 266.05,162.16 L 262.32,160.57 L 259.2,157.85 L 257.03,154.21 L 256.08,150.0 L 256.49,145.61 L 258.28,141.49 L 261.32,138.05 L 265.35,135.69 L 270.0,134.67 L 274.83,135.15 L 279.35,137.14 L 283.09,140.49 L 285.66,144.91 L 286.75,150.0 L 286.2,155.26 L 284.01,160.18 L 280.35,164.24 L 275.53,167.01 L 270.0,168.17 L 264.3,167.55 L 258.99,165.16 L 254.62,161.18 L 251.64,155.96 L 250.42,150.0 L 251.11,143.86 L 253.7,138.16 L 257.99,133.47 L 263.6,130.3 L 270.0,129.0" fill="none" stroke="var(--gold)" stroke-width="1"/>
+      </g>
+
+      <g id="p-dial">
+        <circle cx="200" cy="200" r="150" fill="#101010"/>
+        <circle cx="200" cy="200" r="147" fill="none" stroke="var(--gold)" stroke-width="4" stroke-opacity=".4" stroke-dasharray="1.2 14.19"/>
+        <g fill="var(--gold)">
+          <rect x="199" y="58" width="2" height="14" transform="rotate(0 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(30 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(60 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(90 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(120 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(150 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(180 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(210 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(240 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(270 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(300 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(330 200 200)"/>
+        </g>
+        <text x="200" y="102" text-anchor="middle" font-family="'Italiana', serif" font-size="11" letter-spacing="4" fill="var(--gold)">MERIDIAN</text>
+        <text x="200" y="114" text-anchor="middle" font-family="'Italiana', serif" font-size="6" letter-spacing="4" fill="var(--muted)">CALIBRE ONE</text>
+      </g>
+
+      <g id="p-hands">
+        <rect x="197" y="130" width="6" height="70" rx="1" fill="var(--blued)" transform="rotate(305 200 200)"/>
+        <rect x="198" y="95" width="4" height="105" rx="1" fill="var(--blued)" transform="rotate(60 200 200)"/>
+        <line class="second-hand" x1="200" y1="200" x2="200" y2="80" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="200" cy="200" r="5" fill="var(--gold)"/>
+      </g>
+
+      <g id="p-bezel">
+        <circle cx="200" cy="200" r="161.5" fill="none" stroke="url(#steelGrad)" stroke-width="13"/>
+      </g>
+
+      <g id="p-crystal">
+        <circle cx="200" cy="200" r="150" fill="#ffffff" opacity=".04"/>
+        <path d="M 106.0,165.8 A 100,100 0 0 1 142.6,118.1" fill="none" stroke="#ffffff" stroke-width="20" stroke-linecap="round" opacity=".12"/>
+      </g>
+      </g>
+    </svg>
+
+    <div class="callout" data-part="crystal">
+      <span class="leader" aria-hidden="true"></span>
+      <span class="callout-text">
+        <span class="label">Sapphire crystal</span>
+        <span class="note">Domed. Anti-reflective on both faces.</span>
+      </span>
+    </div>
+    <div class="callout callout--right" data-part="bezel">
+      <span class="leader" aria-hidden="true"></span>
+      <span class="callout-text">
+        <span class="label">Bezel</span>
+        <span class="note">316L steel, brushed to a satin finish.</span>
+      </span>
+    </div>
+    <div class="callout" data-part="hands">
+      <span class="leader" aria-hidden="true"></span>
+      <span class="callout-text">
+        <span class="label">Hands</span>
+        <span class="note">Heat-blued. Luminous fill.</span>
+      </span>
+    </div>
+    <div class="callout callout--right" data-part="dial">
+      <span class="leader" aria-hidden="true"></span>
+      <span class="callout-text">
+        <span class="label">Dial</span>
+        <span class="note">Triple-lacquered onyx. Applied indices.</span>
+      </span>
+    </div>
+    <div class="callout" data-part="plate">
+      <span class="leader" aria-hidden="true"></span>
+      <span class="callout-text">
+        <span class="label">Movement plate</span>
+        <span class="note">Hand-finished, stripe by stripe.</span>
+      </span>
+    </div>
+    <div class="callout callout--right" data-part="balance">
+      <span class="leader" aria-hidden="true"></span>
+      <span class="callout-text">
+        <span class="label">Balance wheel</span>
+        <span class="note">28,800 beats per hour. Free-sprung.</span>
+      </span>
+    </div>
+    <div class="callout" data-part="caseback">
+      <span class="leader" aria-hidden="true"></span>
+      <span class="callout-text">
+        <span class="label">Caseback</span>
+        <span class="note">Sapphire exhibition back. Engraved series number.</span>
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- 03 · MATERIALS -->
+<section id="materials">
+  <div class="materials-grid">
+    <div class="materials-col-a">
+      <h2>Material, without compromise.</h2>
+      <div class="stats-row">
+        <div class="stat-item">
+          <span class="stat" data-count="41" data-suffix="mm">41mm</span>
+          <span class="stat-label">Case</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat" data-count="72" data-suffix="h">72h</span>
+          <span class="stat-label">Reserve</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat" data-count="100" data-suffix="m">100m</span>
+          <span class="stat-label">Water</span>
+        </div>
+      </div>
+    </div>
+    <div class="materials-copy col">
+      <p>The case is milled from a single billet of 316L steel, then brushed until it holds light without shouting. The crystal is sapphire, domed like watchmaking used to be.</p>
+      <p>The lume is applied by hand in two passes. It glows the way embers do — quietly, and for longer than you'd think.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 04 · MOVEMENT -->
+<section id="movement">
+  <div class="movement-grid">
+    <div class="balance-visual">
+      <svg viewBox="0 0 300 300" aria-hidden="true" focusable="false">
+        <g class="balance">
+          <circle cx="150" cy="150" r="92" fill="none" stroke="var(--gold)" stroke-width="3"/>
+          <g stroke="var(--gold)" stroke-width="2">
+            <line x1="150" y1="150" x2="150" y2="68" transform="rotate(0 150 150)"/>
+            <line x1="150" y1="150" x2="150" y2="68" transform="rotate(120 150 150)"/>
+            <line x1="150" y1="150" x2="150" y2="68" transform="rotate(240 150 150)"/>
+          </g>
+          <path d="M 150.0,140.0 L 152.88,139.24 L 156.14,139.37 L 159.49,140.51 L 162.61,142.72 L 165.16,145.94 L 166.83,150.0 L 167.36,154.65 L 166.55,159.56 L 164.32,164.32 L 160.69,168.52 L 155.83,171.76 L 150.0,173.67 L 143.58,173.96 L 137.03,172.47 L 130.85,169.15 L 125.56,164.11 L 121.64,157.6 L 119.5,150.0 L 119.44,141.81 L 121.61,133.61 L 126.02,126.02 L 132.47,119.64 L 140.63,115.04 L 150.0,112.67 L 159.96,112.84 L 169.81,115.7 L 178.81,121.19 L 186.28,129.06 L 191.56,138.86 L 194.17,150.0 L 193.76,161.73 L 190.22,173.22 L 183.65,183.65 L 174.36,192.19 L 162.91,198.16 L 150.0,201.0 L 136.51,200.36 L 123.36,196.14 L 111.52,188.48 L 101.89,177.78 L 95.24,164.67 L 92.17,150.0 L 93.04,134.74 L 97.94,119.94 L 106.69,106.69 L 118.81,95.97 L 133.56,88.64 L 150.0,85.33 L 167.03,86.44 L 183.47,92.02 L 198.14,101.86 L 209.95,115.39 L 217.96,131.79 L 221.5,150.0 L 220.16,168.8 L 213.89,186.89 L 202.97,202.97 L 188.03,215.87 L 169.98,224.56 L 150.0,228.33 L 129.43,226.76 L 109.69,219.81 L 92.19,207.81 L 78.22,191.44 L 68.84,171.75 L 64.83,150.0 L 66.64,127.66 L 74.27,106.28 L 87.36,87.36 L 105.14,72.3 L 126.48,62.23 L 150.0,58.0" fill="none" stroke="var(--gold)" stroke-width="1.5"/>
+        </g>
+      </svg>
+    </div>
+    <div class="movement-copy panel-copy">
+      <h2>Four hertz of quiet insistence.</h2>
+      <p>An escapement is a negotiation between a spring that wants to unwind and a wheel that refuses to hurry. Ours settles the argument 28,800 times an hour.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 05 · MANIFESTO -->
+<section id="manifesto">
+  <div class="manifesto-wrap">
+    <div class="rule rule-a" aria-hidden="true"></div>
+    <blockquote class="quote">“A watch is not an instrument for keeping time. It is an argument for keeping it well.”</blockquote>
+    <p class="attribution">— The MERIDIAN workshop</p>
+    <div class="rule rule-b" aria-hidden="true"></div>
+  </div>
+</section>
+
+<!-- 06 · COLORWAYS -->
+<section id="colorways">
+  <div class="colorways-wrap">
+    <h2>Three dials. One argument.</h2>
+    <div class="cw-visual">
+      <svg viewBox="0 0 300 300" aria-hidden="true" focusable="false">
+        <circle cx="150" cy="150" r="128" fill="none" stroke="url(#steelGrad)" stroke-width="10"/>
+        <circle id="cw-dial" cx="150" cy="150" r="112" fill="#101010"/>
+        <g fill="var(--gold)">
+          <rect x="149" y="44" width="2" height="10" transform="rotate(0 150 150)"/>
+          <rect x="149" y="44" width="2" height="10" transform="rotate(30 150 150)"/>
+          <rect x="149" y="44" width="2" height="10" transform="rotate(60 150 150)"/>
+          <rect x="149" y="44" width="2" height="10" transform="rotate(90 150 150)"/>
+          <rect x="149" y="44" width="2" height="10" transform="rotate(120 150 150)"/>
+          <rect x="149" y="44" width="2" height="10" transform="rotate(150 150 150)"/>
+          <rect x="149" y="44" width="2" height="10" transform="rotate(180 150 150)"/>
+          <rect x="149" y="44" width="2" height="10" transform="rotate(210 150 150)"/>
+          <rect x="149" y="44" width="2" height="10" transform="rotate(240 150 150)"/>
+          <rect x="149" y="44" width="2" height="10" transform="rotate(270 150 150)"/>
+          <rect x="149" y="44" width="2" height="10" transform="rotate(300 150 150)"/>
+          <rect x="149" y="44" width="2" height="10" transform="rotate(330 150 150)"/>
+        </g>
+        <rect x="148" y="100" width="4" height="52" rx="1" fill="var(--blued)" transform="rotate(305 150 150)"/>
+        <rect x="149" y="80" width="3" height="74" rx="1" fill="var(--blued)" transform="rotate(60 150 150)"/>
+        <circle cx="150" cy="150" r="4" fill="var(--gold)"/>
+      </svg>
+    </div>
+    <div class="colorway-buttons">
+      <button class="colorway active" type="button" data-name="Onyx" data-fill="#101010">
+        <span class="swatch" style="background:#101010"></span>Onyx
+      </button>
+      <button class="colorway" type="button" data-name="Slate" data-fill="#3a4148">
+        <span class="swatch" style="background:#3a4148"></span>Slate
+      </button>
+      <button class="colorway" type="button" data-name="Champagne" data-fill="#cbb27c">
+        <span class="swatch" style="background:#cbb27c"></span>Champagne
+      </button>
+    </div>
+    <p class="cw-name" id="cw-name">Calibre One — Onyx · $4,800</p>
+  </div>
+</section>
+
+<!-- 07 · ACQUIRE -->
+<section id="acquire">
+  <div class="acquire-grid">
+    <div class="acquire-visual">
+      <svg viewBox="0 0 400 400" aria-hidden="true" focusable="false">
+        <!-- caseback -->
+        <circle cx="200" cy="200" r="178" fill="#181818" stroke="var(--gold)" stroke-width="1"/>
+
+        <!-- movement plate -->
+        <circle cx="200" cy="200" r="160" fill="#161616"/>
+        <g stroke="#3d3a34" stroke-width="1" stroke-opacity=".08">
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(0 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(30 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(60 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(90 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(120 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(150 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(180 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(210 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(240 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(270 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(300 200 200)"/>
+          <line x1="200" y1="45" x2="200" y2="160" transform="rotate(330 200 200)"/>
+        </g>
+
+        <!-- balance wheel -->
+        <circle cx="270" cy="150" r="26" fill="none" stroke="var(--gold)" stroke-width="2"/>
+        <g stroke="var(--gold)" stroke-width="1.5">
+          <line x1="270" y1="150" x2="270" y2="128" transform="rotate(0 270 150)"/>
+          <line x1="270" y1="150" x2="270" y2="128" transform="rotate(120 270 150)"/>
+          <line x1="270" y1="150" x2="270" y2="128" transform="rotate(240 270 150)"/>
+        </g>
+        <path d="M 270.0,146.0 L 271.32,145.93 L 272.68,146.31 L 273.92,147.15 L 274.88,148.41 L 275.42,150.0 L 275.42,151.76 L 274.84,153.52 L 273.68,155.07 L 272.02,156.23 L 270.0,156.83 L 267.8,156.77 L 265.65,155.99 L 263.78,154.52 L 262.42,152.46 L 261.75,150.0 L 261.88,147.36 L 262.87,144.82 L 264.65,142.64 L 267.1,141.08 L 270.0,140.33 L 273.07,140.54 L 276.02,141.72 L 278.51,143.82 L 280.27,146.66 L 281.08,150.0 L 280.81,153.51 L 279.43,156.85 L 277.01,159.65 L 273.78,161.62 L 270.0,162.5 L 266.05,162.16 L 262.32,160.57 L 259.2,157.85 L 257.03,154.21 L 256.08,150.0 L 256.49,145.61 L 258.28,141.49 L 261.32,138.05 L 265.35,135.69 L 270.0,134.67 L 274.83,135.15 L 279.35,137.14 L 283.09,140.49 L 285.66,144.91 L 286.75,150.0 L 286.2,155.26 L 284.01,160.18 L 280.35,164.24 L 275.53,167.01 L 270.0,168.17 L 264.3,167.55 L 258.99,165.16 L 254.62,161.18 L 251.64,155.96 L 250.42,150.0 L 251.11,143.86 L 253.7,138.16 L 257.99,133.47 L 263.6,130.3 L 270.0,129.0" fill="none" stroke="var(--gold)" stroke-width="1"/>
+
+        <!-- dial -->
+        <circle cx="200" cy="200" r="150" fill="#101010"/>
+        <circle cx="200" cy="200" r="147" fill="none" stroke="var(--gold)" stroke-width="4" stroke-opacity=".4" stroke-dasharray="1.2 14.19"/>
+        <g fill="var(--gold)">
+          <rect x="199" y="58" width="2" height="14" transform="rotate(0 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(30 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(60 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(90 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(120 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(150 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(180 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(210 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(240 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(270 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(300 200 200)"/>
+          <rect x="199" y="58" width="2" height="14" transform="rotate(330 200 200)"/>
+        </g>
+        <text x="200" y="102" text-anchor="middle" font-family="'Italiana', serif" font-size="11" letter-spacing="4" fill="var(--gold)">MERIDIAN</text>
+        <text x="200" y="114" text-anchor="middle" font-family="'Italiana', serif" font-size="6" letter-spacing="4" fill="var(--muted)">CALIBRE ONE</text>
+
+        <!-- hands -->
+        <rect x="197" y="130" width="6" height="70" rx="1" fill="var(--blued)" transform="rotate(305 200 200)"/>
+        <rect x="198" y="95" width="4" height="105" rx="1" fill="var(--blued)" transform="rotate(60 200 200)"/>
+        <line class="second-hand" x1="200" y1="200" x2="200" y2="80" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="200" cy="200" r="5" fill="var(--gold)"/>
+
+        <!-- bezel -->
+        <circle cx="200" cy="200" r="161.5" fill="none" stroke="url(#steelGrad)" stroke-width="13"/>
+
+        <!-- crystal -->
+        <circle cx="200" cy="200" r="150" fill="#ffffff" opacity=".04"/>
+        <path d="M 106.0,165.8 A 100,100 0 0 1 142.6,118.1" fill="none" stroke="#ffffff" stroke-width="20" stroke-linecap="round" opacity=".12"/>
+      </svg>
+    </div>
+    <div class="acquire-copy">
+      <table class="spec-table">
+        <tbody>
+          <tr><th scope="row">Case</th><td>41 mm, 316L steel</td></tr>
+          <tr><th scope="row">Movement</th><td>MC-01 automatic</td></tr>
+          <tr><th scope="row">Reserve</th><td>72 hours</td></tr>
+          <tr><th scope="row">Crystal</th><td>Sapphire, domed</td></tr>
+          <tr><th scope="row">Water resistance</th><td>100 m</td></tr>
+          <tr><th scope="row">Strap</th><td>Italian calf, quick-release</td></tr>
+          <tr><th scope="row">Edition</th><td>500 pieces</td></tr>
+        </tbody>
+      </table>
+      <p class="price">$4,800</p>
+      <button class="cta" type="button">Reserve Calibre One</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <nav class="footer-links" aria-label="Footer">
+    <a href="/explore/">← All studies</a>
+    <a href="#hero">Calibre One</a>
+    <a href="#materials">Materials</a>
+    <a href="#movement">Movement</a>
+    <a href="#acquire">Acquire</a>
+  </nav>
+  <p class="footer-disclaimer">MERIDIAN is a fictional brand created as a design study. © 2026.</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(function () {
+  var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var mobile  = matchMedia('(max-width: 900px)').matches;
+  var enhance = !reduced && window.gsap && window.ScrollTrigger;
+  if (!enhance) return; // static page stands on its own
+  gsap.registerPlugin(ScrollTrigger);
+
+  if (window.Lenis) {
+    var lenis = new Lenis();
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add(function (t) { lenis.raf(t * 1000); });
+    gsap.ticker.lagSmoothing(0);
+    window.__lenis = lenis;
+  }
+
+  // S2 helpers
+  function reveal(targets, vars) {
+    gsap.utils.toArray(targets).forEach(function (el) {
+      gsap.fromTo(el, { y: 40, opacity: 0 },
+        Object.assign({ y: 0, opacity: 1, duration: 0.9, ease: 'power2.out',
+          scrollTrigger: { trigger: el, start: 'top 82%' } }, vars || {}));
+    });
+  }
+  function countUp(el) {
+    var end = parseFloat(el.dataset.count), obj = { v: 0 };
+    gsap.to(obj, { v: end, duration: 1.4, ease: 'power1.out',
+      scrollTrigger: { trigger: el, start: 'top 85%' },
+      onUpdate: function () { el.textContent = Math.round(obj.v) + (el.dataset.suffix || ''); } });
+  }
+  function whenVisible(el, startFn, stopFn) {
+    new IntersectionObserver(function (entries) {
+      entries[0].isIntersecting ? startFn() : stopFn();
+    }, { threshold: 0.05 }).observe(el);
+  }
+
+  function initHero() {
+    gsap.from('.hero-line', { y: 60, opacity: 0, duration: 1, stagger: 0.12, ease: 'power2.out' });
+  }
+
+  function initExploded(mobile) {
+    if (mobile) { reveal('#exploded .callout'); return; }
+    gsap.set('.callout', { opacity: 0 });
+    var tl = gsap.timeline({ scrollTrigger: {
+      trigger: '#exploded', start: 'top top', end: '+=300%', scrub: 0.6, pin: true } });
+    var parts = ['#p-crystal','#p-bezel','#p-hands','#p-dial','#p-plate','#p-balance','#p-caseback'];
+    tl.to('#stage-group', { scale: 0.6, transformOrigin: '200px 200px', duration: 1 }, 0); // shrink the stage (about its true center) in lockstep with the first (fastest) part so it never lags behind mid-explosion
+    parts.forEach(function (id, i) {
+      var y = (i - 3) * 55; // crystal drifts up, caseback down
+      tl.to(id, { y: y, scale: 1 + (3 - i) * 0.02, duration: 1 }, i * 0.9);
+      tl.to('.callout[data-part="' + id.slice(3) + '"]', { opacity: 1, duration: 0.4 }, i * 0.9 + 0.4);
+    });
+    tl.to(parts.join(','), { y: 0, scale: 1, duration: 2 }, '+=0.5');   // reassemble
+    tl.to('#stage-group', { scale: 1, transformOrigin: '200px 200px', duration: 2 }, '<');  // restore stage scale
+    tl.to('.callout', { opacity: 0, duration: 0.6 }, '<');
+  }
+
+  function initEditorial() {
+    reveal('#materials .stats-row, #materials .materials-copy');
+    reveal('#movement .balance-visual, #movement .panel-copy');
+    reveal('#manifesto .quote, #manifesto .attribution');
+    gsap.utils.toArray('.stat').forEach(countUp);
+    gsap.to('.rule-a', { xPercent: -8, scrollTrigger: { trigger: '#manifesto', scrub: true } });
+    gsap.to('.rule-b', { xPercent: 8, scrollTrigger: { trigger: '#manifesto', scrub: true } });
+  }
+
+  [initHero, initExploded, initEditorial].forEach(function (fn) {
+    try { fn(mobile); } catch (e) { console.error('[init]', fn.name, e); }
+  });
+})();
+</script>
+
+<!-- Colorway + CTA handlers: plain JS, outside the enhancement gate. Must work without GSAP/ScrollTrigger. -->
+<script>
+(function () {
+  var dial = document.getElementById('cw-dial');
+  var nameEl = document.getElementById('cw-name');
+  var swatchButtons = document.querySelectorAll('.colorway');
+
+  swatchButtons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      swatchButtons.forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      var fill = btn.getAttribute('data-fill');
+      var name = btn.getAttribute('data-name');
+      if (dial) dial.setAttribute('fill', fill);
+      if (nameEl) nameEl.textContent = 'Calibre One — ' + name + ' · $4,800';
+    });
+  });
+
+  var cta = document.querySelector('.cta');
+  if (cta) {
+    var original = cta.textContent;
+    cta.addEventListener('click', function () {
+      cta.textContent = 'Reserved — demo only';
+      cta.disabled = true;
+      setTimeout(function () {
+        cta.textContent = original;
+        cta.disabled = false;
+      }, 2000);
+    });
+  }
+})();
+</script>
+</body>
+</html>
