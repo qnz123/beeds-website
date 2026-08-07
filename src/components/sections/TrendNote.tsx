@@ -39,10 +39,10 @@ export default function TrendNote() {
         <span className="trend-note-break">Some break.</span>
       </p>
       <p className="trend-note-body">
-        What follows is our own human read on what’s moving in design — not a
-        rulebook. Not every trend deserves a permanent place in a brand. Knowing
-        which ones to build on, and which to let pass, is the work. That is
-        exactly why we’re here.
+        The above is our own human read on what’s moving in design — not a
+        rulebook or a “this is it.” Not every trend deserves a permanent place in
+        a brand. Knowing which ones to build on, and which to let pass, is the
+        work. That is exactly why we’re here.
       </p>
     </div>
   )

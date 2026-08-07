@@ -60,8 +60,6 @@ export default function ExplorePage() {
         {/* Design Trends / Journal */}
         <section className="py-14 px-10 bg-white">
           <div className="container-x">
-            <h2 className="eyebrow mb-8">Design Trends — Journal</h2>
-
             {/* Point-of-view notice (light editorial, scroll-revealed) */}
             <TrendNote />
           </div>
