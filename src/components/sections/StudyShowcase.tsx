@@ -160,8 +160,9 @@ function StudyCard({
     if (max <= 0) return
     // Mobile scrolls slower — the narrow vertical frame reads faster, so ~240px/s
     // vs ~520px/s on desktop, with a higher cap so long mobile pages stay calm.
-    const pxPerSec = cardMode === 'mobile' ? 240 : 520
-    const cap = cardMode === 'mobile' ? 34 : 18
+    const slow = mobileHero || cardMode === 'mobile'
+    const pxPerSec = slow ? 240 : 520
+    const cap = slow ? 34 : 18
     const duration = Math.min(cap, Math.max(6, max / pxPerSec))
     if (win.__lenis) {
       win.__lenis.scrollTo(max, { duration, easing: (t: number) => t })
@@ -182,8 +183,30 @@ function StudyCard({
 
   useEffect(() => cancelRaf, [])
 
-  // Desktop gets the live auto-scroll preview; mobile gets a static embed of
-  // the study's hero (its top screen) — both defer until near the viewport.
+  // Mobile has no hover: when the card sits in the middle of the screen the
+  // sample auto-scrolls top → bottom by itself, and rewinds once it leaves.
+  const midViewRef = useRef(false)
+  useEffect(() => {
+    if (isDesktop) return
+    const el = windowRef.current
+    if (!el) return
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          midViewRef.current = e.isIntersecting
+          if (e.isIntersecting) play()
+          else rewind()
+        })
+      },
+      { threshold: 0.55 },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDesktop])
+
+  // Desktop gets the live auto-scroll preview; mobile gets the study's mobile
+  // layout, auto-playing when centered — both defer until near the viewport.
   const showFrame = inView
 
   // When access is granted the window becomes a real, keyboard-operable control
@@ -233,6 +256,11 @@ function StudyCard({
               tabIndex={-1}
               scrolling="no"
               loading="lazy"
+              onLoad={() => {
+                // If the card is already mid-screen when the embed finishes
+                // loading (common on mobile), start the auto-scroll now.
+                if (!isDesktop && midViewRef.current) play()
+              }}
               style={{
                 width: baseW,
                 height: dims.h,
@@ -259,11 +287,14 @@ function StudyCard({
           )}
         </div>
 
-        {/* Hover affordance */}
-        <span className="pointer-events-none absolute bottom-0 left-0 right-0 flex items-center justify-between px-3 py-2 text-[11px] uppercase tracking-[0.12em] text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100 bg-gradient-to-t from-black/70 to-transparent">
-          <span>Hover to scroll</span>
-          <span>{granted ? 'Click to review →' : 'Full study — customers only'}</span>
-        </span>
+        {/* Hover affordance — desktop only; touch screens have no hover and
+            taps would flash it meaninglessly */}
+        {isDesktop && (
+          <span className="pointer-events-none absolute bottom-0 left-0 right-0 flex items-center justify-between px-3 py-2 text-[11px] uppercase tracking-[0.12em] text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100 bg-gradient-to-t from-black/70 to-transparent">
+            <span>Hover to scroll</span>
+            <span>{granted ? 'Click to review →' : 'Full study — customers only'}</span>
+          </span>
+        )}
       </div>
 
       {/* Caption — BEEDS editorial */}
