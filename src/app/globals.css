@@ -1741,77 +1741,9 @@ textarea.blank:focus {
   color: #f5f5f5;
 }
 
-/* ---- Hero prism focus pass ----
-   Plays once, half a second after the typewriter lands: the hero softens like
-   glass seen through water, two thin rainbow refraction lines drift across,
-   and everything pulls back into focus. Triggered by .hero-prism (Hero.tsx);
-   skipped entirely under prefers-reduced-motion. */
-
 .hero {
   position: relative;
   overflow: hidden;
-}
-
-.hero-prism .hero-defocus {
-  animation: hero-defocus 3.6s cubic-bezier(0.22, 0.61, 0.21, 1) forwards;
-}
-
-/* The pass chains the water displacement (#hero-water, settled to 0 by JS as
-   focus lands) with the blur dip — the fish-tank look from study A. */
-@keyframes hero-defocus {
-  0% { filter: url(#hero-water) blur(0); }
-  22% { filter: url(#hero-water) blur(10px); }
-  100% { filter: url(#hero-water) blur(0); }
-}
-
-.hero-streaks {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.hero-streak {
-  position: absolute;
-  left: -25%;
-  width: 150%;
-  opacity: 0;
-  filter: blur(8px);
-  transform: rotate(-14deg) translate3d(-10%, 0, 0);
-  background: linear-gradient(95deg,
-    transparent 14%,
-    rgba(255, 90, 110, 0.45) 32%,
-    rgba(255, 200, 80, 0.45) 44%,
-    rgba(120, 220, 140, 0.40) 54%,
-    rgba(90, 170, 255, 0.45) 64%,
-    rgba(190, 110, 255, 0.40) 76%,
-    transparent 90%);
-}
-
-.hero-streak.one { top: 30%; height: 32px; }
-.hero-streak.two { top: 62%; height: 20px; }
-
-.hero-prism .hero-streak {
-  animation: hero-prism-pass 3.3s ease-in-out 0.2s forwards;
-}
-
-.hero-prism .hero-streak.two {
-  animation-delay: 0.4s;
-}
-
-/* Whisper-level rainbow — present, barely announced */
-@keyframes hero-prism-pass {
-  0%   { opacity: 0;    transform: rotate(-14deg) translate3d(-12%, 0, 0); }
-  22%  { opacity: 0.32; }
-  60%  { opacity: 0.2;  }
-  100% { opacity: 0;    transform: rotate(-14deg) translate3d(12%, 4%, 0); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero-prism .hero-defocus,
-  .hero-prism .hero-streak {
-    animation: none;
-  }
 }
 
 /* ---- Hero rainbow hover reveal ----
@@ -1828,8 +1760,12 @@ textarea.blank:focus {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  /* Per-letter neon colors are set inline in Hero.tsx (renderNeon) — the
-     palette cycles #9929EA / #FF5FCF / #FAEB92, one solid color per letter. */
+  /* Random vertical color strips (client palette) are generated per page
+     load in Hero.tsx and applied as an inline background-image; the gradient
+     is clipped to the letterforms here. */
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
   /* Water ripple inside the reveal circle (constant, never settles) */
   filter: url(#hero-bubble);
   opacity: 0;
@@ -1862,10 +1798,4 @@ textarea.blank:focus {
     transparent 99%, #000 100%);
 }
 
-/* The black layer underneath peeks through the anti-aliased glyph edges as a
-   dark fringe; a thin stroke in each letter's own color covers it so the
-   revealed letters read as solid color edge to edge. */
-.hero-rainbow span {
-  -webkit-text-stroke: 1.2px currentColor;
-}
 
