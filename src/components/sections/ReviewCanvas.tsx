@@ -110,9 +110,9 @@ export default function ReviewCanvas({
   }, [mode, baseW])
 
   // Client-tuned pacing on top of the 1:1 scale conversion: wheel stays calm
-  // and deliberate; touch runs quicker so mobile review doesn't drag.
+  // and deliberate; touch runs at 1.7x so mobile review moves fast.
   const WHEEL_DAMPING = 0.45
-  const TOUCH_DAMPING = 0.85
+  const TOUCH_DAMPING = 1.7
 
   // Drive the embedded page's internal scroll by a SCREEN-pixel delta, clamped
   // to its range. The delta is converted to the page's logical pixels (÷ scale)
