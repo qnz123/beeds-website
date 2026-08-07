@@ -14,40 +14,80 @@ import { useEffect, useRef, useState } from 'react'
 // it falls back to native scroll when Lenis isn't present (e.g. reduced-motion,
 // where the page is already fully visible and static).
 //
+// Two modes share this exact protection:
+//  - 'desktop' (default, unchanged): the page is embedded at its real 1280px
+//    desktop viewport and scaled down to fill the canvas width.
+//  - 'mobile': the page is embedded at a real ~390px logical viewport — below
+//    the studies' own ~900px responsive breakpoint — so it renders its actual
+//    mobile layout, then scaled/centered inside an editorial phone frame.
+// In both cases the iframe's *logical* width (its real layout viewport, via
+// inline width + CSS scale) is what the embedded page measures — only the
+// number changes.
+//
 // NOTE: strong, casual-proof protection — not DRM. Dev tools can still inspect
 // network traffic; a true lock would need a server-side render/proxy.
 
-const BASE_W = 1280
+export type ReviewMode = 'desktop' | 'mobile'
+
+const BASE_WIDTHS: Record<ReviewMode, number> = { desktop: 1280, mobile: 390 }
+// Logical phone height used only to shape the mobile frame's aspect ratio
+// (roughly a modern phone's viewport) — the embedded page still scrolls to
+// its own full content height regardless of this number.
+const MOBILE_FRAME_H = 844
+// Breathing room around the phone silhouette inside the mobile canvas.
+const MOBILE_FRAME_MARGIN = 24
 
 export default function ReviewCanvas({
   slug,
   name,
   autoFocus = false,
+  mode = 'desktop',
 }: {
   slug: string
   name: string
   autoFocus?: boolean
+  mode?: ReviewMode
 }) {
-  const wrapRef = useRef<HTMLDivElement>(null)
+  const baseW = BASE_WIDTHS[mode]
+  // Measured element: the full clipping box in desktop mode, or the centering
+  // wrap (from which we derive the best-fit phone size) in mobile mode.
+  const measureRef = useRef<HTMLDivElement>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const targetRef = useRef(0)
   const [dims, setDims] = useState({ scale: 0.5, h: 900 })
+  const [frame, setFrame] = useState({ w: 0, h: 0 })
 
-  // Keep the embedded desktop page (1280-wide) scaled to fill the canvas, and
-  // size its logical viewport to the visible slice so scroll math is correct.
+  // Keep the embedded page scaled to fill the canvas (desktop: full width; mobile:
+  // a best-fit phone silhouette), and size its logical viewport to the visible
+  // slice so scroll math is correct.
   useEffect(() => {
-    const el = wrapRef.current
+    const el = measureRef.current
     if (!el) return
     const compute = () => {
-      const scale = el.clientWidth / BASE_W
-      setDims({ scale, h: el.clientHeight / scale })
+      if (mode === 'mobile') {
+        const availW = Math.max(0, el.clientWidth - MOBILE_FRAME_MARGIN * 2)
+        const availH = Math.max(0, el.clientHeight - MOBILE_FRAME_MARGIN * 2)
+        const aspect = baseW / MOBILE_FRAME_H
+        let w = availH * aspect
+        let h = availH
+        if (w > availW) {
+          w = availW
+          h = availW / aspect
+        }
+        setFrame({ w, h })
+        const scale = w > 0 ? w / baseW : 0.5
+        setDims({ scale, h: scale > 0 ? h / scale : 900 })
+      } else {
+        const scale = el.clientWidth / baseW
+        setDims({ scale, h: el.clientHeight / scale })
+      }
     }
     compute()
     const ro = new ResizeObserver(compute)
     ro.observe(el)
     return () => ro.disconnect()
-  }, [])
+  }, [mode, baseW])
 
   // Drive the embedded page's internal scroll by a delta, clamped to its range.
   const scrollByDelta = (delta: number) => {
@@ -102,16 +142,17 @@ export default function ReviewCanvas({
     }
   }
 
-  return (
-    <div
-      ref={wrapRef}
-      className="relative w-full overflow-hidden border border-black bg-white"
-      style={{ height: 'min(80vh, 760px)' }}
-    >
+  const overlayLabel =
+    mode === 'mobile'
+      ? `${name} mobile design review — scroll up and down to explore`
+      : `${name} design review — scroll up and down to explore`
+
+  const canvasBody = (
+    <>
       <iframe
         ref={iframeRef}
         src={`/studies/${slug}.html`}
-        title={`${name} — design review`}
+        title={`${name} — ${mode} design review`}
         aria-hidden="true"
         tabIndex={-1}
         scrolling="no"
@@ -119,7 +160,7 @@ export default function ReviewCanvas({
           targetRef.current = 0
         }}
         style={{
-          width: BASE_W,
+          width: baseW,
           height: dims.h,
           border: 0,
           transform: `scale(${dims.scale})`,
@@ -132,7 +173,7 @@ export default function ReviewCanvas({
       <div
         ref={overlayRef}
         role="group"
-        aria-label={`${name} design review — scroll up and down to explore`}
+        aria-label={overlayLabel}
         tabIndex={0}
         // eslint-disable-next-line jsx-a11y/no-autofocus
         autoFocus={autoFocus}
@@ -142,6 +183,33 @@ export default function ReviewCanvas({
         className="absolute inset-0 outline-none focus-visible:ring-2 focus-visible:ring-black"
         style={{ cursor: 'ns-resize' }}
       />
+    </>
+  )
+
+  return (
+    <div
+      className="relative w-full overflow-hidden border border-black bg-white"
+      style={{ height: 'min(80vh, 760px)' }}
+    >
+      {mode === 'mobile' ? (
+        <div
+          ref={measureRef}
+          className="flex h-full w-full items-center justify-center bg-[#e9e9e9]"
+        >
+          {/* Editorial phone bezel — a hairline-consistent frame, not a
+              skeuomorphic device render. */}
+          <div
+            className="relative overflow-hidden bg-white border-[6px] border-black rounded-[24px]"
+            style={{ width: frame.w || undefined, height: frame.h || undefined }}
+          >
+            {canvasBody}
+          </div>
+        </div>
+      ) : (
+        <div ref={measureRef} className="relative h-full w-full">
+          {canvasBody}
+        </div>
+      )}
     </div>
   )
 }

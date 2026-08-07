@@ -58,7 +58,7 @@ export default function ExplorePage() {
         <StudyShowcase />
 
         {/* Design Trends / Journal */}
-        <section className="py-14 px-10 border-t border-black bg-white">
+        <section className="py-14 px-10 bg-white">
           <div className="container-x">
             <h2 className="eyebrow mb-8">Design Trends — Journal</h2>
 

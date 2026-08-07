@@ -1,12 +1,19 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
-import ReviewCanvas from './ReviewCanvas'
+import { useEffect, useRef, useState } from 'react'
+import ReviewCanvas, { type ReviewMode } from './ReviewCanvas'
+import DeviceToggle from './DeviceToggle'
 
 // Lightbox that opens a study in the larger scroll-only review canvas, in the
 // same page. Standard dialog behaviour: Escape and backdrop click close it,
 // focus is moved in on open and restored on close, focus is trapped inside, and
 // the background page is scroll-locked while it's open.
+//
+// Device switch: a Desktop/Mobile segmented control swaps ReviewCanvas's mode.
+// A toggle (rather than side-by-side) was chosen so each rendering gets the
+// canvas's full width — a phone silhouette squeezed next to a 1280px desktop
+// view inside a ~1100px lightbox would read cramped on both sides. ReviewCanvas
+// remounts on mode change (key={mode}) so each embed starts fresh at the top.
 export default function StudyLightbox({
   slug,
   name,
@@ -18,6 +25,7 @@ export default function StudyLightbox({
 }) {
   const panelRef = useRef<HTMLDivElement>(null)
   const closeRef = useRef<HTMLButtonElement>(null)
+  const [mode, setMode] = useState<ReviewMode>('desktop')
 
   useEffect(() => {
     const returnFocus = document.activeElement as HTMLElement | null
@@ -72,23 +80,31 @@ export default function StudyLightbox({
         className="flex w-full flex-col bg-[#f5f5f5] border border-black"
         style={{ maxWidth: 'min(1100px, 94vw)' }}
       >
-        <div className="flex items-center justify-between border-b border-black px-5 py-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black px-5 py-3">
           <span className="eyebrow text-[#666]">{name} — Review</span>
-          <button
-            ref={closeRef}
-            type="button"
-            onClick={onClose}
-            aria-label="Close review"
-            className="text-[13px] uppercase tracking-[1.5px] underline underline-offset-4 hover:opacity-55"
-          >
-            Close ✕
-          </button>
+
+          <div className="flex items-center gap-4">
+            {/* Desktop / Mobile rounded pill switch. */}
+            <DeviceToggle mode={mode} onChange={setMode} />
+
+            <button
+              ref={closeRef}
+              type="button"
+              onClick={onClose}
+              aria-label="Close review"
+              className="text-[13px] uppercase tracking-[1.5px] underline underline-offset-4 hover:opacity-55"
+            >
+              Close ✕
+            </button>
+          </div>
         </div>
 
         <div className="p-3 md:p-4">
-          <ReviewCanvas slug={slug} name={name} />
+          <ReviewCanvas key={mode} slug={slug} name={name} mode={mode} />
           <p className="mt-3 text-sm text-[#666]">
-            Scroll up and down to review the design.
+            {mode === 'mobile'
+              ? 'Scroll up and down to review the mobile layout.'
+              : 'Scroll up and down to review the design.'}
           </p>
         </div>
       </div>

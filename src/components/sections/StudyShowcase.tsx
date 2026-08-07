@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from 'react'
 import DeckAccess from './DeckAccess'
 import StudyLightbox from './StudyLightbox'
+import DeviceToggle from './DeviceToggle'
+import type { ReviewMode } from './ReviewCanvas'
 
 // Interactive design studies. Each card embeds one of the self-contained
 // scroll-choreographed pages served from /public/studies as a scaled, live
@@ -32,21 +34,21 @@ const STUDIES: Study[] = [
   {
     slug: 'meridian',
     name: 'MERIDIAN',
-    descriptor: 'A mechanical watch, taken apart by scrolling.',
-    tag: 'Dark cinematic luxury',
+    descriptor: 'For premium products that earn a slow, deliberate reveal.',
+    tag: 'Cinematic luxury',
     accent: '#c9a96a',
   },
   {
     slug: 'aura',
     name: 'aura',
-    descriptor: 'A serum argued one drop at a time.',
-    tag: 'Light, liquid, organic',
+    descriptor: 'For gentle brands that sell calm — soft on the eye, kind to the skin.',
+    tag: 'Liquid, organic',
     accent: '#e8c4c4',
   },
   {
     slug: 'volt',
     name: 'VOLT',
-    descriptor: 'Headphones that shout back at the scroll.',
+    descriptor: 'For loud products that would rather shout than blend in.',
     tag: 'Brutalist kinetic',
     accent: '#d8ff00',
   },
@@ -68,9 +70,11 @@ function StudyCard({
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const rafRef = useRef<number | null>(null)
 
-  const [scale, setScale] = useState(1)
+  const [dims, setDims] = useState({ scale: 1, h: BASE_H })
   const [inView, setInView] = useState(false)
   const [isDesktop, setIsDesktop] = useState(false)
+  const [cardMode, setCardMode] = useState<ReviewMode>('desktop')
+  const baseW = cardMode === 'mobile' ? 390 : BASE_W
 
   // Only run the live iframe where hover exists and the viewport is wide enough;
   // small/touch screens get the lightweight static poster and tap-to-open.
@@ -99,16 +103,20 @@ function StudyCard({
     return () => io.disconnect()
   }, [])
 
-  // Keep the iframe scaled to the card width (mini-browser at a real 1280px layout).
+  // Keep the embedded page scaled to fill the card window at the current mode's
+  // logical width (1280 desktop / 390 mobile) so it renders that layout.
   useEffect(() => {
     const el = windowRef.current
     if (!el) return
-    const compute = () => setScale(el.clientWidth / BASE_W)
+    const compute = () => {
+      const scale = el.clientWidth / baseW
+      setDims({ scale, h: el.clientHeight / scale })
+    }
     compute()
     const ro = new ResizeObserver(compute)
     ro.observe(el)
     return () => ro.disconnect()
-  }, [])
+  }, [baseW])
 
   const prefersReduced = () =>
     typeof window !== 'undefined' &&
@@ -147,7 +155,11 @@ function StudyCard({
     if (!win || !doc) return
     const max = Math.max(0, doc.documentElement.scrollHeight - win.innerHeight)
     if (max <= 0) return
-    const duration = Math.min(18, Math.max(6, max / 520)) // ~520px/sec, clamped
+    // Mobile scrolls slower — the narrow vertical frame reads faster, so ~240px/s
+    // vs ~520px/s on desktop, with a higher cap so long mobile pages stay calm.
+    const pxPerSec = cardMode === 'mobile' ? 240 : 520
+    const cap = cardMode === 'mobile' ? 34 : 18
+    const duration = Math.min(cap, Math.max(6, max / pxPerSec))
     if (win.__lenis) {
       win.__lenis.scrollTo(max, { duration, easing: (t: number) => t })
     } else {
@@ -189,12 +201,15 @@ function StudyCard({
   return (
     <div className="flex flex-col">
       <div
-        className={`group relative block overflow-hidden border border-black bg-white${
+        className={`group relative block overflow-hidden border border-black bg-white transition-[aspect-ratio] duration-300 motion-reduce:transition-none${
           granted
             ? ' cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black'
             : ''
         }`}
-        style={{ aspectRatio: `${BASE_W} / ${BASE_H}` }}
+        style={{
+          // Frame flips to a vertical (portrait) phone shape in mobile mode.
+          aspectRatio: cardMode === 'mobile' ? '9 / 16' : `${BASE_W} / ${BASE_H}`,
+        }}
         onMouseEnter={play}
         onMouseLeave={rewind}
         {...interactiveProps}
@@ -202,17 +217,18 @@ function StudyCard({
         <div ref={windowRef} className="absolute inset-0" aria-hidden="true">
           {showFrame ? (
             <iframe
+              key={cardMode}
               ref={iframeRef}
               src={`/studies/${study.slug}.html`}
-              title={`${study.name} — interactive study preview`}
+              title={`${study.name} — ${cardMode} preview`}
               tabIndex={-1}
               scrolling="no"
               loading="lazy"
               style={{
-                width: BASE_W,
-                height: BASE_H,
+                width: baseW,
+                height: dims.h,
                 border: 0,
-                transform: `scale(${scale})`,
+                transform: `scale(${dims.scale})`,
                 transformOrigin: 'top left',
                 pointerEvents: 'none',
               }}
@@ -243,7 +259,14 @@ function StudyCard({
 
       {/* Caption — BEEDS editorial */}
       <div className="mt-4 pt-4 border-t border-black">
-        <h3 className="text-xl leading-none">{study.name}</h3>
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="text-xl leading-none">{study.name}</h3>
+          {/* Per-card device switch — shows visitors each study has a desktop
+              AND a mobile version, and flips the live preview between them. */}
+          {isDesktop && (
+            <DeviceToggle size="sm" mode={cardMode} onChange={setCardMode} />
+          )}
+        </div>
         <p className="mt-3 text-sm leading-[1.6] text-[#666]">{study.descriptor}</p>
         <p className="mt-2 text-[11px] uppercase tracking-[0.12em] text-[#999]">
           {study.tag}
@@ -270,16 +293,22 @@ export default function StudyShowcase() {
   const activeStudy = STUDIES.find((s) => s.slug === active) ?? null
 
   return (
-    <section className="py-14 px-10 border-t border-black">
+    <section className="py-14 px-10">
       <div className="container-x">
-        <h2 className="eyebrow mb-3">Interactive Studies</h2>
+        <h2 className="eyebrow mb-3">Explore what fits</h2>
         <p className="text-sm leading-[1.6] text-[#666] max-w-[560px] mb-10">
           <span className="brush-highlight">Hover a frame</span> to watch it play
-          from top to bottom
-          {granted ? ', or click to open the full review.' : '.'}
+          top to bottom, then pick the direction that fits your product — or{' '}
+          <a
+            href="/booking/"
+            className="underline underline-offset-4 decoration-[#999] hover:decoration-black"
+          >
+            contact us for custom planning
+          </a>
+          .
         </p>
 
-        <div className="grid gap-x-8 gap-y-12 md:grid-cols-3">
+        <div className="grid items-start gap-x-8 gap-y-12 md:grid-cols-3">
           {STUDIES.map((study) => (
             <StudyCard
               key={study.slug}
@@ -291,7 +320,7 @@ export default function StudyShowcase() {
         </div>
 
         {granted ? (
-          <p className="mt-12 pt-8 border-t border-black eyebrow text-[#666]">
+          <p className="mt-12 eyebrow text-[#666]">
             Access granted — click any study above to open its full review.
           </p>
         ) : (
