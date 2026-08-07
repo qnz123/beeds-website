@@ -1812,3 +1812,59 @@ textarea.blank:focus {
     animation: none;
   }
 }
+
+/* ---- Hero rainbow hover reveal ----
+   A rainbow duplicate of the headline sits exactly under the black type,
+   masked to a soft circle that follows the cursor (--mx/--my set in Hero.tsx).
+   Hovering the headline reveals the color "underneath the ink" only within
+   that circle; the rest stays black. Pointer-events off, hidden from AT. */
+
+.hero-title {
+  position: relative;
+}
+
+.hero-rainbow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Per-letter neon colors are set inline in Hero.tsx (renderNeon) — the
+     palette cycles #9929EA / #FF5FCF / #FAEB92, one solid color per letter. */
+  /* Water ripple inside the reveal circle (constant, never settles) */
+  filter: url(#hero-bubble);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  /* Sharp reveal window — zero softness at the circle's edge. Radius is 70px
+     in local coordinates: the 1.15 lens magnification (below) scales it back
+     up to ~80px on screen, matching the hole in the ink layer. */
+  -webkit-mask-image: radial-gradient(circle 70px at var(--mx, 50%) var(--my, 50%),
+    #000 99%, transparent 100%);
+  mask-image: radial-gradient(circle 70px at var(--mx, 50%) var(--my, 50%),
+    #000 99%, transparent 100%);
+  /* Magnifying glass: content inside the circle reads ~15% larger, zooming
+     about the cursor point so the magnified area stays under the lens */
+  transform: scale(1.15);
+  transform-origin: var(--mx, 50%) var(--my, 50%);
+}
+
+/* Hover only arms after the prism pass has finished (.reveal-ready, Hero.tsx) */
+.hero-title.reveal-ready:hover .hero-rainbow {
+  opacity: 1;
+}
+
+/* While hovering, punch the same circle OUT of the black ink layer — the
+   rippling neon is then the only text inside the circle (otherwise the water
+   displacement shifts the color off the ink and both show as doubles). */
+.hero-title.reveal-ready:hover .hero-ink {
+  -webkit-mask-image: radial-gradient(circle 80px at var(--mx, 50%) var(--my, 50%),
+    transparent 99%, #000 100%);
+  mask-image: radial-gradient(circle 80px at var(--mx, 50%) var(--my, 50%),
+    transparent 99%, #000 100%);
+}
+
+/* The black layer underneath peeks through the anti-aliased glyph edges as a
+   dark fringe; a thin stroke in each letter's own color covers it so the
+   revealed letters read as solid color edge to edge. */
+.hero-rainbow span {
+  -webkit-text-stroke: 1.2px currentColor;
+}
+
