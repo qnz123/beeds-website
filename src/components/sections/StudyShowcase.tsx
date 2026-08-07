@@ -74,7 +74,10 @@ function StudyCard({
   const [inView, setInView] = useState(false)
   const [isDesktop, setIsDesktop] = useState(false)
   const [cardMode, setCardMode] = useState<ReviewMode>('desktop')
-  const baseW = cardMode === 'mobile' ? 390 : BASE_W
+  // Small/touch screens always embed the 390px mobile layout — the thumbnail
+  // shows the study's hero, static (no hover, no auto-scroll on touch).
+  const mobileHero = !isDesktop
+  const baseW = mobileHero || cardMode === 'mobile' ? 390 : BASE_W
 
   // Only run the live iframe where hover exists and the viewport is wide enough;
   // small/touch screens get the lightweight static poster and tap-to-open.
@@ -179,7 +182,9 @@ function StudyCard({
 
   useEffect(() => cancelRaf, [])
 
-  const showFrame = isDesktop && inView
+  // Desktop gets the live auto-scroll preview; mobile gets a static embed of
+  // the study's hero (its top screen) — both defer until near the viewport.
+  const showFrame = inView
 
   // When access is granted the window becomes a real, keyboard-operable control
   // that opens the full review canvas.
@@ -207,8 +212,12 @@ function StudyCard({
             : ''
         }`}
         style={{
-          // Frame flips to a vertical (portrait) phone shape in mobile mode.
-          aspectRatio: cardMode === 'mobile' ? '9 / 16' : `${BASE_W} / ${BASE_H}`,
+          // Frame flips to a vertical (portrait) phone shape in mobile mode —
+          // and on small/touch screens, where the hero shows in portrait.
+          aspectRatio:
+            mobileHero || cardMode === 'mobile'
+              ? '9 / 16'
+              : `${BASE_W} / ${BASE_H}`,
         }}
         onMouseEnter={play}
         onMouseLeave={rewind}
@@ -217,10 +226,10 @@ function StudyCard({
         <div ref={windowRef} className="absolute inset-0" aria-hidden="true">
           {showFrame ? (
             <iframe
-              key={cardMode}
+              key={`${cardMode}-${mobileHero}`}
               ref={iframeRef}
               src={`/studies/${study.slug}.html`}
-              title={`${study.name} — ${cardMode} preview`}
+              title={`${study.name} — ${mobileHero ? 'mobile' : cardMode} preview`}
               tabIndex={-1}
               scrolling="no"
               loading="lazy"

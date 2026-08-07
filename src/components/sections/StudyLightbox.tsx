@@ -66,7 +66,7 @@ export default function StudyLightbox({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 md:p-8"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-1 md:p-8"
       onMouseDown={(e) => {
         // Backdrop click (not a click inside the panel) closes.
         if (e.target === e.currentTarget) onClose()
@@ -99,9 +99,9 @@ export default function StudyLightbox({
           </div>
         </div>
 
-        <div className="p-3 md:p-4">
+        <div className="p-1 md:p-4">
           <ReviewCanvas key={mode} slug={slug} name={name} mode={mode} />
-          <p className="mt-3 text-sm text-[#666]">
+          <p className="mt-2 px-2 pb-1 text-sm text-[#666] md:mt-3 md:px-0 md:pb-0">
             {mode === 'mobile'
               ? 'Scroll up and down to review the mobile layout.'
               : 'Scroll up and down to review the design.'}

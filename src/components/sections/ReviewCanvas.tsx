@@ -36,6 +36,9 @@ const BASE_WIDTHS: Record<ReviewMode, number> = { desktop: 1280, mobile: 390 }
 const MOBILE_FRAME_H = 844
 // Breathing room around the phone silhouette inside the mobile canvas.
 const MOBILE_FRAME_MARGIN = 24
+// On narrow (phone-width) canvases the frame instead hugs the side edges.
+const NARROW_MARGIN = 4
+const NARROW_MAX = 560
 
 export default function ReviewCanvas({
   slug,
@@ -55,6 +58,8 @@ export default function ReviewCanvas({
   const overlayRef = useRef<HTMLDivElement>(null)
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const targetRef = useRef(0)
+  // Live scale for the scroll handlers (bound once, so state would go stale)
+  const scaleRef = useRef(0.5)
   const [dims, setDims] = useState({ scale: 0.5, h: 900 })
   const [frame, setFrame] = useState({ w: 0, h: 0 })
 
@@ -66,20 +71,35 @@ export default function ReviewCanvas({
     if (!el) return
     const compute = () => {
       if (mode === 'mobile') {
-        const availW = Math.max(0, el.clientWidth - MOBILE_FRAME_MARGIN * 2)
-        const availH = Math.max(0, el.clientHeight - MOBILE_FRAME_MARGIN * 2)
+        const narrow = el.clientWidth <= NARROW_MAX
+        const margin = narrow ? NARROW_MARGIN : MOBILE_FRAME_MARGIN
+        const availW = Math.max(0, el.clientWidth - margin * 2)
+        const availH = Math.max(0, el.clientHeight - margin * 2)
         const aspect = baseW / MOBILE_FRAME_H
-        let w = availH * aspect
-        let h = availH
-        if (w > availW) {
+        let w: number
+        let h: number
+        if (narrow) {
+          // Phone screens: fill the width edge-to-edge (client direction);
+          // the height takes everything the canvas offers, capped at true
+          // phone proportions.
           w = availW
-          h = availW / aspect
+          h = Math.min(availH, w / aspect)
+        } else {
+          // Wide canvases: best-fit phone silhouette, height-driven.
+          w = availH * aspect
+          h = availH
+          if (w > availW) {
+            w = availW
+            h = availW / aspect
+          }
         }
         setFrame({ w, h })
         const scale = w > 0 ? w / baseW : 0.5
+        scaleRef.current = scale
         setDims({ scale, h: scale > 0 ? h / scale : 900 })
       } else {
         const scale = el.clientWidth / baseW
+        scaleRef.current = scale
         setDims({ scale, h: el.clientHeight / scale })
       }
     }
@@ -89,15 +109,22 @@ export default function ReviewCanvas({
     return () => ro.disconnect()
   }, [mode, baseW])
 
-  // Drive the embedded page's internal scroll by a delta, clamped to its range.
+  // Drive the embedded page's internal scroll by a SCREEN-pixel delta, clamped
+  // to its range. The delta is converted to the page's logical pixels (÷ scale)
+  // so the content tracks the finger/wheel 1:1 visually — without this, a
+  // heavily scaled-down embed (e.g. 1280px page in a 350px phone canvas)
+  // scrolls at a crawl.
   const scrollByDelta = (delta: number) => {
     const win = iframeRef.current?.contentWindow as
       | (Window & { __lenis?: any })
       | null
     const doc = iframeRef.current?.contentDocument
     if (!win || !doc) return
+    // 0.45 damping on top of the 1:1 conversion — a calm, deliberate review
+    // pace (client-tuned).
+    const logical = (delta * 0.45) / (scaleRef.current || 1)
     const max = Math.max(0, doc.documentElement.scrollHeight - win.innerHeight)
-    targetRef.current = Math.min(max, Math.max(0, targetRef.current + delta))
+    targetRef.current = Math.min(max, Math.max(0, targetRef.current + logical))
     if (win.__lenis) win.__lenis.scrollTo(targetRef.current, { duration: 0.4 })
     else win.scrollTo({ top: targetRef.current })
   }
