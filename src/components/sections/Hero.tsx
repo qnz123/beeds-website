@@ -30,8 +30,19 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
   const [cursorBlinkOut, setCursorBlinkOut] = useState(false)
   // The neon hover reveal arms once the typewriter has finished
   const [revealReady, setRevealReady] = useState(false)
+  // Mobile shows the typewriter only — the neon hover layer renders solely on
+  // hover-capable desktop viewports (same gate as the Explore study cards)
+  const [isDesktop, setIsDesktop] = useState(false)
   const cancelled = useRef(false)
   const titleRef = useRef<HTMLHeadingElement>(null)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px) and (pointer: fine)')
+    const sync = () => setIsDesktop(mq.matches)
+    sync()
+    mq.addEventListener('change', sync)
+    return () => mq.removeEventListener('change', sync)
+  }, [])
 
   // Stripe palette (client-supplied 2026-08-07): random-width vertical strips
   // of these colors run across the full headline (background-clip: text).
@@ -159,7 +170,9 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
               follows the cursor while hovering the headline. Each line mirrors
               the black layer exactly, including an invisible stand-in for the
               typewriter cursor (its inline-block grows the line box a few px;
-              without the stand-in the two layers drift apart vertically). */}
+              without the stand-in the two layers drift apart vertically).
+              Desktop only — mobile gets the plain typewriter. */}
+          {isDesktop && (
           <div
             className="hero-rainbow"
             aria-hidden="true"
@@ -184,6 +197,7 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
               )}
             </div>
           </div>
+          )}
         </h1>
 
         <p className="text-base max-w-[600px] leading-[1.8]">{t.body}</p>
