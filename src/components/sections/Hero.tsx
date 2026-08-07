@@ -129,7 +129,7 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
         if (disp) {
           const t0 = performance.now()
           const step = (t: number) => {
-            const p = Math.min(1, (t - t0) / 2600)
+            const p = Math.min(1, (t - t0) / 3600)
             disp.setAttribute('scale', String(28 * Math.pow(1 - p, 3)))
             if (p < 1 && !cancelled.current) {
               rafRef.current = requestAnimationFrame(step)
@@ -137,8 +137,8 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
           }
           rafRef.current = requestAnimationFrame(step)
         }
-        // Arm the neon hover reveal once the pass has landed (2.6s run)
-        await sleep(2600)
+        // Arm the neon hover reveal once the pass has landed (3.6s run)
+        await sleep(3600)
         if (cancelled.current) return
         setRevealReady(true)
       }

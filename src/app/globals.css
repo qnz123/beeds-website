@@ -1753,7 +1753,7 @@ textarea.blank:focus {
 }
 
 .hero-prism .hero-defocus {
-  animation: hero-defocus 2.6s cubic-bezier(0.22, 0.61, 0.21, 1) forwards;
+  animation: hero-defocus 3.6s cubic-bezier(0.22, 0.61, 0.21, 1) forwards;
 }
 
 /* The pass chains the water displacement (#hero-water, settled to 0 by JS as
@@ -1792,18 +1792,19 @@ textarea.blank:focus {
 .hero-streak.two { top: 62%; height: 20px; }
 
 .hero-prism .hero-streak {
-  animation: hero-prism-pass 2.3s ease-in-out 0.2s forwards;
+  animation: hero-prism-pass 3.3s ease-in-out 0.2s forwards;
 }
 
 .hero-prism .hero-streak.two {
   animation-delay: 0.4s;
 }
 
+/* Whisper-level rainbow — present, barely announced */
 @keyframes hero-prism-pass {
-  0%   { opacity: 0;   transform: rotate(-14deg) translate3d(-12%, 0, 0); }
-  22%  { opacity: 0.9; }
-  60%  { opacity: 0.6; }
-  100% { opacity: 0;   transform: rotate(-14deg) translate3d(12%, 4%, 0); }
+  0%   { opacity: 0;    transform: rotate(-14deg) translate3d(-12%, 0, 0); }
+  22%  { opacity: 0.32; }
+  60%  { opacity: 0.2;  }
+  100% { opacity: 0;    transform: rotate(-14deg) translate3d(12%, 4%, 0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
