@@ -103,11 +103,7 @@ export default function DeckAccess({ onGranted }: { onGranted: () => void }) {
 
   return (
     <div className="mt-16 pt-10 border-t border-black">
-      <p className="eyebrow text-[#666] mb-4">Customers only</p>
-      <p className="text-xl md:text-2xl leading-[1.35] max-w-[620px] mb-8">
-        The full interactive studies are reserved for BEEDS clients. Request
-        access and we’ll open the complete deck for you to review.
-      </p>
+      <p className="eyebrow text-[#666] mb-6">Customers only</p>
 
       {!open ? (
         // House button — no third-party branding until the visitor opts in.
