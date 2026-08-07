@@ -258,7 +258,7 @@ function StudyCard({
       </div>
 
       {/* Caption — BEEDS editorial */}
-      <div className="mt-4 pt-4 border-t border-black">
+      <div className="mt-4">
         <div className="flex items-center justify-between gap-3">
           <h3 className="text-xl leading-none">{study.name}</h3>
           {/* Per-card device switch — shows visitors each study has a desktop
