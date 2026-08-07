@@ -109,20 +109,23 @@ export default function ReviewCanvas({
     return () => ro.disconnect()
   }, [mode, baseW])
 
+  // Client-tuned pacing on top of the 1:1 scale conversion: wheel stays calm
+  // and deliberate; touch runs quicker so mobile review doesn't drag.
+  const WHEEL_DAMPING = 0.45
+  const TOUCH_DAMPING = 0.85
+
   // Drive the embedded page's internal scroll by a SCREEN-pixel delta, clamped
   // to its range. The delta is converted to the page's logical pixels (÷ scale)
   // so the content tracks the finger/wheel 1:1 visually — without this, a
   // heavily scaled-down embed (e.g. 1280px page in a 350px phone canvas)
   // scrolls at a crawl.
-  const scrollByDelta = (delta: number) => {
+  const scrollByDelta = (delta: number, damping = 1) => {
     const win = iframeRef.current?.contentWindow as
       | (Window & { __lenis?: any })
       | null
     const doc = iframeRef.current?.contentDocument
     if (!win || !doc) return
-    // 0.45 damping on top of the 1:1 conversion — a calm, deliberate review
-    // pace (client-tuned).
-    const logical = (delta * 0.45) / (scaleRef.current || 1)
+    const logical = (delta * damping) / (scaleRef.current || 1)
     const max = Math.max(0, doc.documentElement.scrollHeight - win.innerHeight)
     targetRef.current = Math.min(max, Math.max(0, targetRef.current + logical))
     if (win.__lenis) win.__lenis.scrollTo(targetRef.current, { duration: 0.4 })
@@ -136,7 +139,7 @@ export default function ReviewCanvas({
     if (!el) return
     const onWheel = (e: WheelEvent) => {
       e.preventDefault()
-      scrollByDelta(e.deltaY)
+      scrollByDelta(e.deltaY, WHEEL_DAMPING)
     }
     let ty = 0
     const onTouchStart = (e: TouchEvent) => {
@@ -144,7 +147,7 @@ export default function ReviewCanvas({
     }
     const onTouchMove = (e: TouchEvent) => {
       const y = e.touches[0].clientY
-      scrollByDelta(ty - y)
+      scrollByDelta(ty - y, TOUCH_DAMPING)
       ty = y
       e.preventDefault()
     }
