@@ -139,8 +139,11 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
       <div className="container-x w-full max-w-full">
         <h1
           ref={titleRef}
-          className={`hero-title text-5xl leading-[1.2]${revealReady ? ' reveal-ready' : ''}`}
-          onMouseMove={handleTitleMove}
+          // reveal-ready (and with it every hover rule — including the mask
+          // hole punched in the ink) only ever applies on desktop; mobile is
+          // purely the typewriter.
+          className={`hero-title text-5xl leading-[1.2]${revealReady && isDesktop ? ' reveal-ready' : ''}`}
+          onMouseMove={isDesktop ? handleTitleMove : undefined}
         >
           {/* Black ink layer — while the reveal is hovered, a hole matching
               the reveal circle is masked out of it so the rippling neon
