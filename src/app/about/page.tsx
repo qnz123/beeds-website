@@ -46,7 +46,6 @@ export default function AboutPage() {
         {/* Lede */}
         <section className="pt-24 pb-20 px-10">
           <div className="container-x">
-            <h2 className="eyebrow mb-8">About BEEDS</h2>
             <h1 className="text-[23px] leading-[1.35] md:text-5xl md:leading-[1.2] max-w-[900px]">
               We help brands move through markets the way good stories move through a room —
               quietly, then all at once.
@@ -60,7 +59,7 @@ export default function AboutPage() {
             <h2 className="eyebrow mb-8">Our Journey — Since 2012</h2>
 
             {/* Dot-to-dot milestone timeline */}
-            <div className="pb-6 mb-6 border-b border-black">
+            <div className="pb-6 mb-6">
               <div className="journey-timeline">
                 <div className="journey-node">
                   <span className="journey-dot" />
@@ -90,15 +89,21 @@ export default function AboutPage() {
             </div>
 
             {/* Pull quote */}
-            <div className="py-6 mb-6 border-b border-black text-center">
+            <div className="py-6 mb-6 text-center">
               <p className="text-2xl md:text-3xl leading-[1.4] max-w-[720px] mx-auto">
-                &ldquo;If you have the ability to destroy, you have the ability to
-                create&rdquo;
+                &ldquo;If you have the ability to destroy, you have the ability
+                {/* Forced break only when the viewport gives the first line
+                    room to sit whole; narrow screens wrap naturally — the
+                    explicit space keeps "ability to" intact when the break
+                    is hidden (JSX drops the newline's whitespace). */}
+                {' '}
+                <br className="hidden md:block" />
+                to create&rdquo;
               </p>
             </div>
 
             {/* Beats: The Production / Backbone */}
-            <div className="grid md:grid-cols-2 gap-x-16 gap-y-6 pb-6 mb-6 border-b border-black">
+            <div className="grid md:grid-cols-2 gap-x-16 gap-y-6 pb-6 mb-6">
               <div>
                 <h3 className="eyebrow text-[#666] mb-2">The Production</h3>
                 <p className="text-sm leading-[1.7] text-[#666]">

@@ -47,7 +47,6 @@ export default function ExplorePage() {
         {/* Lede */}
         <section className="pt-24 pb-16 px-10">
           <div className="container-x">
-            <h2 className="eyebrow mb-8">Explore</h2>
             <h1 className="text-[23px] leading-[1.35] md:text-5xl md:leading-[1.2] max-w-[900px]">
               What’s moving people online — and the work that proves it.
             </h1>

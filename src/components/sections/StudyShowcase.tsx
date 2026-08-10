@@ -66,18 +66,98 @@ function StudyCard({
   granted: boolean
   onOpen: (slug: string) => void
 }) {
+  const rootRef = useRef<HTMLDivElement>(null)
   const windowRef = useRef<HTMLDivElement>(null)
-  const iframeRef = useRef<HTMLIFrameElement>(null)
+  // Both device embeds stay mounted (see render) — toggling flips visibility
+  // instantly instead of remounting/reloading the study page.
+  const iframeRefs = useRef<Record<ReviewMode, HTMLIFrameElement | null>>({
+    desktop: null,
+    mobile: null,
+  })
   const rafRef = useRef<number | null>(null)
 
   const [dims, setDims] = useState({ scale: 1, h: BASE_H })
   const [inView, setInView] = useState(false)
   const [isDesktop, setIsDesktop] = useState(false)
   const [cardMode, setCardMode] = useState<ReviewMode>('desktop')
+
+  // Ref to the caption's title row (holds this toggle) — the scroll target's
+  // lower bound: frame + toggle must be visible, the description may overflow.
+  const captionRowRef = useRef<HTMLDivElement>(null)
+
+  // Custom eased scroll (easeInOutCubic, duration scaled to distance) — a
+  // softer glide than native smooth scrolling.
+  const smoothScrollTo = (targetY: number) => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      window.scrollTo(0, targetY)
+      return
+    }
+    const startY = window.scrollY
+    const delta = targetY - startY
+    if (Math.abs(delta) < 2) return
+    // Locked to the frame's aspect-ratio morph (same 1.4s, same quintic
+    // curve — see the card's transition classes): both start on the click
+    // and settle together, with a soft gradual tail.
+    const dur = 1400
+    const t0 = performance.now()
+    const ease = (t: number) =>
+      t < 0.5 ? 16 * t * t * t * t * t : 1 - Math.pow(-2 * t + 2, 5) / 2
+    const step = (now: number) => {
+      const p = Math.min(1, (now - t0) / dur)
+      window.scrollTo(0, startY + delta * ease(p))
+      if (p < 1) requestAnimationFrame(step)
+    }
+    requestAnimationFrame(step)
+  }
+
+  // On every device switch, glide the page so the sample frame AND the
+  // toggle row are in view (description below may fall off-screen):
+  //  - to mobile: the tall portrait frame centers when it fits; otherwise the
+  //    toggle row is pinned just inside the bottom so the way back is visible
+  //  - back to desktop: the whole landscape frame comes fully into view
+  const handleModeChange = (m: ReviewMode) => {
+    setCardMode(m)
+    // No waiting for the 300ms aspect-ratio morph: predict the frame's final
+    // height from its (unchanging) width and scroll immediately — the glide
+    // and the morph run together and land on the same final layout.
+    requestAnimationFrame(() => {
+      // Start the newly shown embed at its top
+      const win = iframeRefs.current[m]?.contentWindow as
+        | (Window & { __lenis?: any })
+        | null
+      if (win) {
+        if (win.__lenis) win.__lenis.scrollTo(0, { immediate: true })
+        else win.scrollTo(0, 0)
+      }
+      const root = rootRef.current
+      const row = captionRowRef.current
+      const frame = windowRef.current
+      if (!root || !row || !frame) return
+      const frameRect = frame.getBoundingClientRect()
+      const finalFrameH =
+        m === 'mobile'
+          ? (frameRect.width * 16) / 9
+          : (frameRect.width * BASE_H) / BASE_W
+      const top = root.getBoundingClientRect().top
+      const measuredRange = row.getBoundingClientRect().bottom - top
+      const rangeH = measuredRange - frameRect.height + finalFrameH
+      const bottom = top + rangeH
+      const vh = window.innerHeight
+      const margin = 24
+      const target =
+        rangeH <= vh - margin * 2
+          ? window.scrollY + top - (vh - rangeH) / 2
+          : window.scrollY + bottom - vh + margin
+      smoothScrollTo(Math.max(0, target))
+    })
+  }
   // Small/touch screens always embed the 390px mobile layout — the thumbnail
   // shows the study's hero, static (no hover, no auto-scroll on touch).
   const mobileHero = !isDesktop
-  const baseW = mobileHero || cardMode === 'mobile' ? 390 : BASE_W
+  const activeMode: ReviewMode =
+    mobileHero || cardMode === 'mobile' ? 'mobile' : 'desktop'
+  const baseW = activeMode === 'mobile' ? 390 : BASE_W
+  const getIframe = () => iframeRefs.current[activeMode]
 
   // Only run the live iframe where hover exists and the viewport is wide enough;
   // small/touch screens get the lightweight static poster and tap-to-open.
@@ -152,7 +232,7 @@ function StudyCard({
 
   const play = () => {
     if (prefersReduced()) return
-    const iframe = iframeRef.current
+    const iframe = getIframe()
     const win = iframe?.contentWindow as (Window & { __lenis?: any }) | null
     const doc = iframe?.contentDocument
     if (!win || !doc) return
@@ -173,7 +253,7 @@ function StudyCard({
 
   const rewind = () => {
     cancelRaf()
-    const win = iframeRef.current?.contentWindow as
+    const win = getIframe()?.contentWindow as
       | (Window & { __lenis?: any })
       | null
     if (!win) return
@@ -227,9 +307,9 @@ function StudyCard({
     : {}
 
   return (
-    <div className="flex flex-col">
+    <div ref={rootRef} className="flex flex-col">
       <div
-        className={`group relative block overflow-hidden border border-black bg-white transition-[aspect-ratio] duration-300 motion-reduce:transition-none${
+        className={`group relative block overflow-hidden border border-black bg-white transition-[aspect-ratio] duration-[1400ms] ease-[cubic-bezier(0.83,0,0.17,1)] motion-reduce:transition-none${
           granted
             ? ' cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black'
             : ''
@@ -248,28 +328,56 @@ function StudyCard({
       >
         <div ref={windowRef} className="absolute inset-0" aria-hidden="true">
           {showFrame ? (
-            <iframe
-              key={`${cardMode}-${mobileHero}`}
-              ref={iframeRef}
-              src={`/studies/${study.slug}.html`}
-              title={`${study.name} — ${mobileHero ? 'mobile' : cardMode} preview`}
-              tabIndex={-1}
-              scrolling="no"
-              loading="lazy"
-              onLoad={() => {
-                // If the card is already mid-screen when the embed finishes
-                // loading (common on mobile), start the auto-scroll now.
-                if (!isDesktop && midViewRef.current) play()
-              }}
-              style={{
-                width: baseW,
-                height: dims.h,
-                border: 0,
-                transform: `scale(${dims.scale})`,
-                transformOrigin: 'top left',
-                pointerEvents: 'none',
-              }}
-            />
+            isDesktop ? (
+              // Both device embeds mounted and preloaded (deferred until the
+              // card is near the viewport via showFrame, so no loading="lazy"
+              // — display:none iframes would never lazy-load). Toggling flips
+              // visibility instantly; no reload, no delay.
+              (['desktop', 'mobile'] as ReviewMode[]).map((m) => (
+                <iframe
+                  key={m}
+                  ref={(el) => {
+                    iframeRefs.current[m] = el
+                  }}
+                  src={`/studies/${study.slug}.html`}
+                  title={`${study.name} — ${m} preview`}
+                  tabIndex={-1}
+                  scrolling="no"
+                  style={{
+                    display: m === activeMode ? 'block' : 'none',
+                    width: m === 'mobile' ? 390 : BASE_W,
+                    height: dims.h,
+                    border: 0,
+                    transform: `scale(${dims.scale})`,
+                    transformOrigin: 'top left',
+                    pointerEvents: 'none',
+                  }}
+                />
+              ))
+            ) : (
+              <iframe
+                ref={(el) => {
+                  iframeRefs.current.mobile = el
+                }}
+                src={`/studies/${study.slug}.html`}
+                title={`${study.name} — mobile preview`}
+                tabIndex={-1}
+                scrolling="no"
+                onLoad={() => {
+                  // If the card is already mid-screen when the embed finishes
+                  // loading, start the auto-scroll now.
+                  if (midViewRef.current) play()
+                }}
+                style={{
+                  width: 390,
+                  height: dims.h,
+                  border: 0,
+                  transform: `scale(${dims.scale})`,
+                  transformOrigin: 'top left',
+                  pointerEvents: 'none',
+                }}
+              />
+            )
           ) : (
             // Static poster (mobile / pre-load): brand name + palette, BEEDS type.
             <div
@@ -299,12 +407,12 @@ function StudyCard({
 
       {/* Caption — BEEDS editorial */}
       <div className="mt-4">
-        <div className="flex items-center justify-between gap-3">
+        <div ref={captionRowRef} className="flex items-center justify-between gap-3">
           <h3 className="text-xl leading-none">{study.name}</h3>
           {/* Per-card device switch — shows visitors each study has a desktop
               AND a mobile version, and flips the live preview between them. */}
           {isDesktop && (
-            <DeviceToggle size="sm" mode={cardMode} onChange={setCardMode} />
+            <DeviceToggle size="sm" mode={cardMode} onChange={handleModeChange} />
           )}
         </div>
         <p className="mt-3 text-sm leading-[1.6] text-[#666]">{study.descriptor}</p>

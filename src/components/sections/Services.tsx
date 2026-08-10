@@ -67,7 +67,7 @@ export default function Services({ lang = 'en' as Locale }: { lang?: Locale }) {
   const t = getDictionary(lang).svc
 
   return (
-    <section id="services" className="bg-white py-20 px-10 border-t border-black">
+    <section id="services" className="bg-white py-20 px-10">
       <div className="container-x">
         <h2 className="eyebrow mb-12">{t.heading}</h2>
 
