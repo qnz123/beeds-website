@@ -78,6 +78,9 @@ function StudyCard({
 
   const [dims, setDims] = useState({ scale: 1, h: BASE_H })
   const [inView, setInView] = useState(false)
+  // The hidden device embed defers a beat so first paint only loads the
+  // visible three studies, not six — it's warm long before anyone toggles.
+  const [preloadHidden, setPreloadHidden] = useState(false)
   const [isDesktop, setIsDesktop] = useState(false)
   const [cardMode, setCardMode] = useState<ReviewMode>('desktop')
 
@@ -263,6 +266,14 @@ function StudyCard({
 
   useEffect(() => cancelRaf, [])
 
+  // Warm up the hidden device embed shortly after the card is in view — the
+  // visible embeds get the bandwidth first, the toggle still feels instant.
+  useEffect(() => {
+    if (!inView || !isDesktop || preloadHidden) return
+    const t = window.setTimeout(() => setPreloadHidden(true), 2500)
+    return () => window.clearTimeout(t)
+  }, [inView, isDesktop, preloadHidden])
+
   // Mobile has no hover: when the card sits in the middle of the screen the
   // sample auto-scrolls top → bottom by itself, and rewinds once it leaves.
   const midViewRef = useRef(false)
@@ -333,7 +344,9 @@ function StudyCard({
               // card is near the viewport via showFrame, so no loading="lazy"
               // — display:none iframes would never lazy-load). Toggling flips
               // visibility instantly; no reload, no delay.
-              (['desktop', 'mobile'] as ReviewMode[]).map((m) => (
+              (['desktop', 'mobile'] as ReviewMode[])
+                .filter((m) => m === activeMode || preloadHidden)
+                .map((m) => (
                 <iframe
                   key={m}
                   ref={(el) => {
