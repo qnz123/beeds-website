@@ -37,7 +37,6 @@ export default function AboutPageJa() {
         {/* Lede */}
         <section className="pt-24 pb-20 px-10">
           <div className="container-x">
-            <h2 className="eyebrow mb-8">About BEEDS</h2>
             <h1 className="text-[26px] leading-[1.45] md:text-5xl md:leading-[1.3] max-w-[900px]">
               ブランドは、語るものではない。
               <br />
@@ -55,7 +54,7 @@ export default function AboutPageJa() {
             <h2 className="eyebrow mb-8">Our Journey — Since 2012</h2>
 
             {/* Dot-to-dot milestone timeline */}
-            <div className="pb-6 mb-6 border-b border-black">
+            <div className="pb-6 mb-6">
               <div className="journey-timeline">
                 <div className="journey-node">
                   <span className="journey-dot" />
@@ -83,17 +82,20 @@ export default function AboutPageJa() {
             </div>
 
             {/* Pull quote */}
-            <div className="py-6 mb-6 border-b border-black text-center">
-              <p className="text-2xl md:text-3xl leading-[1.4] max-w-[720px] mx-auto mb-5">
-                &ldquo;If you have the ability to destroy, you have the ability to create&rdquo;
-              </p>
-              <p className="text-sm leading-[1.9] text-[#666] max-w-[600px] mx-auto">
-                壊すことができるなら、創り直すこともできる。変化は終わりではありません。次の可能性の始まりです。
+            <div className="py-6 mb-6 text-center">
+              <p className="text-2xl md:text-3xl leading-[1.4] max-w-[720px] mx-auto">
+                &ldquo;If you have the ability to destroy, you have the ability
+                {/* Matches the EN page: forced break only when the viewport
+                    gives the first line room; the explicit space keeps
+                    "ability to" intact when the break is hidden. */}
+                {' '}
+                <br className="hidden md:block" />
+                to create&rdquo;
               </p>
             </div>
 
             {/* Beats: Production / Backbone */}
-            <div className="grid md:grid-cols-2 gap-x-16 gap-y-6 pb-6 mb-6 border-b border-black">
+            <div className="grid md:grid-cols-2 gap-x-16 gap-y-6 pb-6 mb-6">
               <div>
                 <h3 className="eyebrow text-[#666] mb-2">Production</h3>
                 <p className="text-sm leading-[1.7] text-[#666]">
@@ -109,7 +111,7 @@ export default function AboutPageJa() {
             </div>
 
             {/* Beats: 2013 — Transform / New York · Tokyo */}
-            <div className="grid md:grid-cols-2 gap-x-16 gap-y-6 pb-6 mb-6 border-b border-black">
+            <div className="grid md:grid-cols-2 gap-x-16 gap-y-6 pb-6 mb-6">
               <div>
                 <h3 className="eyebrow text-[#666] mb-2">2013 — Transform</h3>
                 <p className="text-sm leading-[1.7] text-[#666]">
