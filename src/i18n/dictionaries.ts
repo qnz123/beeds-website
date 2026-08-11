@@ -165,9 +165,8 @@ const en: Dict = {
   svc: { heading: 'Our Services', clients: 'Selected Clients' },
   explore: {
     heroLines: ['What’s moving people online — and the work that proves it.'],
-    introHighlight: 'Hover a frame',
-    introRest:
-      ' to watch it play top to bottom, then pick the direction that fits your product — or ',
+    introHighlight: 'Pick the direction',
+    introRest: ' that fits your product — or ',
     introLinkText: 'contact us for custom planning',
     introAfterLink: '.',
     trendLede: 'Trends are trends.',
@@ -276,9 +275,9 @@ const ja: Dict = {
       'オンラインで、人の心を動かすもの。',
       'そして、それを証明するクリエイティブ。',
     ],
-    introHighlight: 'フレームにカーソルを合わせると',
+    introHighlight: 'プロダクトに最適な方向性',
     introRest:
-      '、上から下へ再生されます。プロダクトに最適な方向性を見つけてください。より自由な発想でプランニングしたい方は、',
+      'を見つけてください。より自由な発想でプランニングしたい方は、',
     introLinkText: 'カスタムプランニングについてお問い合わせください',
     introAfterLink: '。',
     trendLede: 'トレンドは、トレンド。',
