@@ -27,9 +27,9 @@ export const metadata: Metadata = {
     siteName: 'BEEDS',
     images: [
       {
-        url: '/logo/beeds-butterfly-black.png',
-        width: 1024,
-        height: 1024,
+        url: '/og/beeds-og-hero.png',
+        width: 1200,
+        height: 630,
         alt: 'BEEDS',
       },
     ],
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title,
     description,
-    images: ['/logo/beeds-butterfly-black.png'],
+    images: ['/og/beeds-og-hero.png'],
   },
 }
 

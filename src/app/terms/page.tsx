@@ -3,10 +3,38 @@ import Link from 'next/link'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 
+const termsTitle = 'Terms of Use - BEEDS'
+const termsDescription =
+  'The terms governing use of the BEEDS website, its content, and the creative work featured on it.'
+
 export const metadata: Metadata = {
-  title: 'Terms of Use - BEEDS',
-  description:
-    'The terms governing use of the BEEDS website, its content, and the creative work featured on it.',
+  title: termsTitle,
+  description: termsDescription,
+  alternates: {
+    canonical: '/terms/',
+  },
+  openGraph: {
+    title: termsTitle,
+    description: termsDescription,
+    url: '/terms/',
+    siteName: 'BEEDS',
+    images: [
+      {
+        url: '/og/beeds-og-hero.png',
+        width: 1200,
+        height: 630,
+        alt: 'BEEDS',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: termsTitle,
+    description: termsDescription,
+    images: ['/og/beeds-og-hero.png'],
+  },
 }
 
 // Each section is an eyebrow label + one or more serif paragraphs, divided by
