@@ -280,9 +280,11 @@ const ja: Dict = {
       'を見つけてください。より自由な発想でプランニングしたい方は、',
     introLinkText: 'カスタムプランニングについてお問い合わせください',
     introAfterLink: '。',
-    trendLede: 'トレンドは、トレンド。',
-    trendStay: '残るものもあれば、',
-    trendBreak: '消えていくものもある。',
+    // Lede stays in English on the JA page (client direction 2026-08-11);
+    // the body paragraphs below it remain Japanese.
+    trendLede: 'Trends are trends.',
+    trendStay: 'Some stay.',
+    trendBreak: 'Some break.',
     trendBody: [
       'ここにあるのは、デザインの世界で今、何が動いているのか。それを私たちなりの目で読み解いたものです。',
       '正解を示すルールブックではありません。「これが正解」という答えでもありません。',

@@ -35,12 +35,7 @@ export default function TrendNote({ lang = 'en' }: { lang?: Locale }) {
   }, [])
 
   return (
-    <div
-      ref={ref}
-      className={`trend-note${lang === 'ja' ? ' trend-note--ja' : ''}${
-        inView ? ' is-in' : ''
-      }`}
-    >
+    <div ref={ref} className={`trend-note${inView ? ' is-in' : ''}`}>
       <p className="trend-note-lede">
         {t.trendLede}{' '}
         <span className="trend-note-stay">{t.trendStay}</span>{' '}
