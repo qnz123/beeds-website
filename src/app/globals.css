@@ -1657,6 +1657,15 @@ textarea.blank:focus {
   max-width: 16ch;
 }
 
+/* Japanese glyphs are full-width (~2x a Latin `ch`), so the 16ch measure
+   breaks phrases mid-sentence. An em-based measure lets each phrase —
+   トレンドは、トレンド。/ 残るものもあれば、/ 消えていくものもある。— hold its own line. */
+.trend-note--ja .trend-note-lede {
+  max-width: 12em;
+  letter-spacing: 0;
+  line-height: 1.35;
+}
+
 .trend-note-stay,
 .trend-note-break {
   position: relative;
@@ -1692,6 +1701,11 @@ textarea.blank:focus {
   font-size: 0.95rem;
   line-height: 1.85;
   color: #444;
+}
+
+/* Multi-paragraph bodies (JA transcreation) sit closer together */
+.trend-note-body + .trend-note-body {
+  margin-top: 1.1rem;
 }
 
 @media (prefers-reduced-motion: no-preference) {

@@ -5,6 +5,8 @@ import DeckAccess from './DeckAccess'
 import StudyLightbox from './StudyLightbox'
 import DeviceToggle from './DeviceToggle'
 import type { ReviewMode } from './ReviewCanvas'
+import type { Locale } from '@/i18n/config'
+import { getDictionary } from '@/i18n/dictionaries'
 
 // Interactive design studies. Each card embeds one of the self-contained
 // scroll-choreographed pages served from /public/studies as a scaled, live
@@ -22,47 +24,33 @@ import type { ReviewMode } from './ReviewCanvas'
 // same cards become clickable — clicking one opens it in the larger scroll-only
 // review canvas (StudyLightbox). No duplicate gallery; the originals do the job.
 
+// Brand identity per study; the descriptor + tag copy is localized and lives
+// in the dictionary (explore.studies), keyed by these slugs.
 type Study = {
-  slug: string
+  slug: 'meridian' | 'aura' | 'volt'
   name: string
-  descriptor: string
-  tag: string
   accent: string
 }
 
 const STUDIES: Study[] = [
-  {
-    slug: 'meridian',
-    name: 'MERIDIAN',
-    descriptor: 'For premium products that earn a slow, deliberate reveal.',
-    tag: 'Cinematic luxury',
-    accent: '#c9a96a',
-  },
-  {
-    slug: 'aura',
-    name: 'aura',
-    descriptor: 'For gentle brands that sell calm — soft on the eye, kind to the skin.',
-    tag: 'Liquid, organic',
-    accent: '#e8c4c4',
-  },
-  {
-    slug: 'volt',
-    name: 'VOLT',
-    descriptor: 'For loud products that would rather shout than blend in.',
-    tag: 'Brutalist kinetic',
-    accent: '#d8ff00',
-  },
+  { slug: 'meridian', name: 'MERIDIAN', accent: '#c9a96a' },
+  { slug: 'aura', name: 'aura', accent: '#e8c4c4' },
+  { slug: 'volt', name: 'VOLT', accent: '#d8ff00' },
 ]
+
+const EN_STUDY_COPY = getDictionary('en').explore.studies
 
 const BASE_W = 1280
 const BASE_H = 800
 
 function StudyCard({
   study,
+  copy,
   granted,
   onOpen,
 }: {
   study: Study
+  copy: { descriptor: string[]; tag: string }
   granted: boolean
   onOpen: (slug: string) => void
 }) {
@@ -428,16 +416,24 @@ function StudyCard({
             <DeviceToggle size="sm" mode={cardMode} onChange={handleModeChange} />
           )}
         </div>
-        <p className="mt-3 text-sm leading-[1.6] text-[#666]">{study.descriptor}</p>
+        <p className="mt-3 text-sm leading-[1.6] text-[#666]">
+          {copy.descriptor.map((line, i) => (
+            <span key={line}>
+              {i > 0 && <br />}
+              {line}
+            </span>
+          ))}
+        </p>
         <p className="mt-2 text-[11px] uppercase tracking-[0.12em] text-[#999]">
-          {study.tag}
+          {copy.tag}
         </p>
       </div>
     </div>
   )
 }
 
-export default function StudyShowcase() {
+export default function StudyShowcase({ lang = 'en' }: { lang?: Locale }) {
+  const t = getDictionary(lang).explore
   const [granted, setGranted] = useState(false)
   const [active, setActive] = useState<string | null>(null)
 
@@ -458,15 +454,15 @@ export default function StudyShowcase() {
       <div className="container-x">
         <h2 className="eyebrow mb-3">Explore what fits</h2>
         <p className="text-sm leading-[1.6] text-[#666] max-w-[560px] mb-10">
-          <span className="brush-highlight">Hover a frame</span> to watch it play
-          top to bottom, then pick the direction that fits your product — or{' '}
+          <span className="brush-highlight">{t.introHighlight}</span>
+          {t.introRest}
           <a
-            href="/booking/"
+            href={lang === 'ja' ? '/ja/booking/' : '/booking/'}
             className="underline underline-offset-4 decoration-[#999] hover:decoration-black"
           >
-            contact us for custom planning
+            {t.introLinkText}
           </a>
-          .
+          {t.introAfterLink}
         </p>
 
         <div className="grid items-start gap-x-8 gap-y-12 md:grid-cols-3">
@@ -474,6 +470,9 @@ export default function StudyShowcase() {
             <StudyCard
               key={study.slug}
               study={study}
+              // Fall back to English if a locale is ever missing this study —
+              // a client-component throw here would blank the whole page.
+              copy={t.studies[study.slug] ?? EN_STUDY_COPY[study.slug]}
               granted={granted}
               onOpen={setActive}
             />

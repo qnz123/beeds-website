@@ -24,9 +24,8 @@ export default function Navigation({
     { label: t.work, href: isJa ? '/ja/#work' : '/#work' },
     { label: t.about, href: isJa ? '/ja/about' : '/about' },
     { label: t.services, href: isJa ? '/ja/about#services' : '/about#services' },
-    // Explore is English-only for now; both locales point to /explore until the
-    // /ja/explore mirror ships (kept in English on the JA nav by client direction).
-    { label: 'Explore', href: '/explore' },
+    // Explore label stays in English on both locales (client direction).
+    { label: 'Explore', href: isJa ? '/ja/explore' : '/explore' },
     { label: t.contact, href: isJa ? '/ja/#contact' : '/#contact' },
   ]
 

@@ -5,15 +5,18 @@ import StudyShowcase from '@/components/sections/StudyShowcase'
 import TrendNote from '@/components/sections/TrendNote'
 import { getDictionary } from '@/i18n/dictionaries'
 
-const title = 'Explore — Design Trends & Studies | BEEDS'
+// Japanese mirror of /explore — client-supplied transcreation (2026-08-11).
+// The interactive studies themselves stay in English (fictional brands).
+
+const title = 'Explore — デザイントレンド＆スタディ | BEEDS'
 const description =
-  'Where BEEDS tracks what moves people online — scroll-driven storytelling, kinetic type, editorial minimalism, and immersive 3D — with live interactive studies you can scroll through.'
+  'オンラインで、人の心を動かすもの。そして、それを証明するクリエイティブ。スクロールで体験できるインタラクティブなデザインスタディ。'
 
 export const metadata: Metadata = {
   title,
   description,
   alternates: {
-    canonical: '/explore/',
+    canonical: '/ja/explore/',
     languages: {
       en: '/explore/',
       ja: '/ja/explore/',
@@ -23,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     title,
     description,
-    url: '/explore/',
+    url: '/ja/explore/',
     siteName: 'BEEDS',
     images: [
       {
@@ -33,7 +36,7 @@ export const metadata: Metadata = {
         alt: 'BEEDS',
       },
     ],
-    locale: 'en_US',
+    locale: 'ja_JP',
     type: 'website',
   },
   twitter: {
@@ -44,16 +47,16 @@ export const metadata: Metadata = {
   },
 }
 
-export default function ExplorePage() {
-  const t = getDictionary('en').explore
+export default function ExplorePageJa() {
+  const t = getDictionary('ja').explore
   return (
     <>
-      <Navigation switchHref="/ja/explore/" />
+      <Navigation lang="ja" switchHref="/explore/" />
       <main>
         {/* Lede */}
         <section className="pt-24 pb-16 px-10">
           <div className="container-x">
-            <h1 className="text-[23px] leading-[1.35] md:text-5xl md:leading-[1.2] max-w-[900px]">
+            <h1 className="text-[26px] leading-[1.45] md:text-5xl md:leading-[1.3] max-w-[900px]">
               {t.heroLines.map((line, i) => (
                 <span key={line}>
                   {i > 0 && <br />}
@@ -65,17 +68,16 @@ export default function ExplorePage() {
         </section>
 
         {/* Interactive studies */}
-        <StudyShowcase />
+        <StudyShowcase lang="ja" />
 
         {/* Design Trends / Journal */}
         <section className="py-14 px-10 bg-white">
           <div className="container-x">
-            {/* Point-of-view notice (light editorial, scroll-revealed) */}
-            <TrendNote />
+            <TrendNote lang="ja" />
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer lang="ja" />
     </>
   )
 }

@@ -56,11 +56,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       alternates: { languages: { en: `${siteUrl}/booking/`, ja: `${siteUrl}/ja/booking/` } },
     },
     {
-      // English-only for now; add /ja/explore alternates when the mirror ships.
       url: `${siteUrl}/explore/`,
       lastModified,
       changeFrequency: 'weekly',
       priority: 0.7,
+      alternates: { languages: { en: `${siteUrl}/explore/`, ja: `${siteUrl}/ja/explore/` } },
+    },
+    {
+      url: `${siteUrl}/ja/explore/`,
+      lastModified,
+      changeFrequency: 'weekly',
+      priority: 0.7,
+      alternates: { languages: { en: `${siteUrl}/explore/`, ja: `${siteUrl}/ja/explore/` } },
     },
     {
       url: `${siteUrl}/ja/booking/`,

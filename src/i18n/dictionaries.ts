@@ -76,6 +76,25 @@ type Dict = {
     after: string
   }
   svc: { heading: string; clients: string }
+  explore: {
+    heroLines: string[] // h1 lines — JA breaks across two lines
+    // Intro sentence around the studies grid: [highlight][rest][link][after]
+    introHighlight: string
+    introRest: string
+    introLinkText: string
+    introAfterLink: string
+    // Trend note: lede + the two underlined phrases + body paragraphs
+    trendLede: string
+    trendStay: string
+    trendBreak: string
+    trendBody: string[]
+    // Study card copy, keyed by slug. `descriptor` is an array of lines —
+    // EN runs as one sentence, JA breaks into two.
+    studies: Record<
+      'meridian' | 'aura' | 'volt',
+      { descriptor: string[]; tag: string }
+    >
+  }
 }
 
 const en: Dict = {
@@ -91,7 +110,7 @@ const en: Dict = {
     businessEmail: 'Business Email —',
     information: 'Information',
     rights: 'All Rights Reserved',
-    location: 'Tokyo, Japan',
+    location: 'Tokyo, Japan · New York, U.S',
   },
   work: { heading: 'Selected Work' },
   clients: { heading: 'Selected Clients' },
@@ -144,6 +163,36 @@ const en: Dict = {
     after: 'After',
   },
   svc: { heading: 'Our Services', clients: 'Selected Clients' },
+  explore: {
+    heroLines: ['What’s moving people online — and the work that proves it.'],
+    introHighlight: 'Hover a frame',
+    introRest:
+      ' to watch it play top to bottom, then pick the direction that fits your product — or ',
+    introLinkText: 'contact us for custom planning',
+    introAfterLink: '.',
+    trendLede: 'Trends are trends.',
+    trendStay: 'Some stay.',
+    trendBreak: 'Some break.',
+    trendBody: [
+      'The above is our own human read on what’s moving in design — not a rulebook or a “this is it.” Not every trend deserves a permanent place in a brand. Knowing which ones to build on, and which to let pass, is the work. That is exactly why we’re here.',
+    ],
+    studies: {
+      meridian: {
+        descriptor: ['For premium products that earn a slow, deliberate reveal.'],
+        tag: 'Cinematic luxury',
+      },
+      aura: {
+        descriptor: [
+          'For gentle brands that sell calm — soft on the eye, kind to the skin.',
+        ],
+        tag: 'Liquid, organic',
+      },
+      volt: {
+        descriptor: ['For loud products that would rather shout than blend in.'],
+        tag: 'Brutalist kinetic',
+      },
+    },
+  },
 }
 
 // --- 日本語（下書き：ネイティブ確認待ち / DRAFT — pending native review） ---
@@ -167,7 +216,7 @@ const ja: Dict = {
     businessEmail: 'ビジネスメール —',
     information: '会社情報',
     rights: '無断転載を禁じます',
-    location: '東京, 日本',
+    location: '東京, 日本 · New York, U.S',
   },
   work: { heading: '制作実績' },
   clients: { heading: '主なクライアント' },
@@ -222,6 +271,45 @@ const ja: Dict = {
     after: '導入後',
   },
   svc: { heading: 'サービス', clients: '主なクライアント' },
+  explore: {
+    heroLines: [
+      'オンラインで、人の心を動かすもの。',
+      'そして、それを証明するクリエイティブ。',
+    ],
+    introHighlight: 'フレームにカーソルを合わせると',
+    introRest:
+      '、上から下へ再生されます。プロダクトに最適な方向性を見つけてください。より自由な発想でプランニングしたい方は、',
+    introLinkText: 'カスタムプランニングについてお問い合わせください',
+    introAfterLink: '。',
+    trendLede: 'トレンドは、トレンド。',
+    trendStay: '残るものもあれば、',
+    trendBreak: '消えていくものもある。',
+    trendBody: [
+      'ここにあるのは、デザインの世界で今、何が動いているのか。それを私たちなりの目で読み解いたものです。',
+      '正解を示すルールブックではありません。「これが正解」という答えでもありません。',
+      'すべてのトレンドを、ブランドに取り入れる必要はない。何を育て、何を見送るのか。その見極めこそが、クリエイティブの仕事です。',
+    ],
+    studies: {
+      meridian: {
+        descriptor: [
+          'じっくりと、意図的に魅力を見せていく。',
+          '時間をかけた演出が似合う、プレミアムなプロダクトに。',
+        ],
+        tag: 'プレミアム × シネマティック',
+      },
+      aura: {
+        descriptor: ['穏やかさを届けるブランドに。', '目にやさしく、肌にもやさしい。'],
+        tag: 'リキッド × オーガニック',
+      },
+      volt: {
+        descriptor: [
+          '周囲に溶け込むより、声を上げたいプロダクトに。',
+          '大胆に、存在感を放つために。',
+        ],
+        tag: 'ブルータリスト × キネティック',
+      },
+    },
+  },
 }
 
 const dictionaries: Record<Locale, Dict> = { en, ja }
