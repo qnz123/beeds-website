@@ -83,6 +83,9 @@ type Dict = {
     introRest: string
     introLinkText: string
     introAfterLink: string
+    // Gated deck CTA
+    deckEyebrow: string
+    deckCta: string
     // Trend note: lede + the two underlined phrases + body paragraphs
     trendLede: string
     trendStay: string
@@ -169,6 +172,8 @@ const en: Dict = {
     introRest: ' that fits your product — or ',
     introLinkText: 'contact us for custom planning',
     introAfterLink: '.',
+    deckEyebrow: 'Customers only',
+    deckCta: 'Review the full deck →',
     trendLede: 'Trends are trends.',
     trendStay: 'Some stay.',
     trendBreak: 'Some break.',
@@ -280,6 +285,8 @@ const ja: Dict = {
       'を見つけてください。より自由な発想でプランニングしたい方は、',
     introLinkText: 'カスタムプランニングについてお問い合わせください',
     introAfterLink: '。',
+    deckEyebrow: 'お客様向け',
+    deckCta: 'デッキ全体を見る →',
     // Lede stays in English on the JA page (client direction 2026-08-11);
     // the body paragraphs below it remain Japanese.
     trendLede: 'Trends are trends.',

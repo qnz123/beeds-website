@@ -485,7 +485,7 @@ export default function StudyShowcase({ lang = 'en' }: { lang?: Locale }) {
           </p>
         ) : (
           // Single gated CTA — one-click Google sign-in + email fallback.
-          <DeckAccess onGranted={handleGranted} />
+          <DeckAccess onGranted={handleGranted} lang={lang} />
         )}
       </div>
 

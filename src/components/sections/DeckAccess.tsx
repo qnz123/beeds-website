@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import type { Locale } from '@/i18n/config'
+import { getDictionary } from '@/i18n/dictionaries'
 
 // The single gated CTA for the Explore studies. It starts as the house button
 // ("Review the full deck →"); clicking it reveals the ways to continue —
@@ -19,7 +21,14 @@ const ENDPOINT = '/api/deck-access/' // trailing slash: trailingSlash:true 308s 
 
 type Status = 'idle' | 'loading' | 'error'
 
-export default function DeckAccess({ onGranted }: { onGranted: () => void }) {
+export default function DeckAccess({
+  onGranted,
+  lang = 'en',
+}: {
+  onGranted: () => void
+  lang?: Locale
+}) {
+  const t = getDictionary(lang).explore
   const btnRef = useRef<HTMLDivElement>(null)
   const [status, setStatus] = useState<Status>('idle')
   const [open, setOpen] = useState(false) // options revealed after the first click
@@ -103,12 +112,12 @@ export default function DeckAccess({ onGranted }: { onGranted: () => void }) {
 
   return (
     <div className="mt-16 pt-10 border-t border-black">
-      <p className="eyebrow text-[#666] mb-6">Customers only</p>
+      <p className="eyebrow text-[#666] mb-6">{t.deckEyebrow}</p>
 
       {!open ? (
         // House button — no third-party branding until the visitor opts in.
         <button type="button" onClick={() => setOpen(true)} className="deck-cta">
-          Review the full deck →
+          {t.deckCta}
         </button>
       ) : (
         <div className="max-w-[420px]">
