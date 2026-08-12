@@ -208,8 +208,35 @@ function FeaturedShowcase({
   // The still shows instantly (28KB webp) and fades out once the film is playing,
   // so the hero is never blank while Vimeo buffers.
   const [playing, setPlaying] = useState(false)
+  // Performance facade (2026-08-12): the Vimeo iframe + player API together
+  // pull ~7MB at page load — 88% of the homepage's weight. The cover always
+  // sits below the 100vh hero, so nobody can see it before scrolling: the
+  // embed mounts on the FIRST scroll intent (or immediately when the page
+  // opens already scrolled, e.g. a #work deep link). Until then the poster
+  // IS the cover — visitors see the identical poster→film experience.
+  const [mountPlayer, setMountPlayer] = useState(false)
 
   useEffect(() => {
+    if (window.scrollY > 0) {
+      setMountPlayer(true)
+      return
+    }
+    const arm = () => setMountPlayer(true)
+    const opts = { passive: true, once: true } as const
+    window.addEventListener('scroll', arm, opts)
+    window.addEventListener('wheel', arm, opts)
+    window.addEventListener('touchstart', arm, opts)
+    window.addEventListener('keydown', arm, opts)
+    return () => {
+      window.removeEventListener('scroll', arm)
+      window.removeEventListener('wheel', arm)
+      window.removeEventListener('touchstart', arm)
+      window.removeEventListener('keydown', arm)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!mountPlayer) return
     let player: VimeoPlayerLike | null = null
     let cancelled = false
 
@@ -230,16 +257,18 @@ function FeaturedShowcase({
       player?.off('play')
       player?.off('timeupdate')
     }
-  }, [])
+  }, [mountPlayer])
 
   return (
     <div className="work-cover">
-      <iframe
-        ref={frameRef}
-        src={`https://player.vimeo.com/video/${clip.vimeoId}?background=1&autoplay=1&muted=1&loop=1&autopause=0&dnt=1&app_id=58479`}
-        allow="autoplay; fullscreen"
-        title={clip.title}
-      />
+      {mountPlayer && (
+        <iframe
+          ref={frameRef}
+          src={`https://player.vimeo.com/video/${clip.vimeoId}?background=1&autoplay=1&muted=1&loop=1&autopause=0&dnt=1&app_id=58479`}
+          allow="autoplay; fullscreen"
+          title={clip.title}
+        />
+      )}
       {/* Instant poster (LCP), fades out when the film starts. A plain <img> is
           intentional: the site is a static export (images unoptimized), so
           next/image adds no benefit here. */}
