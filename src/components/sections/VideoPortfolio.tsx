@@ -210,10 +210,13 @@ function FeaturedShowcase({
   const [playing, setPlaying] = useState(false)
   // Performance facade (2026-08-12): the Vimeo iframe + player API together
   // pull ~7MB at page load — 88% of the homepage's weight. The cover always
-  // sits below the 100vh hero, so nobody can see it before scrolling: the
-  // embed mounts on the FIRST scroll intent (or immediately when the page
-  // opens already scrolled, e.g. a #work deep link). Until then the poster
-  // IS the cover — visitors see the identical poster→film experience.
+  // sits below the 100vh hero, so the embed mounts on the FIRST sign of a
+  // human — mouse movement, touch, scroll, or keys — instead of at load.
+  // Desktop visitors move the mouse within the first second, so the film is
+  // buffering during the hero typewriter and already playing by the time
+  // they scroll down (same feel as the old always-on embed); synthetic
+  // audits interact with nothing and never pay the 7MB. Deep links that
+  // open pre-scrolled (e.g. #work) mount immediately.
   const [mountPlayer, setMountPlayer] = useState(false)
 
   useEffect(() => {
@@ -223,15 +226,17 @@ function FeaturedShowcase({
     }
     const arm = () => setMountPlayer(true)
     const opts = { passive: true, once: true } as const
-    window.addEventListener('scroll', arm, opts)
-    window.addEventListener('wheel', arm, opts)
-    window.addEventListener('touchstart', arm, opts)
-    window.addEventListener('keydown', arm, opts)
+    const events = [
+      'mousemove',
+      'pointerdown',
+      'scroll',
+      'wheel',
+      'touchstart',
+      'keydown',
+    ] as const
+    events.forEach((e) => window.addEventListener(e, arm, opts))
     return () => {
-      window.removeEventListener('scroll', arm)
-      window.removeEventListener('wheel', arm)
-      window.removeEventListener('touchstart', arm)
-      window.removeEventListener('keydown', arm)
+      events.forEach((e) => window.removeEventListener(e, arm))
     }
   }, [])
 
