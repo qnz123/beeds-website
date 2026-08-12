@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     siteName: 'BEEDS',
     type: 'website',
     locale: 'ja_JP',
-    images: [{ url: '/og/beeds-og-hero.png', width: 1200, height: 630, alt: 'BEEDS' }],
+    images: [{ url: '/og/beeds-og-sticker.png', width: 1200, height: 630, alt: 'BEEDS' }],
   },
 }
 
