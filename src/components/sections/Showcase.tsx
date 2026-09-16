@@ -34,16 +34,22 @@ const GROUND = ['#eeeeee', '#efe9df', '#f1eee8'] // light grey · cream · bone
       num: '01', industry: 'Performance', title: 'Preparation is the edge',
       note: 'Performance brands shout specifications at everyone. This study speaks to high performing athletes, the people who know that preparation decides the result long before the race begins. Every scroll is a rehearsal. The frame breaks open, the headline shears apart, the pace climbs to 4:12 and the cut lands on the diagonal. Nothing is sold until the runner has felt the stride. Preparation is the key to a higher rate of success in anything, and the page is built to feel like it.',
       motion: 'Frame breaks open · headline shears · pace counts up · diagonal cut to the next frame.',
+      ba: '/showcase/img/before-after-performance.webp',
+      baAlt: 'Before and after: a typical performance running site beside the Preparation is the edge direction',
     },
     {
       num: '02', industry: 'Hospitality', title: 'Coming home to rest',
       note: 'Most hotel sites sell the daytime: bright rooms, blue skies, a lobby at noon. We believe guests care most about the moment they come back after a full day of travel and want a proper rest. So this study focuses on the transition to night. The door opens on the room in daylight, then the light goes, the lamps come on and the headline turns from arriving to staying. The room rate is still one click away. It simply arrives after the visitor has already decided they want to be there.',
       motion: 'Scroll opens the door · the headline gives way to a second invitation · day turns to evening.',
+      ba: '/showcase/img/before-after-hospitality.webp',
+      baAlt: 'Before and after: a typical hotel site beside the Coming home to rest direction',
     },
     {
       num: '03', industry: 'Wellness', title: 'Mindfulness, close to home',
       note: 'Wellness sites tend to be either a clinical dashboard or a pastel blur. The local market is asking for something more specific: a genuine focus on mindfulness. So the page breathes. A ring expands and settles with the scroll, inhale, hold, exhale, while a small window widens into soft morning light. The numbers arrive last, small and gentle, as texture rather than proof. Calm first, then the data, the way a good coach does it.',
       motion: 'Breathing ring follows the scroll · the window widens · the numbers arrive last.',
+      ba: '/showcase/img/before-after-wellness.webp',
+      baAlt: 'Before and after: a typical wellness dashboard beside the Mindfulness, close to home direction',
     },
   ];
 
@@ -115,6 +121,8 @@ export default function Showcase() {
       $('[data-title]', notes).textContent = n.title;
       $('[data-note]', notes).textContent = n.note;
       $('[data-motion]', notes).textContent = n.motion;
+      const ba = $('[data-ba]', notes);
+      if (ba) { ba.setAttribute('src', n.ba); ba.setAttribute('alt', n.baAlt); }
       rail.forEach((b, k) => b.setAttribute('aria-pressed', String(k === i)));
     }
 
@@ -316,6 +324,7 @@ export default function Showcase() {
     // QA hook: /explore/?at=0.5 pins the stage at that progress (no scrolling).
     const at = new URLSearchParams(location.search).get('at');
     if (at !== null) { forcedP = clamp(parseFloat(at)); root.classList.add('debug-at'); }
+    if (new URLSearchParams(location.search).get('ba') !== null) $('.sc-note-ba')?.setAttribute('open', '');
 
     navHeight();
     updateMotion();
@@ -438,27 +447,15 @@ export default function Showcase() {
                 <p className="sc-note-copy" data-note></p>
               </div>
               <p className="sc-note-motion" data-motion></p>
+              <details className="sc-note-ba">
+                <summary><span className="eyebrow">Before / After</span><i aria-hidden="true"></i></summary>
+                <img data-ba src="/showcase/img/before-after-performance.webp" alt="Before and after: a typical performance running site beside the Preparation is the edge direction" width={2768} height={1110} loading="lazy" />
+              </details>
             </aside>
           </div>
         </div>
       </div>
 
-      <div className="container-x sc-ba" aria-labelledby="ba-title">
-        <h2 className="eyebrow" id="ba-title">Before / After</h2>
-        <p className="sc-ba-note">Same photography, same fictional brands. Left, what each category usually ships. Right, the direction. Click a study to see it.</p>
-        <details className="sc-ba-row">
-          <summary><span className="eyebrow">01 / Performance</span><span className="sc-ba-title">Preparation is the edge</span><i aria-hidden="true"></i></summary>
-          <img src="/showcase/img/before-after-performance.webp" alt="Before and after: a typical performance running site beside the Preparation is the edge direction" width={2768} height={1110} loading="lazy" />
-        </details>
-        <details className="sc-ba-row">
-          <summary><span className="eyebrow">02 / Hospitality</span><span className="sc-ba-title">Coming home to rest</span><i aria-hidden="true"></i></summary>
-          <img src="/showcase/img/before-after-hospitality.webp" alt="Before and after: a typical hotel site beside the Coming home to rest direction" width={2768} height={1110} loading="lazy" />
-        </details>
-        <details className="sc-ba-row">
-          <summary><span className="eyebrow">03 / Wellness</span><span className="sc-ba-title">Mindfulness, close to home</span><i aria-hidden="true"></i></summary>
-          <img src="/showcase/img/before-after-wellness.webp" alt="Before and after: a typical wellness dashboard beside the Mindfulness, close to home direction" width={2768} height={1110} loading="lazy" />
-        </details>
-      </div>
     </section>
   )
 }
