@@ -303,6 +303,12 @@ export default function Showcase() {
     }
 
     rail.forEach((b, i) => b.addEventListener('click', () => goChapter(i)));
+    // Before / After row: a button + grid-rows body so the reveal eases open (native <details> can't animate).
+    const baToggle = $('.sc-note-ba-toggle');
+    if (baToggle) baToggle.addEventListener('click', () => {
+      const open = (baToggle.parentElement as HTMLElement).classList.toggle('is-open');
+      baToggle.setAttribute('aria-expanded', String(open));
+    });
     if (calm) calm.steps.forEach((b, i) => b.addEventListener('click', () => {
       if (paused) return;
       const at = [0.02, 0.4, 0.72][i];
@@ -324,7 +330,7 @@ export default function Showcase() {
     // QA hook: /explore/?at=0.5 pins the stage at that progress (no scrolling).
     const at = new URLSearchParams(location.search).get('at');
     if (at !== null) { forcedP = clamp(parseFloat(at)); root.classList.add('debug-at'); }
-    if (new URLSearchParams(location.search).get('ba') !== null) $('.sc-note-ba')?.setAttribute('open', '');
+    if (new URLSearchParams(location.search).get('ba') !== null) { $('.sc-note-ba')?.classList.add('is-open'); $('.sc-note-ba-toggle')?.setAttribute('aria-expanded', 'true'); }
 
     navHeight();
     updateMotion();
@@ -438,10 +444,12 @@ export default function Showcase() {
                 <p className="sc-note-copy" data-note></p>
               </div>
               <p className="sc-note-motion" data-motion></p>
-              <details className="sc-note-ba">
-                <summary><span className="eyebrow">Before / After</span><i aria-hidden="true"></i></summary>
-                <img data-ba src="/showcase/img/before-after-performance.webp" alt="Before and after: a typical performance running site beside the Preparation is the edge direction" width={2768} height={1110} loading="lazy" />
-              </details>
+              <div className="sc-note-ba">
+                <button type="button" className="sc-note-ba-toggle" aria-expanded="false" aria-controls="sc-note-ba-body"><span className="eyebrow">Before / After</span><i aria-hidden="true"></i></button>
+                <div className="sc-note-ba-body" id="sc-note-ba-body"><div>
+                  <img data-ba src="/showcase/img/before-after-performance.webp" alt="Before and after: a typical performance running site beside the Preparation is the edge direction" width={2768} height={1110} loading="lazy" />
+                </div></div>
+              </div>
             </aside>
           </div>
         </div>
