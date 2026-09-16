@@ -65,11 +65,11 @@ export default function ExplorePage() {
           </div>
         </section>
 
-        {/* Showcase — three point-of-view studies in a sticky stage */}
-        <Showcase />
-
         {/* Interactive studies */}
         <StudyShowcase />
+
+        {/* Showcase — three point-of-view studies in a sticky stage */}
+        <Showcase />
 
         {/* Design Trends / Journal */}
         <section className="py-14 px-10 bg-white">

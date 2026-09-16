@@ -332,13 +332,8 @@ export default function Showcase() {
   const fonts = [italiana.variable, cormorant.variable, archivo.variable, inter.variable, fraunces.variable, karla.variable].join(' ')
 
   return (
-    <section ref={rootRef} className={`sc-showcase ${fonts}`} id="showcase" aria-labelledby="sc-title">
+    <section ref={rootRef} className={`sc-showcase ${fonts}`} id="showcase" aria-label="Showcase">
       <div className="container-x sc-head">
-        <div>
-          <h2 className="eyebrow" id="sc-title">Showcase</h2>
-          <p className="sc-lede">Three industries. Three ways to make someone feel something <span className="brush-highlight">before they read a word.</span></p>
-          <p className="sc-intro">Each study opens on a real industry problem and answers it with one scroll-driven idea. Scroll to move through all three, or jump with the index.</p>
-        </div>
         <nav className="sc-rail" aria-label="Showcase index">
           <button type="button" data-chapter="0" aria-pressed="true"><span>01</span>Performance</button>
           <button type="button" data-chapter="1" aria-pressed="false"><span>02</span>Hospitality</button>
@@ -450,10 +445,19 @@ export default function Showcase() {
 
       <div className="container-x sc-ba" aria-labelledby="ba-title">
         <h2 className="eyebrow" id="ba-title">Before / After</h2>
-        <p className="sc-ba-note">Same photography, same fictional brands. Left, what each category usually ships. Right, the direction.</p>
-        <img src="/showcase/img/before-after-performance.webp" alt="Before and after: a typical performance running site beside the Preparation is the edge direction" width={2768} height={1110} loading="lazy" />
-        <img src="/showcase/img/before-after-hospitality.webp" alt="Before and after: a typical hotel site beside the Coming home to rest direction" width={2768} height={1110} loading="lazy" />
-        <img src="/showcase/img/before-after-wellness.webp" alt="Before and after: a typical wellness dashboard beside the Mindfulness, close to home direction" width={2768} height={1110} loading="lazy" />
+        <p className="sc-ba-note">Same photography, same fictional brands. Left, what each category usually ships. Right, the direction. Click a study to see it.</p>
+        <details className="sc-ba-row">
+          <summary><span className="eyebrow">01 / Performance</span><span className="sc-ba-title">Preparation is the edge</span><i aria-hidden="true"></i></summary>
+          <img src="/showcase/img/before-after-performance.webp" alt="Before and after: a typical performance running site beside the Preparation is the edge direction" width={2768} height={1110} loading="lazy" />
+        </details>
+        <details className="sc-ba-row">
+          <summary><span className="eyebrow">02 / Hospitality</span><span className="sc-ba-title">Coming home to rest</span><i aria-hidden="true"></i></summary>
+          <img src="/showcase/img/before-after-hospitality.webp" alt="Before and after: a typical hotel site beside the Coming home to rest direction" width={2768} height={1110} loading="lazy" />
+        </details>
+        <details className="sc-ba-row">
+          <summary><span className="eyebrow">03 / Wellness</span><span className="sc-ba-title">Mindfulness, close to home</span><i aria-hidden="true"></i></summary>
+          <img src="/showcase/img/before-after-wellness.webp" alt="Before and after: a typical wellness dashboard beside the Mindfulness, close to home direction" width={2768} height={1110} loading="lazy" />
+        </details>
       </div>
     </section>
   )
