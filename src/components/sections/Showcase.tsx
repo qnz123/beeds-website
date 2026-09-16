@@ -1,0 +1,460 @@
+'use client'
+
+import { useEffect, useRef } from 'react'
+import { Italiana, Cormorant_Garamond, Archivo_Black, Inter, Fraunces, Karla } from 'next/font/google'
+
+// Explore — "Showcase": three fictional-brand studies (Performance / Hospitality /
+// Wellness) in one sticky stage, scrubbed by scroll, each answering a category
+// pain point with one scroll-driven idea. Ported from the approved preview in
+// Studio_Landing/showcase.html (2026-09-16). The engine below is imperative on
+// purpose: one progress value drives every scene, the two transitions, the stage
+// ground colour, the index rail and the notes column, and scrolling back rewinds.
+// Styles live in globals.css under "Explore — Showcase".
+
+const italiana = Italiana({ weight: '400', subsets: ['latin'], variable: '--font-italiana', display: 'swap' })
+const cormorant = Cormorant_Garamond({ weight: ['400', '500'], style: ['normal', 'italic'], subsets: ['latin'], variable: '--font-cormorant', display: 'swap' })
+const archivo = Archivo_Black({ weight: '400', subsets: ['latin'], variable: '--font-archivo', display: 'swap' })
+const inter = Inter({ weight: ['400', '500', '600'], subsets: ['latin'], variable: '--font-inter', display: 'swap' })
+const fraunces = Fraunces({ weight: ['300', '400'], style: ['normal', 'italic'], subsets: ['latin'], variable: '--font-fraunces', display: 'swap' })
+const karla = Karla({ weight: ['400', '500'], subsets: ['latin'], variable: '--font-karla', display: 'swap' })
+
+const CH = [
+  { start: 0.0, end: 0.3 },
+  { start: 0.36, end: 0.64 },
+  { start: 0.7, end: 1.0 },
+]
+const TR = [
+  { start: 0.3, end: 0.36 },
+  { start: 0.64, end: 0.7 },
+]
+const GROUND = ['#eeeeee', '#efe9df', '#f1eee8'] // light grey · cream · bone
+
+  const NOTES = [
+    {
+      num: '01', industry: 'Performance', title: 'Preparation is the edge',
+      note: 'Performance brands shout specifications at everyone. This study speaks to high performing athletes, the people who know that preparation decides the result long before the race begins. Every scroll is a rehearsal. The frame breaks open, the headline shears apart, the pace climbs to 4:12 and the cut lands on the diagonal. Nothing is sold until the runner has felt the stride. Preparation is the key to a higher rate of success in anything, and the page is built to feel like it.',
+      motion: 'Frame breaks open · headline shears · pace counts up · diagonal cut to the next frame.',
+    },
+    {
+      num: '02', industry: 'Hospitality', title: 'Coming home to rest',
+      note: 'Most hotel sites sell the daytime: bright rooms, blue skies, a lobby at noon. We believe guests care most about the moment they come back after a full day of travel and want a proper rest. So this study focuses on the transition to night. The door opens on the room in daylight, then the light goes, the lamps come on and the headline turns from arriving to staying. The room rate is still one click away. It simply arrives after the visitor has already decided they want to be there.',
+      motion: 'Scroll opens the door · the headline gives way to a second invitation · day turns to evening.',
+    },
+    {
+      num: '03', industry: 'Wellness', title: 'Mindfulness, close to home',
+      note: 'Wellness sites tend to be either a clinical dashboard or a pastel blur. The local market is asking for something more specific: a genuine focus on mindfulness. So the page breathes. A ring expands and settles with the scroll, inhale, hold, exhale, while a small window widens into soft morning light. The numbers arrive last, small and gentle, as texture rather than proof. Calm first, then the data, the way a good coach does it.',
+      motion: 'Breathing ring follows the scroll · the window widens · the numbers arrive last.',
+    },
+  ];
+
+export default function Showcase() {
+  const rootRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    if (!rootRef.current) return
+    const root = rootRef.current as HTMLElement
+    const $ = (s: string, r: ParentNode = root) => r.querySelector(s) as HTMLElement;
+    const $$ = (s: string, r: ParentNode = root) => [...r.querySelectorAll(s)] as HTMLElement[];
+    const clamp = (v: number, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+    const ease = (t: number) => t * t * (3 - 2 * t);            // smoothstep
+    const quint = (t: number) => (t < 0.5 ? 16 * t ** 5 : 1 - Math.pow(-2 * t + 2, 5) / 2);
+    const seg = (p: number, s: { start: number; end: number }) => clamp((p - s.start) / (s.end - s.start));
+
+    const track = $('.sc-track');
+    const sticky = $('.sc-sticky');
+    const stage = $('.sc-stage');
+    const scenes = $$('.scene');
+    const sceneEl = { hotel: $('.scene.hotel'), run: $('.scene.run'), calm: $('.scene.calm') };
+    // Standalone pages set <body data-chapter="0|1|2">: one study, p maps straight onto its
+    // own 0..1, no transitions, notes are static in the markup.
+    const solo: number | null = null;
+    const rail = $$('.sc-rail button');
+    const railProgress = $('.sc-rail-progress');
+    const notes = $('.sc-notes');
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+
+    let paused = reduce.matches;
+    let staticChapter = 0;
+    let frame = 0;
+    let lastChapter = -1;
+
+    // ---- colour lerp for the stage ground ----
+    const hex = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+    const mix = (a: string, b: string, t: number) => {
+      const A = hex(a), B = hex(b);
+      return `rgb(${A.map((v, i) => Math.round(v + (B[i] - v) * t)).join(',')})`;
+    };
+
+    function navHeight() {
+      const nav = document.querySelector('.nav') as HTMLElement | null;
+      root.style.setProperty('--nav-h', `${nav ? nav.offsetHeight : 57}px`);
+    }
+
+    function travel() {
+      return Math.max(1, track.offsetHeight - sticky.offsetHeight);
+    }
+
+    let forcedP: number | null = null;                                        // preview-only debug override (see bottom)
+    function progress() {
+      if (forcedP !== null) return forcedP;
+      if (paused) return solo !== null ? 1 : CH[staticChapter].end;   // finished state of the chosen chapter
+      return clamp(-track.getBoundingClientRect().top / travel());
+    }
+
+    function chapterAt(p: number) {
+      return p < (TR[0].start + TR[0].end) / 2 ? 0 : p < (TR[1].start + TR[1].end) / 2 ? 1 : 2;
+    }
+
+    // ---- notes column ----
+    function setNotes(i: number) {
+      if (i === lastChapter) return;
+      lastChapter = i;
+      const n = NOTES[i];
+      $('[data-num]', notes).textContent = n.num;
+      $('[data-industry]', notes).textContent = n.industry;
+      $('[data-title]', notes).textContent = n.title;
+      $('[data-note]', notes).textContent = n.note;
+      $('[data-motion]', notes).textContent = n.motion;
+      rail.forEach((b, k) => b.setAttribute('aria-pressed', String(k === i)));
+    }
+
+    // ---- chapter renderers (t = 0..1 inside the chapter) ----
+    const hotel = sceneEl.hotel && {
+      el: sceneEl.hotel,
+      doorL: $('.door-left', sceneEl.hotel), doorR: $('.door-right', sceneEl.hotel),
+      title: $('.arrival-title', sceneEl.hotel), reveal: $('.arrival-reveal', sceneEl.hotel), stay: $('.arrival-stay', sceneEl.hotel),
+      room: $('.room:not(.evening) img', sceneEl.hotel), evening: $('.room.evening', sceneEl.hotel),
+      clock: $('.s-clock', sceneEl.hotel), bar: $('.s-progress i', sceneEl.hotel),
+    };
+    function renderHotel(t: number) {
+      if (!hotel) return;
+      const open = ease(clamp((t - 0.04) / 0.56));
+      hotel.doorL.style.transform = `translateX(${-open * 102}%)`;
+      hotel.doorR.style.transform = `translateX(${open * 102}%)`;
+      hotel.title.style.opacity = String(1 - clamp(t * 3.2));
+      hotel.title.style.transform = `translateY(${-t * 70}px)`;
+      hotel.room.style.transform = `scale(${1.16 - open * 0.16})`;
+      const r = clamp((t - 0.4) * 3.2);
+      const ev = ease(clamp((t - 0.7) / 0.22));
+      hotel.reveal.style.opacity = String(r * (1 - clamp((t - 0.72) * 5)));
+      hotel.reveal.style.transform = `translateY(${(1 - r) * 35}px)`;
+      hotel.evening.style.opacity = String(ev);
+      const s = clamp((t - 0.8) * 5);
+      hotel.stay.style.opacity = String(s);
+      hotel.stay.style.transform = `translateY(${(1 - s) * 30}px)`;
+      const minutes = Math.round(840 + (1122 - 840) * ev);
+      if (hotel.clock) hotel.clock.textContent = `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
+      hotel.el.classList.toggle('revealed', t > 0.42);
+      hotel.bar.style.transform = `scaleX(${t})`;
+    }
+
+    const run = sceneEl.run && {
+      el: sceneEl.run, inner: $('.run-inner', sceneEl.run),
+      frameA: $('.frame-a', sceneEl.run), imgA: $('.frame-a img', sceneEl.run), frameB: $('.frame-b', sceneEl.run),
+      k1: $('.k-one', sceneEl.run), k2: $('.k-two', sceneEl.run), second: $('.run-second', sceneEl.run),
+      pace: $('.pace', sceneEl.run), paceValue: $('.pace-value', sceneEl.run),
+      marquee: $('.marquee-track', sceneEl.run), count: $('.frame-count', sceneEl.run), bar: $('.s-progress i', sceneEl.run),
+    };
+    function renderRun(t: number) {
+      if (!run) return;
+      const w = stage.clientWidth;
+      const narrow = w < 700 || matchMedia('(max-width: 1000px)').matches;
+      const brk = ease(clamp(t / 0.38));
+      const v = narrow ? 18 : 11, h = narrow ? 22 : 35;
+      run.frameA.style.clipPath = `inset(${(1 - brk) * v}% ${(1 - brk) * h}% ${(1 - brk) * v}% ${(1 - brk) * h}%)`;
+      run.imgA.style.transform = `scale(${1.25 - brk * 0.25}) translateY(${(1 - brk) * -3}%)`;
+      const shear = t * w * 0.6, fade = 1 - clamp((t - 0.22) * 4);
+      run.k1.style.transform = `translateX(${-shear}px)`;
+      run.k2.style.transform = `translateX(${shear}px)`;
+      run.k1.style.opacity = run.k2.style.opacity = String(fade);
+      const pv = clamp((t - 0.12) / 0.45);
+      const secs = Math.round(pv * 252);
+      run.paceValue.textContent = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
+      run.pace.style.opacity = String(clamp((t - 0.3) * 5) * (1 - clamp((t - 0.88) * 8)));
+      const cut = ease(clamp((t - 0.5) / 0.25));
+      const x = 100 - cut * 220;
+      run.frameB.style.clipPath = `polygon(${x}% 100%, 100% ${x}%, 100% 100%)`;
+      const s2 = clamp((t - 0.58) * 4);
+      run.second.style.opacity = String(s2);
+      run.second.style.transform = `translateY(${(1 - s2) * 30}px)`;
+      // Chevrons point right and travel forward as you scroll (strip is 3x wide, pre-offset left).
+      run.marquee.style.transform = `translateX(${-64 + t * 60}%)`;
+      run.count.textContent = `FR ${String(Math.round(t * 240)).padStart(4, '0')}`;
+      run.bar.style.transform = `scaleX(${t})`;
+    }
+
+    const calm = sceneEl.calm && {
+      el: sceneEl.calm,
+      window: $('.window', sceneEl.calm), w1: $('.w-one', sceneEl.calm), w2: $('.w-two', sceneEl.calm),
+      ring: $('.breath-ring', sceneEl.calm), ringLabel: $('.breath-ring-label', sceneEl.calm),
+      one: $('.calm-one', sceneEl.calm), two: $('.calm-two', sceneEl.calm),
+      stats: $('.stats', sceneEl.calm), bpm: $('.st-bpm', sceneEl.calm), min: $('.st-min', sceneEl.calm), rounds: $('.st-rounds', sceneEl.calm),
+      steps: $$('.steps button', sceneEl.calm), bar: $('.s-progress i', sceneEl.calm),
+    };
+    function renderCalm(t: number) {
+      if (!calm) return;
+      const narrow = matchMedia('(max-width: 1000px)').matches;
+      // breathing: inhale 0–.36, hold .36–.64, exhale .64–1
+      let s, label;
+      if (t < 0.36) { s = 1 + 0.35 * ease(t / 0.36); label = 'Inhale'; }
+      else if (t < 0.64) { s = 1.35; label = 'Hold'; }
+      else { s = 1.35 - 0.35 * ease((t - 0.64) / 0.36); label = 'Exhale'; }
+      calm.ring.style.transform = `scale(${s})`;
+      if (calm.ringLabel.textContent !== label) calm.ringLabel.textContent = label;
+      const w = ease(clamp((t - 0.08) / 0.42));
+      const from = narrow ? [60, 50, 14, 6] : [50, 60, 12, 8];
+      const to = narrow ? [46, 0, 0, 0] : [44, 0, 0, 0];
+      const ins = from.map((f, i) => f + (to[i] - f) * w);
+      calm.window.style.clipPath = `inset(${ins[0]}% ${ins[1]}% ${ins[2]}% ${ins[3]}%)`;
+      // Start shifted left so the small window frames the watch; settle to centre as it widens.
+      calm.w1.style.transform = `translate(${-(1 - w) * 24}%, ${14 - w * 16}%) scale(${1.15 - w * 0.15})`;
+      calm.el.classList.toggle('on-photo', w > 0.5);
+      const x = ease(clamp((t - 0.55) / 0.25));
+      calm.w2.style.opacity = String(x);
+      calm.w2.style.transform = `scale(${1.1 - x * 0.1})`;
+      calm.one.style.opacity = String(1 - clamp((t - 0.55) * 4));
+      const h2 = clamp((t - 0.62) * 4);
+      calm.two.style.opacity = String(h2);
+      calm.two.style.transform = `translateY(${(1 - h2) * 16}px)`;
+      const n = ease(clamp((t - 0.68) / 0.25));
+      calm.stats.style.opacity = String(n);
+      calm.bpm.textContent = String(Math.round(60 - 18 * n));
+      calm.min.textContent = String(Math.round(7 * n));
+      calm.rounds.textContent = String(Math.round(3 * n));
+      calm.steps.forEach((b, i) => {
+        const sp = clamp(t * 3 - i);
+        (b.querySelector('i') as HTMLElement).style.transform = `scaleX(${sp})`;
+        b.classList.toggle('active', sp > 0 && sp < 1 || (i === 2 && sp === 1));
+      });
+      calm.bar.style.transform = `scaleX(${t})`;
+    }
+
+    // ---- master render ----
+    const RENDER = [renderRun, renderHotel, renderCalm];
+    function render() {
+      frame = 0;
+      const p = progress();
+      if (solo !== null) {
+        stage.style.background = GROUND[solo];
+        RENDER[solo](p);
+        if (railProgress) railProgress.style.transform = `scaleX(${p})`;
+        return;
+      }
+      const t = CH.map((c) => seg(p, c));
+      const tr1 = quint(seg(p, TR[0]));
+      const tr2 = quint(seg(p, TR[1]));
+
+      // Scene 1 lifts away; scene 2 rises as a curtain; scene 2 recedes; scene 3 breathes open.
+      scenes[0].style.opacity = String(1 - clamp(tr1 * 1.25));
+      scenes[0].style.transform = `translateY(${-tr1 * 6}%)`;
+      scenes[0].classList.toggle('off', tr1 >= 1);
+
+      scenes[1].style.clipPath = `inset(${(1 - tr1) * 100}% 0 0 0)`;
+      scenes[1].style.transform = `scale(${1.06 - tr1 * 0.06 - tr2 * 0.04})`;
+      scenes[1].style.opacity = String(1 - tr2);
+      scenes[1].classList.toggle('off', tr1 <= 0 || tr2 >= 1);
+
+      scenes[2].style.clipPath = `circle(${tr2 * 100}% at 50% 50%)`;
+      scenes[2].classList.toggle('off', tr2 <= 0);
+
+      stage.style.background = tr1 < 1 ? mix(GROUND[0], GROUND[1], tr1) : mix(GROUND[1], GROUND[2], tr2);
+
+      renderRun(t[0]);
+      renderHotel(t[1]);
+      renderCalm(t[2]);
+
+      // Notes: fade out through the first half of a transition, swap at the midpoint, fade back in.
+      const tri = Math.max(1 - Math.abs(2 * tr1 - 1), 1 - Math.abs(2 * tr2 - 1)) * ((tr1 > 0 && tr1 < 1) || (tr2 > 0 && tr2 < 1) ? 1 : 0);
+      notes.style.opacity = String(1 - tri);
+      notes.style.transform = `translateY(${tri * 10}px)`;
+      setNotes(chapterAt(p));
+      railProgress.style.transform = `scaleX(${p})`;
+    }
+
+    function schedule() { if (!frame) frame = requestAnimationFrame(render); }
+
+    // ---- navigation ----
+    function scrollToProgress(target: number, instant?: boolean) {
+      const top = window.scrollY + track.getBoundingClientRect().top + travel() * target;
+      if (instant || paused) { window.scrollTo(0, top); return; }
+      const startY = window.scrollY, delta = top - startY;
+      if (Math.abs(delta) < 2) return;
+      const dur = Math.min(1600, 700 + Math.abs(delta) * 0.25);
+      const t0 = performance.now();
+      const step = (now: number) => {
+        const q = Math.min(1, (now - t0) / dur);
+        window.scrollTo(0, startY + delta * quint(q));
+        if (q < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+
+    function goChapter(i: number) {
+      if (paused) { staticChapter = i; setNotes(-1); lastChapter = -1; schedule(); return; }
+      scrollToProgress(CH[i].start + 0.004);
+    }
+
+    rail.forEach((b, i) => b.addEventListener('click', () => goChapter(i)));
+    if (calm) calm.steps.forEach((b, i) => b.addEventListener('click', () => {
+      if (paused) return;
+      const at = [0.02, 0.4, 0.72][i];
+      scrollToProgress(solo !== null ? at : CH[2].start + (CH[2].end - CH[2].start) * at);
+    }));
+
+    function updateMotion() {
+      root.classList.toggle('motion-paused', paused);
+      schedule();
+    }
+    const onReduce = () => { paused = reduce.matches; updateMotion(); };
+    const onResize = () => { navHeight(); schedule(); };
+    reduce.addEventListener('change', onReduce);
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', onResize);
+    const ro = new ResizeObserver(schedule);
+    ro.observe(stage);
+
+    // QA hook: /explore/?at=0.5 pins the stage at that progress (no scrolling).
+    const at = new URLSearchParams(location.search).get('at');
+    if (at !== null) { forcedP = clamp(parseFloat(at)); root.classList.add('debug-at'); }
+
+    navHeight();
+    updateMotion();
+
+    return () => {
+      reduce.removeEventListener('change', onReduce);
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', onResize);
+      ro.disconnect();
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, [])
+
+  const fonts = [italiana.variable, cormorant.variable, archivo.variable, inter.variable, fraunces.variable, karla.variable].join(' ')
+
+  return (
+    <section ref={rootRef} className={`sc-showcase ${fonts}`} id="showcase" aria-labelledby="sc-title">
+      <div className="container-x sc-head">
+        <div>
+          <h2 className="eyebrow" id="sc-title">Showcase</h2>
+          <p className="sc-lede">Three industries. Three ways to make someone feel something <span className="brush-highlight">before they read a word.</span></p>
+          <p className="sc-intro">Each study opens on a real industry problem and answers it with one scroll-driven idea. Scroll to move through all three, or jump with the index.</p>
+        </div>
+        <nav className="sc-rail" aria-label="Showcase index">
+          <button type="button" data-chapter="0" aria-pressed="true"><span>01</span>Performance</button>
+          <button type="button" data-chapter="1" aria-pressed="false"><span>02</span>Hospitality</button>
+          <button type="button" data-chapter="2" aria-pressed="false"><span>03</span>Wellness</button>
+          <i className="sc-rail-progress" aria-hidden="true"></i>
+        </nav>
+      </div>
+
+      <div className="sc-track">
+        <div className="sc-sticky">
+          <div className="container-x sc-layout">
+            <div className="sc-stage" aria-live="off">
+            <section className="scene run" data-scene="1" aria-label="Performance study: Split Second">
+                          <div className="run-inner">
+                            <div className="frame frame-a"><img src="/showcase/img/running_02.webp" alt="A runner holds a pale blue running shoe against the sky" /></div>
+                            <div className="frame frame-b"><img src="/showcase/img/running_01.webp" alt="A runner stretching, seen from below against a bright sky" /></div>
+                            <div className="run-shade"></div>
+                            <div className="kinetic" aria-hidden="true">
+                              <span className="k-line k-one">Built for the</span>
+                              <span className="k-line k-two">next stride.</span>
+                            </div>
+                            <h3 className="run-title">Built for the next stride.</h3>
+                            <div className="run-second">
+                              <h3>Your pace.<br /><em>Your terms.</em></h3>
+                              <p>Cushion tuned to the runner, not the spec sheet.</p>
+                            </div>
+                            <div className="pace"><span className="pace-label">Pace</span><span className="pace-value">0:00</span><span className="pace-unit">/km</span></div>
+                            <div className="s-nav">
+                              <span className="s-logo run-logo">TEMPO</span>
+                              <span className="s-button run-button run-cart" role="img" aria-label="Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 4h2.2l2.1 10.4a1.2 1.2 0 0 0 1.2 1h8.6a1.2 1.2 0 0 0 1.2-.9L20 8H6.1"/><circle cx="9.5" cy="19.2" r="1.3"/><circle cx="17" cy="19.2" r="1.3"/></svg></span>
+                            </div>
+                            <span className="frame-count">FR 0000</span>
+                            <div className="marquee" aria-hidden="true"><div className="marquee-track"><svg className="chevrons" preserveAspectRatio="none"><defs><pattern id="chev" width="9" height="16" patternUnits="userSpaceOnUse"><path d="M-1 18 L10.5 -2" stroke="#1f6f9a" strokeWidth="2.6" strokeOpacity=".8"/></pattern></defs><rect width="100%" height="100%" fill="url(#chev)"/></svg></div></div>
+                              <div className="s-progress"><i></i></div>
+                          </div>
+                        </section>
+
+            <section className="scene hotel" data-scene="0" aria-label="Hospitality study: The Arrival">
+                          <div className="room"><img src="/showcase/img/hotel-bed-01.webp" alt="A calm hotel bedroom in soft daylight" /></div>
+                          <div className="room evening"><img src="/showcase/img/hotel-bed-02.webp" alt="The same room at dusk, lamps glowing" /></div>
+                          <div className="room-shade"></div>
+                          <div className="door door-left">
+                            <div className="door-border"></div>
+                            <div className="arrival-title">
+                              <h3>You have<br /><em>arrived.</em></h3>
+                            </div>
+                          </div>
+                          <div className="door door-right">
+                            <div className="door-border"></div>
+                            <div className="door-photo"><img src="/showcase/img/hotel-key-01.webp" alt="A leather room key hanging from an open door" /></div>
+                          </div>
+                          <div className="s-nav">
+                            <span className="s-logo hotel-logo">solenne<span>The art of staying</span></span>
+                            <span className="s-button s-icon" role="img" aria-label="Book the stay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="8" cy="12" r="4"/><path d="M12 12h9M18 12v3M15 12v2.5"/></svg></span>
+                          </div>
+                          <div className="arrival-reveal">
+                            <h3>Make yourself<br /><em>at home.</em></h3>
+                          </div>
+                          <div className="arrival-stay">
+                            <h3>Stay a little<br /><em>longer.</em></h3>
+                          </div>
+                          <div className="s-progress"><i></i></div>
+                        </section>
+
+            <section className="scene calm" data-scene="2" aria-label="Wellness study: The Quiet Hour">
+                          <div className="calm-inner">
+                            <div className="window">
+                              <img className="w-one" src="/showcase/img/Lifestyle_01.webp" alt="Someone in soft grey activewear checks a watch at home beside a yoga mat" />
+                              <img className="w-two" src="/showcase/img/Lifestyle_02.webp" alt="Morning light on grey leggings beside a window and a rolled mat" />
+                            </div>
+                            <div className="breath-ring" aria-hidden="true">
+                              <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="96"/><circle className="breath-ring-inner" cx="100" cy="100" r="70"/></svg>
+                              <span className="breath-ring-label">Inhale</span>
+                            </div>
+                            <div className="calm-copy">
+                              <p className="s-eyebrow">The quiet hour</p>
+                              <h3 className="calm-one">Move a little.<br /><em>Feel a lot.</em></h3>
+                              <h3 className="calm-two">Data can be<br /><em>gentle too.</em></h3>
+                            </div>
+                            <div className="stats" aria-hidden="true">
+                              <span><b className="st-bpm">60</b> bpm</span><span><b className="st-min">0</b> min</span><span><b className="st-rounds">0</b> rounds</span>
+                            </div>
+                            <div className="steps" aria-label="Ritual steps">
+                              <button type="button" data-step="0"><span>01</span>Stretch<i></i></button>
+                              <button type="button" data-step="1"><span>02</span>Breathe<i></i></button>
+                              <button type="button" data-step="2"><span>03</span>Rest<i></i></button>
+                            </div>
+                            <div className="s-nav">
+                              <span className="s-logo calm-logo">hush</span>
+                              <span className="s-button s-icon calm-button" role="img" aria-label="Begin the ritual"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14z"/><path d="M5 19l8-8"/></svg></span>
+                            </div>
+                              <div className="s-progress"><i></i></div>
+                          </div>
+                        </section>
+            </div>
+
+            <aside className="sc-notes" aria-live="polite">
+              <p className="eyebrow sc-note-index"><span data-num>01</span> / <span data-industry>Performance</span></p>
+              <h3 className="sc-note-title" data-title>Preparation is the edge</h3>
+              <div className="sc-note-block">
+                <p className="eyebrow">Our point of view</p>
+                <p className="sc-note-copy" data-note></p>
+              </div>
+              <p className="sc-note-motion" data-motion></p>
+            </aside>
+          </div>
+        </div>
+      </div>
+
+      <div className="container-x sc-ba" aria-labelledby="ba-title">
+        <h2 className="eyebrow" id="ba-title">Before / After</h2>
+        <p className="sc-ba-note">Same photography, same fictional brands. Left, what each category usually ships. Right, the direction.</p>
+        <img src="/showcase/img/before-after-performance.webp" alt="Before and after: a typical performance running site beside the Preparation is the edge direction" width={2768} height={1110} loading="lazy" />
+        <img src="/showcase/img/before-after-hospitality.webp" alt="Before and after: a typical hotel site beside the Coming home to rest direction" width={2768} height={1110} loading="lazy" />
+        <img src="/showcase/img/before-after-wellness.webp" alt="Before and after: a typical wellness dashboard beside the Mindfulness, close to home direction" width={2768} height={1110} loading="lazy" />
+      </div>
+    </section>
+  )
+}

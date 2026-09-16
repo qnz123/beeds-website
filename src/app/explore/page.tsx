@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import StudyShowcase from '@/components/sections/StudyShowcase'
+import Showcase from '@/components/sections/Showcase'
 import TrendNote from '@/components/sections/TrendNote'
 import { getDictionary } from '@/i18n/dictionaries'
 
@@ -63,6 +64,9 @@ export default function ExplorePage() {
             </h1>
           </div>
         </section>
+
+        {/* Showcase — three point-of-view studies in a sticky stage */}
+        <Showcase />
 
         {/* Interactive studies */}
         <StudyShowcase />
