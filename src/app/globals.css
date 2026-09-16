@@ -1851,10 +1851,8 @@ textarea.blank:focus {
 .sc-showcase button:focus-visible { outline: 2px solid #000; outline-offset: 4px; }
 .sc-showcase h3 { font-weight: 400; line-height: 1.3; }
 .sc-showcase .sc-rail .eyebrow { margin: 0; }
-/* No heading block: the index rail alone sits over the notes column. */
-.sc-showcase .sc-head { padding-top: 56px; }
-.sc-showcase .sc-head > .sc-rail { grid-column: 2; }
-@media (max-width: 1000px) { .sc-showcase .sc-head > .sc-rail { grid-column: 1; } }
+/* No heading block and no index rail: the stage opens the section. */
+.sc-showcase { padding-top: 40px; }
 .sc-showcase a { color: inherit; text-decoration: none; }
 .sc-showcase .showcase { padding-top: 24px; }
 .sc-showcase .sc-head { display: grid; grid-template-columns: 1.6fr 1fr; gap: 48px; align-items: end; padding-bottom: 28px; }
@@ -2054,6 +2052,12 @@ textarea.blank:focus {
   .sc-showcase .sc-rail button span { margin-right: 6px; }
   .sc-showcase .sc-note-title { font-size: 21px; }
 }
+/* Notes column without hairline rules (client direction 2026-09-16). */
+.sc-showcase .sc-note-block, .sc-showcase .sc-note-motion, .sc-showcase .sc-note-ba { border-top: 0; }
+.sc-showcase .sc-note-block { padding: 4px 0 20px; }
+.sc-showcase .sc-note-motion { padding-top: 0; }
+.sc-showcase .sc-note-ba { margin-top: 10px; }
+.sc-showcase .sc-note-ba summary { padding: 10px 0; }
 /* Before / After: a compact click-to-reveal row under the study description (native details). */
 .sc-showcase .sc-note-ba { border-top: 1px solid #000; margin-top: 14px; }
 .sc-showcase .sc-note-ba summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 14px 0; }

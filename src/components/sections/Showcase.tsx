@@ -276,7 +276,7 @@ export default function Showcase() {
       notes.style.opacity = String(1 - tri);
       notes.style.transform = `translateY(${tri * 10}px)`;
       setNotes(chapterAt(p));
-      railProgress.style.transform = `scaleX(${p})`;
+      if (railProgress) railProgress.style.transform = `scaleX(${p})`;
     }
 
     function schedule() { if (!frame) frame = requestAnimationFrame(render); }
@@ -342,15 +342,6 @@ export default function Showcase() {
 
   return (
     <section ref={rootRef} className={`sc-showcase ${fonts}`} id="showcase" aria-label="Showcase">
-      <div className="container-x sc-head">
-        <nav className="sc-rail" aria-label="Showcase index">
-          <button type="button" data-chapter="0" aria-pressed="true"><span>01</span>Performance</button>
-          <button type="button" data-chapter="1" aria-pressed="false"><span>02</span>Hospitality</button>
-          <button type="button" data-chapter="2" aria-pressed="false"><span>03</span>Wellness</button>
-          <i className="sc-rail-progress" aria-hidden="true"></i>
-        </nav>
-      </div>
-
       <div className="sc-track">
         <div className="sc-sticky">
           <div className="container-x sc-layout">
