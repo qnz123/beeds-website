@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { Italiana, Cormorant_Garamond, Archivo_Black, Inter, Fraunces, Karla } from 'next/font/google'
+import { Italiana, Oswald, Cormorant_Garamond, Archivo_Black, Inter, Fraunces, Karla } from 'next/font/google'
 import type { Locale } from '@/i18n/config'
 
 // Explore — "Showcase": three fictional-brand studies (Performance / Hospitality /
@@ -13,6 +13,7 @@ import type { Locale } from '@/i18n/config'
 // Styles live in globals.css under "Explore — Showcase".
 
 const italiana = Italiana({ weight: '400', subsets: ['latin'], variable: '--font-italiana', display: 'swap' })
+const oswald = Oswald({ weight: '700', subsets: ['latin'], variable: '--font-oswald', display: 'swap' })
 const cormorant = Cormorant_Garamond({ weight: ['400', '500'], style: ['normal', 'italic'], subsets: ['latin'], variable: '--font-cormorant', display: 'swap' })
 const archivo = Archivo_Black({ weight: '400', subsets: ['latin'], variable: '--font-archivo', display: 'swap' })
 const inter = Inter({ weight: ['400', '500', '600'], subsets: ['latin'], variable: '--font-inter', display: 'swap' })
@@ -395,7 +396,7 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const fonts = [italiana.variable, cormorant.variable, archivo.variable, inter.variable, fraunces.variable, karla.variable].join(' ')
+  const fonts = [italiana.variable, oswald.variable, cormorant.variable, archivo.variable, inter.variable, fraunces.variable, karla.variable].join(' ')
 
   return (
     <section ref={rootRef} className={`sc-showcase ${fonts}`} id="showcase" aria-label="Showcase">
@@ -443,7 +444,7 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
                             <div className="door-photo"><img src="/showcase/img/hotel-key-01.webp" alt="A leather room key hanging from an open door" /></div>
                           </div>
                           <div className="s-nav">
-                            <span className="s-logo hotel-logo">solenne<span>The art of staying</span></span>
+                            <span className="s-logo hotel-logo">Solar</span>
                             <span className="s-button s-icon" role="img" aria-label="Book the stay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="8" cy="12" r="4"/><path d="M12 12h9M18 12v3M15 12v2.5"/></svg></span>
                           </div>
                           <div className="arrival-reveal">

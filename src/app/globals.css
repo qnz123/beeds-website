@@ -1910,7 +1910,7 @@ textarea.blank:focus {
 .sc-showcase .hotel .s-eyebrow, .sc-showcase .hotel .s-intro, .sc-showcase .hotel .s-button, .sc-showcase .hotel .s-footer, .sc-showcase .hotel .s-logo span, .sc-showcase .hotel .door-number, .sc-showcase .hotel .vertical-type { font-family: var(--font-inter), Arial, sans-serif; }
 .sc-showcase .hotel h3 { font-family: var(--font-italiana), Georgia, serif; font-size: 9.2cqw; line-height: .96; letter-spacing: -.03em; }
 .sc-showcase .hotel h3 em { font-family: var(--font-cormorant), Georgia, serif; font-style: italic; font-weight: 400; }
-.sc-showcase .hotel-logo { font-family: var(--font-italiana), Georgia, serif; font-size: 3.6cqw; letter-spacing: -.02em; }
+.sc-showcase .hotel-logo { font-family: var(--font-oswald), Impact, sans-serif; font-weight: 700; font-size: 3.2cqw; line-height: 1; letter-spacing: .01em; text-transform: uppercase; }
 .sc-showcase .room, .sc-showcase .room-shade, .sc-showcase .door { position: absolute; inset: 0; }
 .sc-showcase .room img { object-position: 50% 55%; will-change: transform; }
 .sc-showcase .room.evening { opacity: 0; }
