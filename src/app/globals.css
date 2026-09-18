@@ -2054,11 +2054,20 @@ textarea.blank:focus {
   .sc-showcase .sc-rail button span { margin-right: 6px; }
   .sc-showcase .sc-note-title { font-size: 21px; }
 }
-/* Study links as small buttons (sharp corners, house style): grey field, ink when current. */
-.sc-showcase .sc-note-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
-.sc-showcase .sc-note-nav button { padding: 10px 16px; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: #333; background: #e7e7e7; transition: background .3s, color .3s; }
-.sc-showcase .sc-note-nav button:hover { background: #dcdcdc; color: #000; }
-.sc-showcase .sc-note-nav button[aria-pressed="true"] { background: #000; color: #f5f5f5; }
+/* Study links as coins: a soft grey circle carrying a rounded-line icon (bag / calendar /
+   heart, the "Balanced" set chosen 2026-09-18), label set small beneath; black coin when current. */
+.sc-showcase .sc-note-nav { display: flex; flex-wrap: wrap; gap: 26px; margin-bottom: 26px; }
+.sc-showcase .sc-note-nav button { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 96px; padding: 0; background: none; color: #000; }
+.sc-showcase .sc-coin { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: #ebebeb; transition: background .3s, color .3s; }
+.sc-showcase .sc-note-nav button:hover .sc-coin { background: #dedede; }
+.sc-showcase .sc-note-nav button[aria-pressed="true"] .sc-coin { background: #000; color: #fff; }
+.sc-showcase .sc-coin svg { width: 28px; height: 28px; overflow: visible; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.sc-showcase .sc-coin svg * { vector-effect: non-scaling-stroke; }
+.sc-showcase .sc-coin-lbl { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); transition: color .3s; }
+.sc-showcase .sc-note-nav button:hover .sc-coin-lbl, .sc-showcase .sc-note-nav button[aria-pressed="true"] .sc-coin-lbl { color: #000; }
+.sc-showcase .sc-note-nav button:focus-visible { outline: 0; }
+.sc-showcase .sc-note-nav button:focus-visible .sc-coin { outline: 2px solid #000; outline-offset: 4px; }
+@media (max-width: 700px) { .sc-showcase .sc-note-nav { gap: 14px; } .sc-showcase .sc-note-nav button { width: 84px; } .sc-showcase .sc-coin { width: 56px; height: 56px; } .sc-showcase .sc-coin svg { width: 24px; height: 24px; } }
 /* Click on a study: no glide, a straight cut; the scene and the new text fade in at once (the
    Services tab behaviour). Only the text block fades on manual scroll, never the buttons. */
 .sc-showcase .sc-note-swap { will-change: opacity, transform; }

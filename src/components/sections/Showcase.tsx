@@ -31,7 +31,7 @@ const GROUND = ['#eeeeee', '#efe9df', '#f1eee8'] // light grey · cream · bone
 
   const NOTES = [
     {
-      num: '01', industry: 'Retail', title: 'Preparation is the edge',
+      num: '01', industry: 'Shop', title: 'Preparation is the edge',
       note: 'Performance brands shout specifications at everyone. This study speaks to high performing athletes, the people who know that preparation decides the result long before the race begins. Every scroll is a rehearsal. The frame breaks open, the headline shears apart, the pace climbs to 4:12 and the cut lands on the diagonal. Nothing is sold until the runner has felt the stride. Preparation is the key to a higher rate of success in anything, and the page is built to feel like it.',
       motion: 'Frame breaks open · headline shears · pace counts up · diagonal cut to the next frame.',
       ba: '/showcase/img/before-after-performance.webp',
@@ -441,9 +441,18 @@ export default function Showcase() {
 
             <aside className="sc-notes" aria-live="polite">
               <nav className="sc-note-nav" aria-label="Studies">
-                <button type="button" data-chapter="0" aria-pressed="true">Retail</button>
-                <button type="button" data-chapter="1" aria-pressed="false">Booking</button>
-                <button type="button" data-chapter="2" aria-pressed="false">Service</button>
+                <button type="button" data-chapter="0" aria-pressed="true">
+                  <span className="sc-coin"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 6h9l.7 6.9a1.1 1.1 0 0 1-1.1 1.2H3.9a1.1 1.1 0 0 1-1.1-1.2z" /><path d="M5.8 6V5.2a2.2 2.2 0 0 1 4.4 0V6" /></svg></span>
+                  <span className="sc-coin-lbl">Shop</span>
+                </button>
+                <button type="button" data-chapter="1" aria-pressed="false">
+                  <span className="sc-coin"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="4" width="11" height="9.5" rx="2.8" /><path d="M5.5 2.4v2.6M10.5 2.4v2.6M2.6 7.2h10.8" /></svg></span>
+                  <span className="sc-coin-lbl">Booking</span>
+                </button>
+                <button type="button" data-chapter="2" aria-pressed="false">
+                  <span className="sc-coin"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 13.4C5.3 11.3 2.4 9.2 2.4 6.3 2.4 4.6 3.7 3.3 5.3 3.3c1.1 0 2.1.6 2.7 1.5.6-.9 1.6-1.5 2.7-1.5 1.6 0 2.9 1.3 2.9 3 0 2.9-2.9 5-5.6 7.1z" /></svg></span>
+                  <span className="sc-coin-lbl">Service</span>
+                </button>
               </nav>
               <div className="sc-note-swap">
                 <div className="sc-note-block">
