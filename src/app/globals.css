@@ -2078,6 +2078,9 @@ textarea.blank:focus {
    description length changes between studies (client direction 2026-09-18). */
 .sc-showcase .sc-sticky { align-items: center; }
 .sc-showcase .sc-layout { align-items: start; }
+/* The note renders as paragraphs (see setNotes): blank line = paragraph, newline = line break. */
+.sc-showcase .sc-note-para { display: block; white-space: pre-line; }
+.sc-showcase .sc-note-para + .sc-note-para { margin-top: .75em; }
 /* Notes column without hairline rules (client direction 2026-09-16). */
 .sc-showcase .sc-note-block, .sc-showcase .sc-note-motion, .sc-showcase .sc-note-ba { border-top: 0; }
 .sc-showcase .sc-note-block { padding: 4px 0 20px; }
