@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { Italiana, Cormorant_Garamond, Archivo_Black, Inter, Fraunces, Karla } from 'next/font/google'
+import type { Locale } from '@/i18n/config'
 
 // Explore — "Showcase": three fictional-brand studies (Performance / Hospitality /
 // Wellness) in one sticky stage, scrubbed by scroll, each answering a category
@@ -29,7 +30,7 @@ const TR = [
 ]
 const GROUND = ['#eeeeee', '#efe9df', '#f1eee8'] // light grey · cream · bone
 
-  const NOTES = [
+  const NOTES_EN = [
     {
       num: '01', industry: 'Shop', title: 'Preparation is the edge',
       note: 'Performance brands shout specifications at everyone. This study speaks to high performing athletes, the people who know that preparation decides the result long before the race begins. Every scroll is a rehearsal. The frame breaks open, the headline shears apart, the pace climbs to 4:12 and the cut lands on the diagonal. Nothing is sold until the runner has felt the stride. Preparation is the key to a higher rate of success in anything, and the page is built to feel like it.',
@@ -53,12 +54,45 @@ const GROUND = ['#eeeeee', '#efe9df', '#f1eee8'] // light grey · cream · bone
     },
   ];
 
-export default function Showcase() {
+// 日本語（下書き：ネイティブ確認待ち / DRAFT — pending native review）. Same studies, same
+// order; the brands' own scene copy stays English, as on the rest of the JA site.
+const NOTES_JA = [
+  {
+    num: '01', industry: 'Shop', title: '準備こそが差になる',
+    note: 'パフォーマンスブランドの多くは、誰に対してもスペックを声高に語ります。このスタディが語りかけるのは、結果はレースが始まるずっと前の準備で決まると知っている、ハイパフォーマンスなアスリートたち。スクロールのひとつひとつがリハーサルです。フレームが開き、見出しが裂け、ペースは4:12へと上がり、カットは斜めに入る。ランナーがストライドを感じるまで、何も売りません。何事も、準備こそが成功率を高める鍵。このページは、それを体感できるように作られています。',
+    motion: 'フレームが開く · 見出しが裂ける · ペースが上がる · 斜めのカットで次のフレームへ',
+    ba: '/showcase/img/before-after-performance.webp',
+    baAlt: 'ビフォー・アフター：一般的なランニングブランドのサイトと、「準備こそが差になる」の方向性',
+  },
+  {
+    num: '02', industry: 'Booking', title: '帰ってきて、休むために',
+    note: '多くのホテルサイトが売っているのは「昼」です。明るい客室、青い空、正午のロビー。しかし私たちは、ゲストが本当に大切にしているのは、一日の旅を終えて部屋に戻り、ゆっくり休みたいと思うその瞬間だと考えています。だからこのスタディは、夜への移り変わりに焦点を当てました。扉が開くと、昼の光に満ちた部屋。やがて光が落ち、ランプが灯り、見出しは「到着」から「滞在」へ。料金はこれまで通り、1クリック先にあります。ただそれは、訪れた人が「ここに泊まりたい」と決めた後に現れるだけです。',
+    motion: 'スクロールで扉が開く · 見出しが次の誘いへ · 昼から夕暮れへ',
+    ba: '/showcase/img/before-after-hospitality.webp',
+    baAlt: 'ビフォー・アフター：一般的なホテルサイトと、「帰ってきて、休むために」の方向性',
+  },
+  {
+    num: '03', industry: 'Service', title: '身近なマインドフルネス',
+    note: 'ウェルネスのサイトは、無機質なダッシュボードか、パステル色のぼんやりとした雰囲気か、そのどちらかになりがちです。国内の市場が求めているのは、もっと具体的なもの。マインドフルネスへの本当の集中です。だからこのページは呼吸をします。スクロールに合わせてリングが広がり、落ち着く。吸って、止めて、吐いて。その間に小さな窓が、柔らかな朝の光へと広がっていきます。数字は最後に、小さく穏やかに現れます。証明としてではなく、質感として。まず静けさ、それからデータ。良いコーチがそうするように。',
+    motion: '呼吸のリングがスクロールに応える · 窓が広がる · 数字は最後に',
+    ba: '/showcase/img/before-after-wellness.webp',
+    baAlt: 'ビフォー・アフター：一般的なウェルネスのダッシュボードと、「身近なマインドフルネス」の方向性',
+  },
+]
+
+const COPY = {
+  en: { notes: NOTES_EN, approach: 'Approach', beforeAfter: 'Before / After', caption: 'Left, what the category usually ships. Right, the direction.' },
+  ja: { notes: NOTES_JA, approach: 'アプローチ', beforeAfter: 'Before / After', caption: '左は、その業界でよく見られる作り。右は、私たちの方向性。' },
+}
+
+export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
   const rootRef = useRef<HTMLElement>(null)
+  const copy = COPY[lang] ?? COPY.en
 
   useEffect(() => {
     if (!rootRef.current) return
     const root = rootRef.current as HTMLElement
+    const NOTES = COPY[lang]?.notes ?? NOTES_EN
     const $ = (s: string, r: ParentNode = root) => r.querySelector(s) as HTMLElement;
     const $$ = (s: string, r: ParentNode = root) => [...r.querySelectorAll(s)] as HTMLElement[];
     const clamp = (v: number, a = 0, b = 1) => Math.max(a, Math.min(b, v));
@@ -345,6 +379,7 @@ export default function Showcase() {
       ro.disconnect();
       if (frame) cancelAnimationFrame(frame);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const fonts = [italiana.variable, cormorant.variable, archivo.variable, inter.variable, fraunces.variable, karla.variable].join(' ')
@@ -456,16 +491,16 @@ export default function Showcase() {
               </nav>
               <div className="sc-note-swap">
                 <div className="sc-note-block">
-                  <p className="eyebrow">Approach</p>
+                  <p className="eyebrow">{copy.approach}</p>
                   <p className="sc-note-copy" data-note></p>
                 </div>
                 <p className="sc-note-motion" data-motion></p>
               </div>
               <div className="sc-note-ba">
-                <button type="button" className="sc-note-ba-toggle" aria-expanded="false" aria-controls="sc-note-ba-body">Before / After<i aria-hidden="true"></i></button>
+                <button type="button" className="sc-note-ba-toggle" aria-expanded="false" aria-controls="sc-note-ba-body">{copy.beforeAfter}<i aria-hidden="true"></i></button>
                 <div className="sc-note-ba-body" id="sc-note-ba-body"><div>
-                  <img data-ba src="/showcase/img/before-after-performance.webp" alt="Before and after: a typical performance running site beside the Preparation is the edge direction" width={2768} height={1110} loading="lazy" />
-                  <p className="sc-note-ba-cap">Left, what the category usually ships. Right, the direction.</p>
+                  <img data-ba src={copy.notes[0].ba} alt={copy.notes[0].baAlt} width={2768} height={1110} loading="lazy" />
+                  <p className="sc-note-ba-cap">{copy.caption}</p>
                 </div></div>
               </div>
             </aside>
