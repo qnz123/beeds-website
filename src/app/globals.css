@@ -2052,6 +2052,10 @@ textarea.blank:focus {
   .sc-showcase .sc-rail button span { margin-right: 6px; }
   .sc-showcase .sc-note-title { font-size: 21px; }
 }
+/* Plain-text study links at the top of the notes column (no numbers, no rules). */
+.sc-showcase .sc-note-nav { display: flex; flex-wrap: wrap; gap: 6px 26px; margin-bottom: 22px; }
+.sc-showcase .sc-note-nav button { padding: 0; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); transition: color .3s; }
+.sc-showcase .sc-note-nav button:hover, .sc-showcase .sc-note-nav button[aria-pressed="true"] { color: #000; }
 /* Notes column without hairline rules (client direction 2026-09-16). */
 .sc-showcase .sc-note-block, .sc-showcase .sc-note-motion, .sc-showcase .sc-note-ba { border-top: 0; }
 .sc-showcase .sc-note-block { padding: 4px 0 20px; }

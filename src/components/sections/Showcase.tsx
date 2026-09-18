@@ -74,7 +74,7 @@ export default function Showcase() {
     // Standalone pages set <body data-chapter="0|1|2">: one study, p maps straight onto its
     // own 0..1, no transitions, notes are static in the markup.
     const solo: number | null = null;
-    const rail = $$('.sc-rail button');
+    const rail = $$('[data-chapter]');   // index rail (preview) or the plain-text study links (app)
     const railProgress = $('.sc-rail-progress');
     const notes = $('.sc-notes');
     const reduce = matchMedia('(prefers-reduced-motion: reduce)');
@@ -116,11 +116,12 @@ export default function Showcase() {
       if (i === lastChapter) return;
       lastChapter = i;
       const n = NOTES[i];
-      $('[data-num]', notes).textContent = n.num;
-      $('[data-industry]', notes).textContent = n.industry;
-      $('[data-title]', notes).textContent = n.title;
-      $('[data-note]', notes).textContent = n.note;
-      $('[data-motion]', notes).textContent = n.motion;
+      const set = (sel: string, val: string) => { const el = $(sel, notes); if (el) el.textContent = val; };
+      set('[data-num]', n.num);
+      set('[data-industry]', n.industry);
+      set('[data-title]', n.title);
+      set('[data-note]', n.note);
+      set('[data-motion]', n.motion);
       const ba = $('[data-ba]', notes);
       if (ba) { ba.setAttribute('src', n.ba); ba.setAttribute('alt', n.baAlt); }
       rail.forEach((b, k) => b.setAttribute('aria-pressed', String(k === i)));
@@ -437,10 +438,13 @@ export default function Showcase() {
             </div>
 
             <aside className="sc-notes" aria-live="polite">
-              <p className="eyebrow sc-note-index"><span data-num>01</span> / <span data-industry>Performance</span></p>
-              <h3 className="sc-note-title" data-title>Preparation is the edge</h3>
+              <nav className="sc-note-nav" aria-label="Studies">
+                <button type="button" data-chapter="0" aria-pressed="true">Performance</button>
+                <button type="button" data-chapter="1" aria-pressed="false">Hospitality</button>
+                <button type="button" data-chapter="2" aria-pressed="false">Wellness</button>
+              </nav>
               <div className="sc-note-block">
-                <p className="eyebrow">Our point of view</p>
+                <p className="eyebrow">Approach</p>
                 <p className="sc-note-copy" data-note></p>
               </div>
               <p className="sc-note-motion" data-motion></p>
