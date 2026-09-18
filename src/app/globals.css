@@ -1969,7 +1969,9 @@ textarea.blank:focus {
 .sc-showcase .calm { background: #f1eee8; color: #2b2a26; font-family: var(--font-karla), Arial, sans-serif; }
 .sc-showcase .calm-inner { position: absolute; inset: 0; }
 .sc-showcase .calm .s-progress { background: rgba(43,42,38,.12); }
-.sc-showcase .calm-logo { font-family: var(--font-fraunces), Georgia, serif; font-size: 3.4cqw; font-weight: 300; letter-spacing: -.02em; }
+.sc-showcase .calm .s-nav { justify-content: flex-end; }
+.sc-showcase .calm-logo { position: absolute; left: 50%; top: 3.8cqw; transform: translateX(-50%); font-family: var(--font-fraunces), Georgia, serif; font-size: 3.4cqw; font-weight: 300; letter-spacing: -.02em; line-height: 1; }
+.sc-showcase .calm-logo::before { content: ''; position: absolute; left: .12em; right: .2em; top: -.34em; height: .48em; border: 1px solid currentColor; border-bottom: 0; border-radius: 50% 50% 0 0 / 100% 100% 0 0; opacity: .75; }
 .sc-showcase .calm-button { border-color: rgba(43,42,38,.4); }
 .sc-showcase .window { position: absolute; inset: 0; clip-path: inset(50% 60% 12% 8%); overflow: hidden; will-change: clip-path; }
 .sc-showcase .window img { position: absolute; inset: 0; will-change: transform, opacity; }
