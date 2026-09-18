@@ -2077,10 +2077,19 @@ textarea.blank:focus {
 .sc-showcase .sc-note-swap { will-change: opacity, transform; }
 .sc-showcase .sc-note-swap.is-fresh, .sc-showcase .sc-stage.is-fresh { animation: sc-note-fade .35s ease; }
 @keyframes sc-note-fade { from { opacity: 0; transform: translateY(6px); } }
-/* The sticky block rides in the comfortable middle of the viewport rather than pinned to the
-   top, while the notes column still starts on the stage's top edge and doesn't re-centre as the
-   description length changes between studies (client direction 2026-09-18). */
-.sc-showcase .sc-sticky { align-items: center; }
+/* The stage sits in the same place in every chapter. We pad the sticky block so the STAGE is
+   vertically centred, rather than centring the whole grid: the grid row is as tall as its tallest
+   item, so a long note (the Japanese Service copy) would otherwise grow the row and push the image
+   upward. The notes column still starts on the stage's top edge and simply extends downward.
+   The stage height below mirrors the layout: container 1400px max, 40px gutters, 1.6fr/1fr with a
+   48px gap, 16:10, capped by the sticky height — keep it in step if those change. */
+@media (min-width: 1001px) {
+  .sc-showcase {
+    --sc-stage-w: calc((min(1400px, 100vw) - 80px - 48px) * 1.6 / 2.6);
+    --sc-stage-h: min(calc(var(--sc-stage-w) * 10 / 16), calc(100svh - var(--nav-h) - 48px));
+  }
+  .sc-showcase .sc-sticky { align-items: flex-start; padding-top: max(0px, calc((100svh - var(--nav-h) - var(--sc-stage-h)) / 2)); }
+}
 .sc-showcase .sc-layout { align-items: start; }
 /* The note renders as paragraphs (see setNotes): blank line = paragraph, newline = line break. */
 .sc-showcase .sc-note-para { display: block; white-space: pre-line; }

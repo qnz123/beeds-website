@@ -63,7 +63,7 @@ const NOTES_JA = [
     "num": "01",
     "industry": "Shop",
     "title": "準備こそが差になる",
-    "note": "多くのパフォーマンスブランドは、誰に対してもスペックを声高に語ります。\n\nこのスタディが語りかけるのは、結果はレースが始まるずっと前、準備の段階で決まると知っているハイパフォーマンスなアスリートたち。\n\nスクロールのひとつひとつが、リハーサルです。\nフレームが開き、見出しが裂け、ペースは4:12へと上がり、斜めのカットが次のシーンへ導く。\n\nランナー自身がストライドを感じるまで、何も売りません。\n\n何事も、準備こそが成功の確率を高める鍵。\nこのページは、それを目で見るのではなく、体感できるように設計されています。",
+    "note": "多くのパフォーマンスブランドは、誰に対してもスペックを声高に語ります。\n\nこのスタディが語りかけるのは、結果はレースが始まるずっと前、準備の段階で決まると知っているハイパフォーマンスなアスリートたち。\n\nスクロールのひとつひとつが、リハーサルです。フレームが開き、見出しが裂け、ペースは4:12へと上がり、斜めのカットが次のシーンへ導く。ランナー自身がストライドを感じるまで、何も売りません。\n\n何事も、準備こそが成功の確率を高める鍵。このページは、それを目で見るのではなく、体感できるように設計されています。",
     "motion": "フレームが開く · 見出しが裂ける · ペースが上がる · 斜めのカットで次のフレームへ",
     "ba": "/showcase/img/before-after-performance.webp",
     "baAlt": "ビフォー・アフター：一般的なランニングブランドのサイトと、「準備こそが差になる」の方向性"
@@ -72,7 +72,7 @@ const NOTES_JA = [
     "num": "02",
     "industry": "Booking",
     "title": "帰ってきて、休むために",
-    "note": "多くのホテルサイトが売っているのは、「昼」です。\n明るい客室、青い空、正午のロビー。\n\nけれど私たちは、ゲストが本当に大切にしているのは、一日の旅を終え、部屋に戻り、ようやくゆっくり休めるその瞬間だと考えています。\n\nだからこのスタディは、夜へと移り変わる時間に焦点を当てました。\n\n扉が開くと、そこには昼の光に満ちた部屋。\nスクロールするにつれて光はゆっくりと落ち、ランプが灯り、見出しは「到着」から「滞在」へと変わっていきます。\n\n料金はこれまでと同じく、1クリック先にあります。\nただし、それが現れるのは、訪れた人が「ここに泊まりたい」と感じた、その後です。",
+    "note": "多くのホテルサイトが売っているのは、「昼」です。明るい客室、青い空、正午のロビー。\n\nけれど私たちは、ゲストが本当に大切にしているのは、一日の旅を終え、部屋に戻り、ようやくゆっくり休めるその瞬間だと考えています。だからこのスタディは、夜へと移り変わる時間に焦点を当てました。\n\n扉が開くと、そこには昼の光に満ちた部屋。スクロールするにつれて光はゆっくりと落ち、ランプが灯り、見出しは「到着」から「滞在」へと変わっていきます。\n\n料金はこれまでと同じく、1クリック先にあります。ただし、それが現れるのは、訪れた人が「ここに泊まりたい」と感じた、その後です。",
     "motion": "スクロールで扉が開く · 見出しが次の誘いへ · 昼から夕暮れへ",
     "ba": "/showcase/img/before-after-hospitality.webp",
     "baAlt": "ビフォー・アフター：一般的なホテルサイトと、「帰ってきて、休むために」の方向性"
@@ -81,7 +81,7 @@ const NOTES_JA = [
     "num": "03",
     "industry": "Service",
     "title": "身近なマインドフルネス",
-    "note": "ウェルネスのサイトは、無機質なダッシュボードか、パステルカラーに包まれた曖昧な世界観か。そのどちらかになりがちです。\n\nけれど、この市場が求めているのは、もっと具体的なもの。\nマインドフルネスに、本当に集中できる体験です。\n\nだから、このページは呼吸します。\n\nスクロールに合わせてリングが広がり、静かに戻る。\n吸って、止めて、吐く。\n\nその間、小さな窓はゆっくりと広がり、柔らかな朝の光が差し込みます。\n\n数字が現れるのは最後。\n小さく、穏やかに。\n\n証明としてではなく、体験の質感として。\n\nまず静けさ。\nそのあとにデータ。\n\n良いコーチがそうするように。",
+    "note": "ウェルネスのサイトは、無機質なダッシュボードか、パステルカラーに包まれた曖昧な世界観か。そのどちらかになりがちです。\n\nけれど、この市場が求めているのは、もっと具体的なもの。マインドフルネスに、本当に集中できる体験です。\n\nだから、このページは呼吸します。スクロールに合わせてリングが広がり、静かに戻る。吸って、止めて、吐く。その間、小さな窓はゆっくりと広がり、柔らかな朝の光が差し込みます。\n\n数字が現れるのは最後。小さく、穏やかに。証明としてではなく、体験の質感として。まず静けさ。そのあとにデータ。良いコーチがそうするように。",
     "motion": "呼吸のリングがスクロールに応える · 窓が広がる · 数字は最後に",
     "ba": "/showcase/img/before-after-wellness.webp",
     "baAlt": "ビフォー・アフター：一般的なウェルネスのダッシュボードと、「身近なマインドフルネス」の方向性"
@@ -378,10 +378,14 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
     const ro = new ResizeObserver(schedule);
     ro.observe(stage);
 
-    // QA hook: /explore/?at=0.5 pins the stage at that progress (no scrolling).
-    const at = new URLSearchParams(location.search).get('at');
+    // QA hooks: ?at=0.5 shows the stage flat at that progress (sticky off, for stills);
+    // ?pin=0.5 holds that progress with the sticky layout intact (for checking real geometry).
+    const params = new URLSearchParams(location.search);
+    const at = params.get('at');
     if (at !== null) { forcedP = clamp(parseFloat(at)); root.classList.add('debug-at'); }
-    if (new URLSearchParams(location.search).get('ba') !== null) { $('.sc-note-ba')?.classList.add('is-open'); $('.sc-note-ba-toggle')?.setAttribute('aria-expanded', 'true'); }
+    const pin = params.get('pin');
+    if (pin !== null) forcedP = clamp(parseFloat(pin));
+    if (params.get('ba') !== null) { $('.sc-note-ba')?.classList.add('is-open'); $('.sc-note-ba-toggle')?.setAttribute('aria-expanded', 'true'); }
 
     navHeight();
     updateMotion();
