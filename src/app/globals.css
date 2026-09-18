@@ -1939,7 +1939,8 @@ textarea.blank:focus {
 .sc-showcase .run-inner { position: absolute; inset: 0; will-change: transform; }
 .sc-showcase .run .s-progress { background: rgba(20,20,20,.1); }
 .sc-showcase .run .s-progress i { background: var(--teal); }
-.sc-showcase .run-logo { font-family: var(--font-archivo), Impact, sans-serif; font-size: 2.6cqw; letter-spacing: .1em; }
+.sc-showcase .run-logo { --sky: #1a4f8f; position: relative; display: inline-block; font-family: var(--font-archivo), Impact, sans-serif; font-size: 2.6cqw; letter-spacing: .08em; color: var(--sky); transform: skewX(-14deg); background: linear-gradient(120deg, var(--sky) 0 48.5%, transparent 48.5% 51.5%, var(--sky) 51.5%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.sc-showcase .run-logo::after { content: ''; position: absolute; left: 100%; bottom: .18em; width: .9em; height: .16em; margin-left: .35em; background: var(--sky); transform: skewX(14deg) rotate(-30deg); transform-origin: left bottom; }
 .sc-showcase .run-button { color: #141414; background: var(--lime); border-color: var(--lime); }
 .sc-showcase .run-cart, .sc-showcase .s-icon { padding: 0; width: 3.6cqw; height: 3.6cqw; border-radius: 50%; justify-content: center; }
 .sc-showcase .run-cart svg, .sc-showcase .s-icon svg { width: 1.8cqw; height: 1.8cqw; }
