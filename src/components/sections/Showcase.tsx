@@ -31,21 +31,21 @@ const GROUND = ['#eeeeee', '#efe9df', '#f1eee8'] // light grey · cream · bone
 
   const NOTES = [
     {
-      num: '01', industry: 'Performance', title: 'Preparation is the edge',
+      num: '01', industry: 'Retail', title: 'Preparation is the edge',
       note: 'Performance brands shout specifications at everyone. This study speaks to high performing athletes, the people who know that preparation decides the result long before the race begins. Every scroll is a rehearsal. The frame breaks open, the headline shears apart, the pace climbs to 4:12 and the cut lands on the diagonal. Nothing is sold until the runner has felt the stride. Preparation is the key to a higher rate of success in anything, and the page is built to feel like it.',
       motion: 'Frame breaks open · headline shears · pace counts up · diagonal cut to the next frame.',
       ba: '/showcase/img/before-after-performance.webp',
       baAlt: 'Before and after: a typical performance running site beside the Preparation is the edge direction',
     },
     {
-      num: '02', industry: 'Hospitality', title: 'Coming home to rest',
+      num: '02', industry: 'Booking', title: 'Coming home to rest',
       note: 'Most hotel sites sell the daytime: bright rooms, blue skies, a lobby at noon. We believe guests care most about the moment they come back after a full day of travel and want a proper rest. So this study focuses on the transition to night. The door opens on the room in daylight, then the light goes, the lamps come on and the headline turns from arriving to staying. The room rate is still one click away. It simply arrives after the visitor has already decided they want to be there.',
       motion: 'Scroll opens the door · the headline gives way to a second invitation · day turns to evening.',
       ba: '/showcase/img/before-after-hospitality.webp',
       baAlt: 'Before and after: a typical hotel site beside the Coming home to rest direction',
     },
     {
-      num: '03', industry: 'Wellness', title: 'Mindfulness, close to home',
+      num: '03', industry: 'Service', title: 'Mindfulness, close to home',
       note: 'Wellness sites tend to be either a clinical dashboard or a pastel blur. The local market is asking for something more specific: a genuine focus on mindfulness. So the page breathes. A ring expands and settles with the scroll, inhale, hold, exhale, while a small window widens into soft morning light. The numbers arrive last, small and gentle, as texture rather than proof. Calm first, then the data, the way a good coach does it.',
       motion: 'Breathing ring follows the scroll · the window widens · the numbers arrive last.',
       ba: '/showcase/img/before-after-wellness.webp',
@@ -441,9 +441,9 @@ export default function Showcase() {
 
             <aside className="sc-notes" aria-live="polite">
               <nav className="sc-note-nav" aria-label="Studies">
-                <button type="button" data-chapter="0" aria-pressed="true">Performance</button>
-                <button type="button" data-chapter="1" aria-pressed="false">Hospitality</button>
-                <button type="button" data-chapter="2" aria-pressed="false">Wellness</button>
+                <button type="button" data-chapter="0" aria-pressed="true">Retail</button>
+                <button type="button" data-chapter="1" aria-pressed="false">Booking</button>
+                <button type="button" data-chapter="2" aria-pressed="false">Service</button>
               </nav>
               <div className="sc-note-swap">
                 <div className="sc-note-block">
