@@ -83,6 +83,7 @@ export default function Showcase() {
     let staticChapter = 0;
     let frame = 0;
     let lastChapter = -1;
+    let arriveTimer: ReturnType<typeof setTimeout> | 0 = 0;
 
     // ---- colour lerp for the stage ground ----
     const hex = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
@@ -274,8 +275,10 @@ export default function Showcase() {
 
       // Notes: fade out through the first half of a transition, swap at the midpoint, fade back in.
       const tri = Math.max(1 - Math.abs(2 * tr1 - 1), 1 - Math.abs(2 * tr2 - 1)) * ((tr1 > 0 && tr1 < 1) || (tr2 > 0 && tr2 < 1) ? 1 : 0);
-      notes.style.opacity = String(1 - tri);
-      notes.style.transform = `translateY(${tri * 10}px)`;
+      if (!notes.classList.contains('is-switching')) {
+        notes.style.opacity = String(1 - tri);
+        notes.style.transform = `translateY(${tri * 10}px)`;
+      }
       setNotes(chapterAt(p));
       if (railProgress) railProgress.style.transform = `scaleX(${p})`;
     }
@@ -283,24 +286,34 @@ export default function Showcase() {
     function schedule() { if (!frame) frame = requestAnimationFrame(render); }
 
     // ---- navigation ----
-    function scrollToProgress(target: number, instant?: boolean) {
+    function scrollToProgress(target: number, instant?: boolean, onDone?: () => void) {
       const top = window.scrollY + track.getBoundingClientRect().top + travel() * target;
-      if (instant || paused) { window.scrollTo(0, top); return; }
+      if (instant || paused) { window.scrollTo(0, top); if (onDone) onDone(); return; }
       const startY = window.scrollY, delta = top - startY;
-      if (Math.abs(delta) < 2) return;
+      if (Math.abs(delta) < 2) { if (onDone) onDone(); return; }
       const dur = Math.min(1600, 700 + Math.abs(delta) * 0.25);
       const t0 = performance.now();
       const step = (now: number) => {
         const q = Math.min(1, (now - t0) / dur);
         window.scrollTo(0, startY + delta * quint(q));
         if (q < 1) requestAnimationFrame(step);
+        else if (onDone) onDone();
       };
       requestAnimationFrame(step);
     }
 
     function goChapter(i: number) {
       if (paused) { staticChapter = i; setNotes(-1); lastChapter = -1; schedule(); return; }
-      scrollToProgress(CH[i].start + 0.004);
+      // The description fades out for the glide and fades back in on arrival (see .is-switching /
+      // .is-arriving in CSS) instead of flipping mid-scroll as the transition windows pass.
+      clearTimeout(arriveTimer);
+      notes.classList.remove('is-arriving');
+      notes.classList.add('is-switching');
+      scrollToProgress(CH[i].start + 0.004, false, () => {
+        notes.classList.remove('is-switching');
+        notes.classList.add('is-arriving');
+        arriveTimer = setTimeout(() => notes.classList.remove('is-arriving'), 500);
+      });
     }
 
     rail.forEach((b, i) => b.addEventListener('click', () => goChapter(i)));

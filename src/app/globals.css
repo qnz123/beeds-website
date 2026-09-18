@@ -1994,6 +1994,8 @@ textarea.blank:focus {
 .sc-showcase .steps button.active { color: #2b2a26; }
 .sc-showcase .calm.on-photo .steps button.active { color: #fff; }
 .sc-showcase .sc-notes { will-change: opacity, transform; }
+.sc-showcase .sc-notes.is-switching, .sc-showcase .sc-notes.is-arriving { transition: opacity .4s ease, transform .45s cubic-bezier(.83,0,.17,1); }
+.sc-showcase .sc-notes.is-switching { opacity: 0 !important; transform: translateY(10px) !important; }
 .sc-showcase .sc-note-index { color: var(--muted); margin-bottom: 14px; }
 .sc-showcase .sc-note-title { font-size: clamp(28px, 2.6vw, 40px); line-height: 1.1; letter-spacing: -.01em; margin-bottom: 30px; }
 .sc-showcase .sc-note-block { border-top: 1px solid #000; padding: 16px 0 22px; }
@@ -2052,10 +2054,14 @@ textarea.blank:focus {
   .sc-showcase .sc-rail button span { margin-right: 6px; }
   .sc-showcase .sc-note-title { font-size: 21px; }
 }
-/* Plain-text study links at the top of the notes column (no numbers, no rules). */
-.sc-showcase .sc-note-nav { display: flex; flex-wrap: wrap; gap: 6px 26px; margin-bottom: 22px; }
-.sc-showcase .sc-note-nav button { padding: 0; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); transition: color .3s; }
-.sc-showcase .sc-note-nav button:hover, .sc-showcase .sc-note-nav button[aria-pressed="true"] { color: #000; }
+/* Study links as small buttons (sharp corners, house style): grey field, ink when current. */
+.sc-showcase .sc-note-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+.sc-showcase .sc-note-nav button { padding: 10px 16px; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: #333; background: #e7e7e7; transition: background .3s, color .3s; }
+.sc-showcase .sc-note-nav button:hover { background: #dcdcdc; color: #000; }
+.sc-showcase .sc-note-nav button[aria-pressed="true"] { background: #000; color: #f5f5f5; }
+/* Description swap on click: hide for the glide, ease back in on arrival. */
+.sc-showcase .sc-notes.is-switching, .sc-showcase .sc-notes.is-arriving { transition: opacity .4s ease, transform .45s cubic-bezier(.83,0,.17,1); }
+.sc-showcase .sc-notes.is-switching { opacity: 0 !important; transform: translateY(10px) !important; }
 /* Notes column without hairline rules (client direction 2026-09-16). */
 .sc-showcase .sc-note-block, .sc-showcase .sc-note-motion, .sc-showcase .sc-note-ba { border-top: 0; }
 .sc-showcase .sc-note-block { padding: 4px 0 20px; }
