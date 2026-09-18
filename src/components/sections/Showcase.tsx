@@ -83,7 +83,7 @@ export default function Showcase() {
     let staticChapter = 0;
     let frame = 0;
     let lastChapter = -1;
-    let arriveTimer: ReturnType<typeof setTimeout> | 0 = 0;
+    let chapterOffset = 0;   // set by a click so a study can be chosen without moving the page
 
     // ---- colour lerp for the stage ground ----
     const hex = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
@@ -102,11 +102,17 @@ export default function Showcase() {
     }
 
     let forcedP: number | null = null;                                        // preview-only debug override (see bottom)
+    const rawProgress = () => -track.getBoundingClientRect().top / travel();
     function progress() {
       if (forcedP !== null) return forcedP;
       if (paused) return solo !== null ? 1 : CH[staticChapter].end;   // finished state of the chosen chapter
-      return clamp(-track.getBoundingClientRect().top / travel());
+      return clamp(rawProgress() + chapterOffset);
     }
+
+    // Land on a progress point WITHOUT touching the scroll position (client direction
+    // 2026-09-18): shift the scroll-to-progress mapping instead of scrolling the page.
+    // Scrolling on from there carries forward from the chosen study.
+    function jumpTo(target: number) { chapterOffset = target - rawProgress(); }
 
     function chapterAt(p: number) {
       return p < (TR[0].start + TR[0].end) / 2 ? 0 : p < (TR[1].start + TR[1].end) / 2 ? 1 : 2;
@@ -275,10 +281,9 @@ export default function Showcase() {
 
       // Notes: fade out through the first half of a transition, swap at the midpoint, fade back in.
       const tri = Math.max(1 - Math.abs(2 * tr1 - 1), 1 - Math.abs(2 * tr2 - 1)) * ((tr1 > 0 && tr1 < 1) || (tr2 > 0 && tr2 < 1) ? 1 : 0);
-      if (!notes.classList.contains('is-switching')) {
-        notes.style.opacity = String(1 - tri);
-        notes.style.transform = `translateY(${tri * 10}px)`;
-      }
+      const swap = $('.sc-note-swap', notes) || notes;
+      swap.style.opacity = String(1 - tri);
+      swap.style.transform = `translateY(${tri * 10}px)`;
       setNotes(chapterAt(p));
       if (railProgress) railProgress.style.transform = `scaleX(${p})`;
     }
@@ -286,34 +291,17 @@ export default function Showcase() {
     function schedule() { if (!frame) frame = requestAnimationFrame(render); }
 
     // ---- navigation ----
-    function scrollToProgress(target: number, instant?: boolean, onDone?: () => void) {
-      const top = window.scrollY + track.getBoundingClientRect().top + travel() * target;
-      if (instant || paused) { window.scrollTo(0, top); if (onDone) onDone(); return; }
-      const startY = window.scrollY, delta = top - startY;
-      if (Math.abs(delta) < 2) { if (onDone) onDone(); return; }
-      const dur = Math.min(1600, 700 + Math.abs(delta) * 0.25);
-      const t0 = performance.now();
-      const step = (now: number) => {
-        const q = Math.min(1, (now - t0) / dur);
-        window.scrollTo(0, startY + delta * quint(q));
-        if (q < 1) requestAnimationFrame(step);
-        else if (onDone) onDone();
-      };
-      requestAnimationFrame(step);
-    }
-
     function goChapter(i: number) {
       if (paused) { staticChapter = i; setNotes(-1); lastChapter = -1; schedule(); return; }
-      // The description fades out for the glide and fades back in on arrival (see .is-switching /
-      // .is-arriving in CSS) instead of flipping mid-scroll as the transition windows pass.
-      clearTimeout(arriveTimer);
-      notes.classList.remove('is-arriving');
-      notes.classList.add('is-switching');
-      scrollToProgress(CH[i].start + 0.004, false, () => {
-        notes.classList.remove('is-switching');
-        notes.classList.add('is-arriving');
-        arriveTimer = setTimeout(() => notes.classList.remove('is-arriving'), 500);
+      // The page stays exactly where it is; the scene and the new text fade in on the spot.
+      const swap = $('.sc-note-swap', notes) || notes;
+      [swap, stage].forEach((el) => {
+        el.classList.remove('is-fresh');
+        void el.offsetWidth;            // restart the fade-in even on a repeat click
+        el.classList.add('is-fresh');
       });
+      jumpTo(CH[i].start + 0.004);
+      schedule();
     }
 
     rail.forEach((b, i) => b.addEventListener('click', () => goChapter(i)));
@@ -326,7 +314,8 @@ export default function Showcase() {
     if (calm) calm.steps.forEach((b, i) => b.addEventListener('click', () => {
       if (paused) return;
       const at = [0.02, 0.4, 0.72][i];
-      scrollToProgress(solo !== null ? at : CH[2].start + (CH[2].end - CH[2].start) * at);
+      jumpTo(solo !== null ? at : CH[2].start + (CH[2].end - CH[2].start) * at);
+      schedule();
     }));
 
     function updateMotion() {
@@ -456,15 +445,18 @@ export default function Showcase() {
                 <button type="button" data-chapter="1" aria-pressed="false">Hospitality</button>
                 <button type="button" data-chapter="2" aria-pressed="false">Wellness</button>
               </nav>
-              <div className="sc-note-block">
-                <p className="eyebrow">Approach</p>
-                <p className="sc-note-copy" data-note></p>
+              <div className="sc-note-swap">
+                <div className="sc-note-block">
+                  <p className="eyebrow">Approach</p>
+                  <p className="sc-note-copy" data-note></p>
+                </div>
+                <p className="sc-note-motion" data-motion></p>
               </div>
-              <p className="sc-note-motion" data-motion></p>
               <div className="sc-note-ba">
-                <button type="button" className="sc-note-ba-toggle" aria-expanded="false" aria-controls="sc-note-ba-body"><span className="eyebrow">Before / After</span><i aria-hidden="true"></i></button>
+                <button type="button" className="sc-note-ba-toggle" aria-expanded="false" aria-controls="sc-note-ba-body">Before / After<i aria-hidden="true"></i></button>
                 <div className="sc-note-ba-body" id="sc-note-ba-body"><div>
                   <img data-ba src="/showcase/img/before-after-performance.webp" alt="Before and after: a typical performance running site beside the Preparation is the edge direction" width={2768} height={1110} loading="lazy" />
+                  <p className="sc-note-ba-cap">Left, what the category usually ships. Right, the direction.</p>
                 </div></div>
               </div>
             </aside>
