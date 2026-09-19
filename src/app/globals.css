@@ -1413,7 +1413,7 @@ figure[data-animate='visible'] .impact-lift-label {
 /* Hero CTAs (2026-09-19, design 03 "Ink and blue", chosen by the client) —
    two free-standing pills under the intro copy, icon left of the label, type
    in Hanken Grotesk at AKQA's subtext spec — 15px / 21px leading / weight 400
-   / zero tracking, read off akqa.com/about at the client's request (their own
+   / zero tracking (weight dropped to 300 at the client's request 2026-09-19), read off akqa.com/about (their own
    face, Season Sans, is licensed and cannot be shipped; he picked Hanken
    Grotesk from the substitutes we measured against it). The --font-hanken
    variable is set on the whole .hero section by Hero.tsx, so the intro
@@ -1439,7 +1439,7 @@ figure[data-animate='visible'] .impact-lift-label {
   border-radius: 999px;
   font-family: var(--font-hanken), 'Hanken Grotesk', 'Hiragino Sans', 'Noto Sans JP', system-ui, -apple-system, sans-serif;
   font-size: 15px;
-  font-weight: 400;
+  font-weight: 300;
   letter-spacing: 0;
   line-height: 21px;
   text-decoration: none;
@@ -1862,7 +1862,7 @@ textarea.blank:focus {
 .hero-body {
   font-family: var(--font-hanken), 'Hanken Grotesk', 'Hiragino Sans', 'Noto Sans JP', system-ui, -apple-system, sans-serif;
   font-size: 15px;
-  font-weight: 400;
+  font-weight: 300;
   letter-spacing: 0;
   line-height: 1.6;
   max-width: 600px;

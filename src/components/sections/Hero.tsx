@@ -13,7 +13,7 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 // picked Hanken Grotesk from the shortlist. The variable goes on the whole
 // section: both the intro paragraph (.hero-body) and the buttons (.hero-btn)
 // are set in it. See globals.css.
-const hanken = Hanken_Grotesk({ weight: ['400', '500'], subsets: ['latin'], variable: '--font-hanken', display: 'swap' })
+const hanken = Hanken_Grotesk({ weight: ['300', '400'], subsets: ['latin'], variable: '--font-hanken', display: 'swap' })
 
 // In-memory flag (resets on full page load): the hero animates on every fresh
 // visit or reload, but sits static when the visitor navigates back to the
