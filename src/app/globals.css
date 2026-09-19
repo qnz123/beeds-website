@@ -1484,7 +1484,11 @@ figure[data-animate='visible'] .impact-lift-label {
 
 .hero-btn-connect {
   background: rgba(255, 255, 255, 0.18);
-  color: #000;
+  /* Grey label at rest, blue on hover (client direction 2026-09-19): the
+     secondary sits quiet beside the solid primary and lights up on approach.
+     #666 is the site's existing muted grey and clears AA on this fill at
+     5.36:1 — #777 and lighter do not. */
+  color: #666;
   border-color: rgba(0, 0, 0, 0.12);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
   -webkit-backdrop-filter: blur(10px);
@@ -1495,9 +1499,18 @@ figure[data-animate='visible'] .impact-lift-label {
   color: #f52789;
 }
 
+/* Hover fills blue with white type. The blue is #0f6fd6, the same shade the
+   primary already hovers to, rather than the lighter #1685f8 — white on that
+   measures 3.66:1 and fails AA, where this clears it at 4.92:1. The icon
+   follows the label to white; pink on blue would fight. */
 .hero-btn-connect:hover {
-  background: rgba(255, 255, 255, 0.45);
-  color: #000;
+  background: #0f6fd6;
+  color: #fff;
+  border-color: #0f6fd6;
+}
+
+.hero-btn-connect:hover .hero-btn-ic {
+  color: #fff;
 }
 
 .hero-btn:active {
