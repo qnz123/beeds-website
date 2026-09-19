@@ -36,22 +36,28 @@ const GROUND = ['#eeeeee', '#efe9df', '#f1eee8'] // light grey · cream · bone
       num: '01', industry: 'Shop', title: 'Preparation is the edge',
       note: 'Performance brands shout specifications at everyone. This study speaks to high performing athletes, the people who know that preparation decides the result long before the race begins. Every scroll is a rehearsal. The frame breaks open, the headline shears apart, the pace climbs to 4:12 and the cut lands on the diagonal. Nothing is sold until the runner has felt the stride. Preparation is the key to a higher rate of success in anything, and the page is built to feel like it.',
       motion: 'Frame breaks open · headline shears · pace counts up · diagonal cut to the next frame.',
-      ba: '/showcase/img/before-after-performance.webp',
-      baAlt: 'Before and after: a typical performance running site beside the Preparation is the edge direction',
+      baBefore: '/showcase/img/ba-performance-before.webp',
+      baAfter: '/showcase/img/ba-performance-after.webp',
+      baBeforeAlt: 'Before: a typical performance running site',
+      baAfterAlt: 'After: the TEMPO direction',
     },
     {
       num: '02', industry: 'Booking', title: 'Coming home to rest',
       note: 'Most hotel sites sell the daytime: bright rooms, blue skies, a lobby at noon. We believe guests care most about the moment they come back after a full day of travel and want a proper rest. So this study focuses on the transition to night. The door opens on the room in daylight, then the light goes, the lamps come on and the headline turns from arriving to staying. The room rate is still one click away. It simply arrives after the visitor has already decided they want to be there.',
       motion: 'Scroll opens the door · the headline gives way to a second invitation · day turns to evening.',
-      ba: '/showcase/img/before-after-hospitality.webp',
-      baAlt: 'Before and after: a typical hotel site beside the Coming home to rest direction',
+      baBefore: '/showcase/img/ba-hospitality-before.webp',
+      baAfter: '/showcase/img/ba-hospitality-after.webp',
+      baBeforeAlt: 'Before: a typical hotel site',
+      baAfterAlt: 'After: the Solar direction, the room at dusk',
     },
     {
       num: '03', industry: 'Service', title: 'Mindfulness, close to home',
       note: 'Wellness sites tend to be either a clinical dashboard or a pastel blur. The local market is asking for something more specific: a genuine focus on mindfulness. So the page breathes. A ring expands and settles with the scroll, inhale, hold, exhale, while a small window widens into soft morning light. The numbers arrive last, small and gentle, as texture rather than proof. Calm first, then the data, the way a good coach does it.',
       motion: 'Breathing ring follows the scroll · the window widens · the numbers arrive last.',
-      ba: '/showcase/img/before-after-wellness.webp',
-      baAlt: 'Before and after: a typical wellness dashboard beside the Mindfulness, close to home direction',
+      baBefore: '/showcase/img/ba-wellness-before.webp',
+      baAfter: '/showcase/img/ba-wellness-after.webp',
+      baBeforeAlt: 'Before: a typical wellness dashboard',
+      baAfterAlt: 'After: the hush direction',
     },
   ];
 
@@ -65,8 +71,10 @@ const NOTES_JA = [
     "title": "準備こそが差になる",
     "note": "多くのパフォーマンスブランドは、誰に対してもスペックを声高に語ります。\n\nこのスタディが語りかけるのは、結果はレースが始まるずっと前、準備の段階で決まると知っているハイパフォーマンスなアスリートたち。\n\nスクロールのひとつひとつが、リハーサルです。フレームが開き、見出しが裂け、ペースは4:12へと上がり、斜めのカットが次のシーンへ導く。ランナー自身がストライドを感じるまで、何も売りません。\n\n何事も、準備こそが成功の確率を高める鍵。このページは、それを目で見るのではなく、体感できるように設計されています。",
     "motion": "フレームが開く · 見出しが裂ける · ペースが上がる · 斜めのカットで次のフレームへ",
-    "ba": "/showcase/img/before-after-performance.webp",
-    "baAlt": "ビフォー・アフター：一般的なランニングブランドのサイトと、「準備こそが差になる」の方向性"
+    "baBefore": "/showcase/img/ba-performance-before.webp",
+    "baAfter": "/showcase/img/ba-performance-after.webp",
+    "baBeforeAlt": "ビフォー：一般的なランニングブランドのサイト",
+    "baAfterAlt": "アフター：TEMPO の方向性"
   },
   {
     "num": "02",
@@ -74,8 +82,10 @@ const NOTES_JA = [
     "title": "帰ってきて、休むために",
     "note": "多くのホテルサイトが売っているのは、「昼」です。明るい客室、青い空、正午のロビー。\n\nけれど私たちは、ゲストが本当に大切にしているのは、一日の旅を終え、部屋に戻り、ようやくゆっくり休めるその瞬間だと考えています。だからこのスタディは、夜へと移り変わる時間に焦点を当てました。\n\n扉が開くと、そこには昼の光に満ちた部屋。スクロールするにつれて光はゆっくりと落ち、ランプが灯り、見出しは「到着」から「滞在」へと変わっていきます。\n\n料金はこれまでと同じく、1クリック先にあります。ただし、それが現れるのは、訪れた人が「ここに泊まりたい」と感じた、その後です。",
     "motion": "スクロールで扉が開く · 見出しが次の誘いへ · 昼から夕暮れへ",
-    "ba": "/showcase/img/before-after-hospitality.webp",
-    "baAlt": "ビフォー・アフター：一般的なホテルサイトと、「帰ってきて、休むために」の方向性"
+    "baBefore": "/showcase/img/ba-hospitality-before.webp",
+    "baAfter": "/showcase/img/ba-hospitality-after.webp",
+    "baBeforeAlt": "ビフォー：一般的なホテルサイト",
+    "baAfterAlt": "アフター：Solar の方向性、夕暮れの客室"
   },
   {
     "num": "03",
@@ -83,13 +93,15 @@ const NOTES_JA = [
     "title": "身近なマインドフルネス",
     "note": "ウェルネスのサイトは、無機質なダッシュボードか、パステルカラーに包まれた曖昧な世界観か。そのどちらかになりがちです。\n\nけれど、この市場が求めているのは、もっと具体的なもの。マインドフルネスに、本当に集中できる体験です。\n\nだから、このページは呼吸します。スクロールに合わせてリングが広がり、静かに戻る。吸って、止めて、吐く。その間、小さな窓はゆっくりと広がり、柔らかな朝の光が差し込みます。\n\n数字が現れるのは最後。小さく、穏やかに。証明としてではなく、体験の質感として。まず静けさ。そのあとにデータ。良いコーチがそうするように。",
     "motion": "呼吸のリングがスクロールに応える · 窓が広がる · 数字は最後に",
-    "ba": "/showcase/img/before-after-wellness.webp",
-    "baAlt": "ビフォー・アフター：一般的なウェルネスのダッシュボードと、「身近なマインドフルネス」の方向性"
+    "baBefore": "/showcase/img/ba-wellness-before.webp",
+    "baAfter": "/showcase/img/ba-wellness-after.webp",
+    "baBeforeAlt": "ビフォー：一般的なウェルネスのダッシュボード",
+    "baAfterAlt": "アフター：hush の方向性"
   }
 ]
 const COPY = {
-  en: { notes: NOTES_EN, approach: 'Approach', beforeAfter: 'Before / After', caption: 'Left, what the category usually ships. Right, the direction.' },
-  ja: { notes: NOTES_JA, approach: 'アプローチ', beforeAfter: 'Before / After', caption: '左は、その業界でよく見られる作り。右は、私たちの方向性。' },
+  en: { notes: NOTES_EN, approach: 'Approach', beforeAfter: 'Before / After', caption: 'Left, what the category usually ships. Right, the direction.', wipe: 'Wipe between before and after' },
+  ja: { notes: NOTES_JA, approach: 'アプローチ', beforeAfter: 'Before / After', caption: '左は、その業界でよく見られる作り。右は、私たちの方向性。', wipe: 'ビフォーとアフターを切り替える' },
 }
 
 export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
@@ -124,7 +136,9 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
     let staticChapter = 0;
     let frame = 0;
     let lastChapter = -1;
-    let chapterOffset = 0;   // set by a click so a study can be chosen without moving the page
+    let chapterOffset = 0;
+    let resetSlider = () => {};   // set once the Before / After slider is wired
+    let onSliderUp = () => {};   // set by a click so a study can be chosen without moving the page
 
     // ---- colour lerp for the stage ground ----
     const hex = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
@@ -177,8 +191,10 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
         return span;
       }));
       set('[data-motion]', n.motion);
-      const ba = $('[data-ba]', notes);
-      if (ba) { ba.setAttribute('src', n.ba); ba.setAttribute('alt', n.baAlt); }
+      const bb = $('[data-ba-before]', notes), ba = $('[data-ba-after]', notes);
+      if (bb) { bb.setAttribute('src', n.baBefore); bb.setAttribute('alt', n.baBeforeAlt); }
+      if (ba) { ba.setAttribute('src', n.baAfter); ba.setAttribute('alt', n.baAfterAlt); }
+      resetSlider();
       rail.forEach((b, k) => b.setAttribute('aria-pressed', String(k === i)));
     }
 
@@ -354,6 +370,21 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
 
     rail.forEach((b, i) => b.addEventListener('click', () => goChapter(i)));
     // Before / After row: a button + grid-rows body so the reveal eases open (native <details> can't animate).
+    // Before / After slider: an invisible range drives the needle (--sc-p); the ribbon unties as the
+    // needle travels right of centre (--sc-loose); the needle tilts on hover and holds through a drag.
+    const slider = $('.ba', notes);
+    if (slider) {
+      const range = $('.ba-range', slider) as HTMLInputElement;
+      const setSlide = (v: number) => { slider.style.setProperty('--sc-p', v + '%'); slider.style.setProperty('--sc-loose', String(Math.max(0, (v - 50) / 50))); };
+      range.addEventListener('input', () => setSlide(+range.value));
+      let dragging = false;
+      slider.addEventListener('pointerenter', () => slider.classList.add('is-tilted'));
+      slider.addEventListener('pointerleave', () => { if (!dragging) slider.classList.remove('is-tilted'); });
+      slider.addEventListener('pointerdown', () => { dragging = true; slider.classList.add('is-tilted'); });
+      onSliderUp = () => { if (!dragging) return; dragging = false; if (!slider.matches(':hover')) slider.classList.remove('is-tilted'); };
+      window.addEventListener('pointerup', onSliderUp);
+      resetSlider = () => { range.value = '50'; setSlide(50); };
+    }
     const baToggle = $('.sc-note-ba-toggle');
     if (baToggle) baToggle.addEventListener('click', () => {
       const open = (baToggle.parentElement as HTMLElement).classList.toggle('is-open');
@@ -394,6 +425,7 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
       reduce.removeEventListener('change', onReduce);
       window.removeEventListener('scroll', schedule);
       window.removeEventListener('resize', onResize);
+      window.removeEventListener('pointerup', onSliderUp);
       ro.disconnect();
       if (frame) cancelAnimationFrame(frame);
     };
@@ -517,7 +549,21 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
               <div className="sc-note-ba">
                 <button type="button" className="sc-note-ba-toggle" aria-expanded="false" aria-controls="sc-note-ba-body">{copy.beforeAfter}<i aria-hidden="true"></i></button>
                 <div className="sc-note-ba-body" id="sc-note-ba-body"><div>
-                  <img data-ba src={copy.notes[0].ba} alt={copy.notes[0].baAlt} width={2768} height={1110} loading="lazy" />
+                  <div className="ba">
+                    <img data-ba-after src={copy.notes[0].baAfter} alt={copy.notes[0].baAfterAlt} width={1280} height={800} loading="lazy" />
+                    <div className="ba-before"><img data-ba-before src={copy.notes[0].baBefore} alt={copy.notes[0].baBeforeAlt} width={1280} height={800} loading="lazy" /></div>
+                    <div className="ba-line">
+                      <svg className="ba-needle" viewBox="0 0 12 400" preserveAspectRatio="none" aria-hidden="true"><path fill="#000" fillRule="evenodd" d="M6 0C8.7 0 10.6 7 10.6 24L6.6 400H5.4L1.4 24C1.4 7 3.3 0 6 0zM6 8c-1 0-1.6 3.2-1.6 8.5S5 25 6 25s1.6-3.2 1.6-8.5S7 8 6 8z" /></svg>
+                      <svg className="ba-bow" viewBox="0 0 46 36" aria-hidden="true" fill="#fff" stroke="#000" strokeWidth="1" strokeLinejoin="round" strokeLinecap="round">
+                        <g className="tail-l"><path d="M19.6 20.2 13.2 33.6l4.2-2.1 2.8 3.4 3.2-14.7z" /><path className="ink" fill="none" strokeWidth=".8" d="M18.2 23.4 15.6 30.2" /></g>
+                        <g className="tail-r"><path d="M26.4 20.2 32.8 33.6l-4.2-2.1-2.8 3.4-3.2-14.7z" /><path className="ink" fill="none" strokeWidth=".8" d="M27.8 23.4l2.6 6.8" /></g>
+                        <g className="loop-l"><path d="M20.5 16.5C17 9.5 8 5.5 3.6 9.2c-3.4 2.8-1.2 8.6 4.2 11.2 4.6 2.2 9.6 1.3 12.7-3.9z" /><path className="ink" fill="none" strokeWidth=".8" d="M18.4 15.2C14.6 10.6 8.8 9.4 6 11.6M17.6 18.2c-3.4 2.4-7.6 2.6-10.6.6" /></g>
+                        <g className="loop-r"><path d="M25.5 16.5c3.5-7 12.5-11 16.9-7.3 3.4 2.8 1.2 8.6-4.2 11.2-4.6 2.2-9.6 1.3-12.7-3.9z" /><path className="ink" fill="none" strokeWidth=".8" d="M27.6 15.2c3.8-4.6 9.6-5.8 12.4-3.6M28.4 18.2c3.4 2.4 7.6 2.6 10.6.6" /></g>
+                        <g className="knot"><rect x="19" y="12.6" width="8" height="8.4" rx="2.4" /><path className="ink" fill="none" strokeWidth=".8" d="M21.6 13.6v6.4M24.4 13.6v6.4" /></g>
+                      </svg>
+                    </div>
+                    <input className="ba-range" type="range" min="0" max="100" defaultValue="50" aria-label={copy.wipe} />
+                  </div>
                   <p className="sc-note-ba-cap">{copy.caption}</p>
                 </div></div>
               </div>
