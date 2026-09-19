@@ -55,7 +55,15 @@ h6 {
    as a lit edge lifted off the page. Drawn as an absolute ::after so the
    flex row is untouched. */
 .nav {
-  position: relative;
+  /* Sticky here, not only via the `sticky` utility in Navigation.tsx: this
+     rule sits after @tailwind utilities at the same specificity, so whatever
+     position it declares wins. It was `relative` (added for the ::after glow)
+     between 2026-09-19 17:00 and 17:40, which silently cancelled the utility
+     and let the bar scroll away. A positioned element either way, so the
+     absolutely positioned ::after below still anchors to it. */
+  position: sticky;
+  top: 0;
+  z-index: 50;
   background: #f5f5f5;
   padding: 20px 40px;
   display: flex;
@@ -1404,8 +1412,13 @@ figure[data-animate='visible'] .impact-lift-label {
 
 /* Hero CTAs (2026-09-19, design 03 "Ink and blue", chosen by the client) —
    two free-standing pills under the intro copy, icon left of the label, type
-   in Nunito (rounded, simple sans — client direction; the --font-nunito
-   variable is set on .hero-actions by Hero.tsx), sentence case.
+   in Hanken Grotesk at AKQA's subtext spec — 15px / 21px leading / weight 400
+   / zero tracking, read off akqa.com/about at the client's request (their own
+   face, Season Sans, is licensed and cannot be shipped; he picked Hanken
+   Grotesk from the substitutes we measured against it). The --font-hanken
+   variable is set on the whole .hero section by Hero.tsx, so the intro
+   paragraph can use it too. Vertical padding is 10px rather than 13px so the
+   21px leading keeps the pill at the same height as before.
    "Learn more" is solid palette blue (#1685f8, the stripe blue of the hidden
    headline) and jumps to the Work section; "Let's connect" is frosted glass
    with a hairline and a pink icon, and jumps to the booking section. Client
@@ -1421,14 +1434,14 @@ figure[data-animate='visible'] .impact-lift-label {
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  padding: 13px 26px 13px 20px;
+  padding: 10px 26px 10px 20px;
   border: 1px solid transparent;
   border-radius: 999px;
-  font-family: var(--font-nunito), 'Nunito', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-hanken), 'Hanken Grotesk', 'Hiragino Sans', 'Noto Sans JP', system-ui, -apple-system, sans-serif;
   font-size: 15px;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  line-height: 1;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 21px;
   text-decoration: none;
   white-space: nowrap;
   transition: background-color 0.2s ease, transform 0.2s ease;
@@ -1841,6 +1854,18 @@ textarea.blank:focus {
 .hero {
   position: relative;
   overflow: hidden;
+}
+
+/* Hero intro paragraph — same face as the buttons (client direction
+   2026-09-19). The Japanese fallbacks keep JA copy in a sans too, so Latin
+   and Japanese don't mix a sans with the system serif. */
+.hero-body {
+  font-family: var(--font-hanken), 'Hanken Grotesk', 'Hiragino Sans', 'Noto Sans JP', system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.6;
+  max-width: 600px;
 }
 
 /* ---- Hero rainbow hover reveal ----

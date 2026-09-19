@@ -1,15 +1,19 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Nunito } from 'next/font/google'
+import { Hanken_Grotesk } from 'next/font/google'
 import type { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
-// Button face: a rounded, simple sans (client direction 2026-09-19), served
-// as a CSS variable on the button row and read by .hero-btn in globals.css.
-const nunito = Nunito({ weight: ['500', '600'], subsets: ['latin'], variable: '--font-nunito', display: 'swap' })
+// Button face: the client pointed at akqa.com/about and asked for its subtext
+// face. That is Season Sans (Displaay Type Foundry) — a commercial licence we
+// cannot ship, so we measured the Google Fonts grotesques against it and he
+// picked Hanken Grotesk from the shortlist. The variable goes on the whole
+// section: both the intro paragraph (.hero-body) and the buttons (.hero-btn)
+// are set in it. See globals.css.
+const hanken = Hanken_Grotesk({ weight: ['400', '500'], subsets: ['latin'], variable: '--font-hanken', display: 'swap' })
 
 // In-memory flag (resets on full page load): the hero animates on every fresh
 // visit or reload, but sits static when the visitor navigates back to the
@@ -140,7 +144,7 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
   }, [lang])
 
   return (
-    <section className="hero min-h-screen flex items-center px-10 py-16">
+    <section className={`hero min-h-screen flex items-center px-10 py-16 ${hanken.variable}`}>
       <div className="container-x w-full max-w-full">
         <h1
           ref={titleRef}
@@ -208,12 +212,12 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
           )}
         </h1>
 
-        <p className="text-base max-w-[600px] leading-[1.8]">{t.body}</p>
+        <p className="hero-body">{t.body}</p>
 
         {/* Two pill buttons (design 03 "Ink and blue"): Work first in solid
             blue with a film-frame icon, then the booking section in frosted
             glass with a speech-bubble icon. */}
-        <div className={`hero-actions ${nunito.variable}`}>
+        <div className="hero-actions">
           <a href="#work" className="hero-btn hero-btn-work">
             <span className="hero-btn-ic" aria-hidden="true">
               <svg viewBox="0 0 24 24">
