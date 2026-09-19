@@ -1,19 +1,10 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Hanken_Grotesk } from 'next/font/google'
 import type { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
-
-// Button face: the client pointed at akqa.com/about and asked for its subtext
-// face. That is Season Sans (Displaay Type Foundry) — a commercial licence we
-// cannot ship, so we measured the Google Fonts grotesques against it and he
-// picked Hanken Grotesk from the shortlist. The variable goes on the whole
-// section: both the intro paragraph (.hero-body) and the buttons (.hero-btn)
-// are set in it. See globals.css.
-const hanken = Hanken_Grotesk({ weight: ['300', '400'], subsets: ['latin'], variable: '--font-hanken', display: 'swap' })
 
 // In-memory flag (resets on full page load): the hero animates on every fresh
 // visit or reload, but sits static when the visitor navigates back to the
@@ -151,8 +142,8 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
     // unresolved variable to Hiragino Sans, i.e. a sans, which is what he
     // asked us to undo.
     <section
-      className={`hero min-h-screen flex items-center px-10 py-16 ${
-        lang === 'ja' ? 'hero-ja' : hanken.variable
+      className={`hero min-h-screen flex items-center px-10 py-16${
+        lang === 'ja' ? ' hero-ja' : ''
       }`}
     >
       <div className="container-x w-full max-w-full">

@@ -63,12 +63,13 @@ export default function Navigation({
   return (
     <>
     <nav className="nav sticky top-0 z-50">
-      <div>
+      {/* The wordmark stays in the house serif; only the link row goes sans. */}
+      <div className="nav-wordmark">
         <Link href={home}>BEEDS</Link>
       </div>
 
       {/* Desktop Navigation */}
-      <div className="hidden md:flex gap-10 items-center">
+      <div className="nav-links hidden md:flex gap-10 items-center">
         {navLinks.map((link) => (
           <Link key={link.href} href={link.href}>
             {link.label}

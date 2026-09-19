@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import { Hanken_Grotesk } from 'next/font/google'
 import './globals.css'
 import Analytics from '@/components/Analytics'
 import StructuredData from '@/components/StructuredData'
@@ -7,6 +8,18 @@ import StructuredData from '@/components/StructuredData'
 // the deploy environment; update the env var (or this default) if the
 // production domain ever changes.
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://beedstu.com'
+
+// The site's one sans, loaded here rather than in a section so any component
+// can use it — the nav sits outside the hero and needs it too. 300 is the
+// English hero lede, 400/500 the interface weights (300 goes fragile at the
+// small uppercase sizes). Latin subset only: Japanese glyphs fall through the
+// stack in globals.css, and the Japanese hero opts out entirely via .hero-ja.
+const hanken = Hanken_Grotesk({
+  weight: ['300', '400', '500'],
+  subsets: ['latin'],
+  variable: '--font-hanken',
+  display: 'swap',
+})
 
 const title = 'BEEDS — Creative Strategy, AI Enablement & Production'
 const description =
@@ -57,7 +70,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={hanken.variable}>
       <head>
         {/* Warm up the Vimeo connections so the featured film starts sooner. */}
         <link rel="preconnect" href="https://player.vimeo.com" />
