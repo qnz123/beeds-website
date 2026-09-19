@@ -10,6 +10,10 @@
 
 html {
   scroll-behavior: smooth;
+  /* A sideways drag must not chain out to the browser's back/forward gesture, which
+     would slide the previous page into view under the finger. The showcase needle is
+     dragged horizontally, so this is load-bearing on touch. */
+  overscroll-behavior-x: none;
 }
 
 body {
@@ -17,6 +21,7 @@ body {
   background: #f5f5f5;
   color: #000;
   overflow-x: hidden;
+  overscroll-behavior-x: none;
 }
 
 h1,
@@ -2126,7 +2131,7 @@ textarea.blank:focus {
 @property --sc-tilt { syntax: '<number>'; inherits: true; initial-value: 0; }
 @property --sc-loose { syntax: '<number>'; inherits: true; initial-value: 0; }
 @property --sc-swing { syntax: '<number>'; inherits: true; initial-value: 0; }
-.sc-showcase .sc-frame { --sc-p: 8%; --sc-tilt: 0; --sc-loose: 0; --sc-swing: 0; --sc-slant: 8.4%; position: relative; user-select: none; transition: --sc-tilt .5s cubic-bezier(.83,0,.17,1), --sc-loose .25s ease-out; }
+.sc-showcase .sc-frame { --sc-p: 8%; --sc-tilt: 0; --sc-loose: 0; --sc-swing: 0; --sc-slant: 8.4%; position: relative; user-select: none; touch-action: pan-y; transition: --sc-tilt .5s cubic-bezier(.83,0,.17,1), --sc-loose .25s ease-out; }
 .sc-showcase .sc-frame.is-tilted { --sc-tilt: 1; }
 .sc-showcase .ba-before { position: absolute; inset: 0; z-index: 6; clip-path: polygon(0 0, calc(var(--sc-p) - var(--sc-tilt) * var(--sc-slant)) 0, calc(var(--sc-p) + var(--sc-tilt) * var(--sc-slant)) 100%, 0 100%); }
 .sc-showcase .ba-before img { display: block; width: 100%; height: 100%; object-fit: cover; margin: 0; border: 0; }
@@ -2151,7 +2156,6 @@ textarea.blank:focus {
    out of the touch path entirely so its jump-to-tap behaviour cannot fight the swipe; it stays
    keyboard reachable, since pointer-events does not affect focus. */
 @media (pointer: coarse) {
-  .sc-showcase .sc-frame { touch-action: pan-y; }
   .sc-showcase .ba-range { pointer-events: none; }
   /* No tilt on touch: the -15deg lean answers a hovering cursor, and a finger never hovers.
      This also keeps the wipe edge vertical, since the slant is driven by the same value. */
