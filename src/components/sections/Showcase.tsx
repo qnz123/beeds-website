@@ -624,7 +624,17 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
                    stage stays a picture and nothing has to be dragged across the artwork. */}
               <div className="ba-mobile">
                 <button type="button" className="ba-toggle" role="switch" aria-checked="false" aria-label={copy.wipe}>
-                  <span className="ba-toggle-knob" />
+                  <span className="ba-toggle-knob">
+                    {/* the needle's own ribbon, drawn plain: no interior lines, which turn to
+                         mush at this size, and no loosening transforms */}
+                    <svg viewBox="0 0 46 36" aria-hidden="true" fill="#fff" stroke="#000" strokeWidth="1" strokeLinejoin="round" strokeLinecap="round">
+                      <path d="M19.6 20.2 13.2 33.6l4.2-2.1 2.8 3.4 3.2-14.7z" />
+                      <path d="M26.4 20.2 32.8 33.6l-4.2-2.1-2.8 3.4-3.2-14.7z" />
+                      <path d="M20.5 16.5C17 9.5 8 5.5 3.6 9.2c-3.4 2.8-1.2 8.6 4.2 11.2 4.6 2.2 9.6 1.3 12.7-3.9z" />
+                      <path d="M25.5 16.5c3.5-7 12.5-11 16.9-7.3 3.4 2.8 1.2 8.6-4.2 11.2-4.6 2.2-9.6 1.3-12.7-3.9z" />
+                      <rect x="19" y="12.6" width="8" height="8.4" rx="2.4" />
+                    </svg>
+                  </span>
                 </button>
               </div>
               </div>
