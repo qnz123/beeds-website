@@ -144,7 +144,17 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
   }, [lang])
 
   return (
-    <section className={`hero min-h-screen flex items-center px-10 py-16 ${hanken.variable}`}>
+    // Hanken Grotesk is an ENGLISH-ONLY treatment (client direction
+    // 2026-09-19): the Japanese hero keeps the site's original serif, so the
+    // font variable is only attached on /en and `hero-ja` restores the former
+    // type in globals.css. Without that class the stack would fall past the
+    // unresolved variable to Hiragino Sans, i.e. a sans, which is what he
+    // asked us to undo.
+    <section
+      className={`hero min-h-screen flex items-center px-10 py-16 ${
+        lang === 'ja' ? 'hero-ja' : hanken.variable
+      }`}
+    >
       <div className="container-x w-full max-w-full">
         <h1
           ref={titleRef}

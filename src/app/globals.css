@@ -1868,6 +1868,24 @@ textarea.blank:focus {
   max-width: 600px;
 }
 
+/* Japanese hero keeps the pre-2026-09-19 type: the site's Times New Roman
+   stack, which Japanese glyphs fall through to the system serif (Hiragino
+   Mincho / Yu Mincho) exactly as they did before. Only the face and the
+   paragraph's former size and leading come back — the pill geometry, colours
+   and icons are unchanged, so both locales keep the same buttons. */
+.hero-ja .hero-body {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.8;
+}
+
+.hero-ja .hero-btn {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 15px;
+  font-weight: 400;
+}
+
 /* ---- Hero rainbow hover reveal ----
    A rainbow duplicate of the headline sits exactly under the black type,
    masked to a soft circle that follows the cursor (--mx/--my set in Hero.tsx).
@@ -2327,3 +2345,9 @@ textarea.blank:focus {
 /* Reduced motion: the rail switches scenes, each shown in its finished state. */
 .sc-showcase.motion-paused .sc-track { height: auto; }
 .sc-showcase.motion-paused .sc-sticky { position: static; height: auto; padding: 8px 0 60px; }
+@media (max-width: 1000px) {
+  /* the still frame needs air above and below it, since the page now scrolls straight past */
+  .sc-showcase.motion-paused .sc-sticky { padding: 28px 0 56px; }
+  .sc-showcase.motion-paused .sc-nav-row { margin-top: 30px; }
+  .sc-showcase.motion-paused .sc-stage { max-height: none; }
+}
