@@ -414,7 +414,7 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
         runRibbon();
       };
 
-      const setSlide = (v: number) => { pos = v; slider.style.setProperty('--sc-p', v + '%'); slider.style.setProperty('--sc-loose', String(Math.max(0, (v - 50) / 50))); runRibbon(); };
+      const setSlide = (v: number) => { pos = v; slider.style.setProperty('--sc-p', v + '%'); slider.style.setProperty('--sc-loose', String(Math.min(1, v / 50))); runRibbon(); };
       range.addEventListener('input', () => setSlide(+range.value));
       let dragging = false;
       slider.addEventListener('pointerenter', () => slider.classList.add('is-tilted'));
@@ -429,7 +429,7 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
       onSliderUp = () => { if (!dragging) return; dragging = false; if (!slider.matches(':hover')) slider.classList.remove('is-tilted'); };
       window.addEventListener('pointerup', onSliderUp);
 
-      // Phones drive the needle from the toggle below the frame, not by dragging across the
+      // Phones drive the needle from the button beside the study coins, not by dragging across the
       // artwork, so the stage carries no touch control of its own. Thrown right, the needle
       // glides to the middle and leans; thrown left, it returns to the frame's edge upright.
       // The glide runs through setSlideAt frame by frame, so the ribbon trails and settles
@@ -444,10 +444,10 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
         };
         requestAnimationFrame(step);
       }
-      const toggle = $('.ba-toggle');
-      if (toggle) toggle.addEventListener('click', () => {
-        const on = toggle.getAttribute('aria-checked') !== 'true';
-        toggle.setAttribute('aria-checked', String(on));
+      const beforeBtn = $('.ba-coin');
+      if (beforeBtn) beforeBtn.addEventListener('click', () => {
+        const on = beforeBtn.getAttribute('aria-checked') !== 'true';
+        beforeBtn.setAttribute('aria-checked', String(on));
         slider.classList.toggle('is-pinned', on);
         glideTo(on ? 50 : 0);
       });
@@ -623,18 +623,15 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
               {/* Phones drive the needle from here rather than from inside the frame, so the
                    stage stays a picture and nothing has to be dragged across the artwork. */}
               <div className="ba-mobile">
-                <button type="button" className="ba-toggle" role="switch" aria-checked="false" aria-label={copy.wipe}>
-                  <span className="ba-toggle-knob">
-                    {/* the needle's own ribbon, drawn plain: no interior lines, which turn to
-                         mush at this size, and no loosening transforms */}
-                    <svg viewBox="0 0 46 36" aria-hidden="true" fill="#fff" stroke="#000" strokeWidth="1" strokeLinejoin="round" strokeLinecap="round">
-                      <path d="M19.6 20.2 13.2 33.6l4.2-2.1 2.8 3.4 3.2-14.7z" />
-                      <path d="M26.4 20.2 32.8 33.6l-4.2-2.1-2.8 3.4-3.2-14.7z" />
-                      <path d="M20.5 16.5C17 9.5 8 5.5 3.6 9.2c-3.4 2.8-1.2 8.6 4.2 11.2 4.6 2.2 9.6 1.3 12.7-3.9z" />
-                      <path d="M25.5 16.5c3.5-7 12.5-11 16.9-7.3 3.4 2.8 1.2 8.6-4.2 11.2-4.6 2.2-9.6 1.3-12.7-3.9z" />
-                      <rect x="19" y="12.6" width="8" height="8.4" rx="2.4" />
-                    </svg>
-                  </span>
+                <button type="button" className="ba-coin" role="switch" aria-checked="false" aria-label={copy.wipe}>
+                  <span className="sc-coin"><svg viewBox="0 0 16 16" aria-hidden="true">
+                    <g className="bw-l"><path d="M7.4 8C5.4 4.8 1.8 5.2 1.8 8s3.6 3.2 5.6 0z" /></g>
+                    <g className="bw-r"><path d="M8.6 8c2-3.2 5.6-2.8 5.6 0s-3.6 3.2-5.6 0z" /></g>
+                    <circle cx="8" cy="8" r="1.15" />
+                    <g className="bw-tl"><path d="M7.4 8.9 6.2 13.6" /></g>
+                    <g className="bw-tr"><path d="M8.6 8.9l1.2 4.7" /></g>
+                  </svg></span>
+                  <span className="sc-coin-lbl">Before</span>
                 </button>
               </div>
               </div>
