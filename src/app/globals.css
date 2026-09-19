@@ -49,11 +49,11 @@ h6 {
 }
 
 /* ---- Navigation ----
-   No hairline under the bar (removed 2026-09-19). In its place a bottom-edge
-   inner glow: the hero headline's hidden stripe palette (yellow, pink,
-   magenta, blue — the dark plum is left out so the tone stays lit) runs
-   across the width and fades upward into the bar like light leaking in
-   from below. Drawn as an absolute ::after so the flex row is untouched. */
+   No hairline under the bar (2026-09-19). The edge is a thin white light
+   instead: a 1px white line with a soft white bloom above it, backed by a
+   faint 1px black hairline and a shallow drop shadow beneath so the bar reads
+   as a lit edge lifted off the page. Drawn as an absolute ::after so the
+   flex row is untouched. */
 .nav {
   position: relative;
   background: #f5f5f5;
@@ -69,16 +69,13 @@ h6 {
   left: 0;
   right: 0;
   bottom: 0;
-  height: 18px;
+  height: 1px;
   pointer-events: none;
-  background: linear-gradient(90deg,
-    #faeb2c 0%, #f52789 28%, #e900ff 52%, #1685f8 76%, #faeb2c 100%);
-  /* Fade to nothing towards the top of the band — the glow reads as an
-     inner shadow along the edge, not a stripe. */
-  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
-  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
-  filter: blur(3px);
-  opacity: 0.75;
+  background: #fff;
+  box-shadow:
+    0 0 6px 1px rgba(255, 255, 255, 0.95),   /* the light */
+    0 1px 0 rgba(0, 0, 0, 0.12),             /* the dark hairline it casts */
+    0 8px 18px -6px rgba(0, 0, 0, 0.16);     /* lift off the page */
 }
 
 .nav a {
@@ -1405,37 +1402,75 @@ figure[data-animate='visible'] .impact-lift-label {
   display: inline;
 }
 
-/* Hero CTAs (2026-09-19) — two solid buttons under the intro copy:
-   "Learn more" jumps to the Work section, "Let's connect" to the booking
-   section (it replaces the old underline-ink link). Rounded corners, white
-   type on the hero palette blue (#1685f8, the stripe blue of the hidden
-   headline). Client-requested exception to the sharp-corner house rule. */
+/* Hero CTAs (2026-09-19, design 03 "Ink and blue", chosen by the client) —
+   two free-standing pills under the intro copy, icon left of the label, type
+   set exactly like the intro paragraph (16px serif, sentence case).
+   "Learn more" is solid palette blue (#1685f8, the stripe blue of the hidden
+   headline) and jumps to the Work section; "Let's connect" is frosted glass
+   with a hairline and a pink icon, and jumps to the booking section. Client
+   requested exception to the sharp-corner house rule. */
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 14px;
+  gap: 12px;
   margin-top: 40px;
 }
 
 .hero-btn {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  padding: 14px 30px;
-  border-radius: 10px;
-  background: #1685f8;
-  color: #fff;
-  font-size: 13px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  text-decoration: none;
+  gap: 12px;
+  padding: 13px 26px 13px 20px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 16px;
   line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
   transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
-.hero-btn:hover {
+.hero-btn-ic {
+  display: inline-flex;
+  flex: none;
+}
+
+.hero-btn-ic svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hero-btn-work {
+  background: #1685f8;
+  color: #fff;
+}
+
+.hero-btn-work:hover {
   background: #0f6fd6;
   color: #fff;
+}
+
+.hero-btn-connect {
+  background: rgba(255, 255, 255, 0.18);
+  color: #000;
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.hero-btn-connect .hero-btn-ic {
+  color: #f52789;
+}
+
+.hero-btn-connect:hover {
+  background: rgba(255, 255, 255, 0.45);
+  color: #000;
 }
 
 .hero-btn:active {
@@ -2211,7 +2246,7 @@ textarea.blank:focus {
    the two-column layout, where the needle is dragged in the frame directly. */
 /* The study coins and, on phones, the needle toggle at the right end of the same row. */
 .sc-showcase .sc-nav-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
-.sc-showcase .ba-mobile { margin-top: -4px; }
+.sc-showcase .ba-mobile { margin-top: 0; }
 .sc-showcase .ba-mobile { display: none; }
 @media (max-width: 1000px) {
   .sc-showcase .ba-mobile { display: block; }
@@ -2243,8 +2278,10 @@ textarea.blank:focus {
 /* the scene's own controls sit under the drag surface, so they no longer invite a click */
 .sc-showcase .steps button { pointer-events: none; }
 @media (max-width: 1000px) {
-  /* the stage is width-driven at 4/3 until the cap bites, so reserve whichever is smaller */
-  .sc-showcase .sc-notes { overflow-y: auto; max-height: calc(100svh - var(--nav-h) - min(75vw, 46svh) - 64px); }
+  /* Only the note scrolls. A scroll container clips anything outside it, and the bow's loops
+     swing beyond their own box as it unties, so the row above must not be one. The stage is
+     width-driven at 4/3 until the cap bites, so reserve whichever is smaller. */
+  .sc-showcase .sc-note-swap { overflow-y: auto; max-height: calc(100svh - var(--nav-h) - min(75vw, 46svh) - 130px); }
   /* the button's bow tracks the needle's bow exactly, including the phone size */
   .sc-showcase .ba-bow, .sc-showcase .ba-bowicon { width: 36px; height: 28px; }
 }
