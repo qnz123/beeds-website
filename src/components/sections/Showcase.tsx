@@ -421,7 +421,13 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
       let dragging = false;
       slider.addEventListener('pointerenter', () => slider.classList.add('is-tilted'));
       slider.addEventListener('pointerleave', () => { if (!dragging) slider.classList.remove('is-tilted'); });
-      slider.addEventListener('pointerdown', () => { dragging = true; slider.classList.add('is-tilted'); });
+      // The range takes focus on pointer-down, which used to light the stage's focus ring for the
+      // whole drag. Keep the ring for keyboard users only.
+      let pointerFocus = false;
+      slider.addEventListener('pointerdown', () => { pointerFocus = true; dragging = true; slider.classList.add('is-tilted'); });
+      range.addEventListener('focus', () => { if (!pointerFocus) slider.classList.add('is-key-focus'); });
+      range.addEventListener('keydown', () => slider.classList.add('is-key-focus'));
+      range.addEventListener('blur', () => { slider.classList.remove('is-key-focus'); pointerFocus = false; });
       onSliderUp = () => { if (!dragging) return; dragging = false; if (!slider.matches(':hover')) slider.classList.remove('is-tilted'); };
       window.addEventListener('pointerup', onSliderUp);
       setSlideAt = (v: number) => { range.value = String(v); setSlide(v); };

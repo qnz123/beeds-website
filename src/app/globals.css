@@ -2144,7 +2144,9 @@ textarea.blank:focus {
 .sc-showcase .ba-range { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; margin: 0; cursor: ew-resize; -webkit-appearance: none; appearance: none; z-index: 9; }
 .sc-showcase .ba-range::-webkit-slider-thumb { -webkit-appearance: none; width: 48px; height: 100%; }
 .sc-showcase .ba-range::-moz-range-thumb { width: 48px; height: 100%; border: 0; background: transparent; }
-.sc-showcase .sc-frame:focus-within .sc-stage { outline: 2px solid #000; outline-offset: 6px; }
+/* Keyboard focus only. :focus-within fired on pointer-down too, drawing a second square
+   outside the frame for the whole drag; is-key-focus is set from JS instead. */
+.sc-showcase .sc-frame.is-key-focus .sc-stage { outline: 2px solid #000; outline-offset: 6px; }
 .sc-showcase .ba-line { position: absolute; top: -26px; bottom: -22px; left: var(--sc-p); width: 12px; pointer-events: none; z-index: 8; transform: translateX(-50%) rotate(calc(var(--sc-tilt) * -15deg)); transform-origin: 50% 50%; }
 .sc-showcase .ba-needle { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .sc-showcase .ba-bow { position: absolute; left: 50%; top: 50%; width: 46px; height: 36px; transform: translate(-50%, calc(-46% + var(--sc-loose) * 9px)) rotate(calc(var(--sc-swing) * 13deg)); transform-origin: 50% 47%; display: block; overflow: visible; }
