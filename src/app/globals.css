@@ -2081,7 +2081,16 @@ textarea.blank:focus {
 .sc-showcase .sc-note-nav button:hover .sc-coin-lbl, .sc-showcase .sc-note-nav button[aria-pressed="true"] .sc-coin-lbl { color: #000; }
 .sc-showcase .sc-note-nav button:focus-visible { outline: 0; }
 .sc-showcase .sc-note-nav button:focus-visible .sc-coin { outline: 2px solid #000; outline-offset: 4px; }
-@media (max-width: 700px) { .sc-showcase .sc-note-nav { gap: 14px; } .sc-showcase .sc-note-nav button { width: 84px; } .sc-showcase .sc-coin { width: 56px; height: 56px; } .sc-showcase .sc-coin svg { width: 24px; height: 24px; } }
+/* Phones: the coins run at half size. The stroke is set in screen pixels by non-scaling-stroke,
+   so it has to come down with the icon or a 12px glyph reads as a blob. */
+@media (max-width: 700px) {
+  .sc-showcase .sc-note-nav { gap: 12px; margin-bottom: 20px; }
+  .sc-showcase .sc-note-nav button { width: 56px; gap: 6px; }
+  .sc-showcase .sc-coin { width: 28px; height: 28px; }
+  .sc-showcase .sc-coin svg { width: 13px; height: 13px; stroke-width: 1.4; }
+  .sc-showcase .sc-coin-lbl { font-size: 9px; letter-spacing: 1px; }
+  .sc-showcase .sc-note-nav button:focus-visible .sc-coin { outline-offset: 3px; }
+}
 /* Click on a study: no glide, a straight cut; the scene and the new text fade in at once (the
    Services tab behaviour). Only the text block fades on manual scroll, never the buttons. */
 .sc-showcase .sc-note-swap { will-change: opacity, transform; }
