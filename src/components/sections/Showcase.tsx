@@ -429,11 +429,29 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
       onSliderUp = () => { if (!dragging) return; dragging = false; if (!slider.matches(':hover')) slider.classList.remove('is-tilted'); };
       window.addEventListener('pointerup', onSliderUp);
 
-      // Phones drive the needle from the slider below the frame (.ba-mrange), not by dragging
-      // across the artwork, so the stage carries no touch control of its own.
-      const mrange = $('.ba-mrange') as HTMLInputElement | null;
-      if (mrange) mrange.addEventListener('input', () => setSlideAt(+mrange.value));
-      setSlideAt = (v: number) => { range.value = String(v); if (mrange) mrange.value = String(v); setSlide(v); };
+      // Phones drive the needle from the toggle below the frame, not by dragging across the
+      // artwork, so the stage carries no touch control of its own. Thrown right, the needle
+      // glides to the middle and leans; thrown left, it returns to the frame's edge upright.
+      // The glide runs through setSlideAt frame by frame, so the ribbon trails and settles
+      // exactly as it does under a cursor.
+      function glideTo(target: number, ms = 420) {
+        const from = +range.value, t0 = performance.now();
+        const step = (now: number) => {
+          const k = Math.min(1, (now - t0) / ms);
+          const e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;   // ease in-out
+          setSlideAt(from + (target - from) * e);
+          if (k < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      }
+      const toggle = $('.ba-toggle');
+      if (toggle) toggle.addEventListener('click', () => {
+        const on = toggle.getAttribute('aria-checked') !== 'true';
+        toggle.setAttribute('aria-checked', String(on));
+        slider.classList.toggle('is-pinned', on);
+        glideTo(on ? 50 : 0);
+      });
+      setSlideAt = (v: number) => { range.value = String(v); setSlide(v); };
       // a chapter swap re-hangs the ribbon rather than throwing it across the frame
       resetSlider = () => { setSlideAt(SLIDE_START); restRibbon(); };
       stopRibbon = () => { if (ribbonFrame) cancelAnimationFrame(ribbonFrame); ribbonFrame = 0; };
@@ -585,13 +603,9 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
               <input className="ba-range" type="range" min="0" max="100" defaultValue="0" aria-label={copy.wipe} />
             </div>
 
-            {/* Phones drive the needle from here rather than from inside the frame, so the
-                 stage stays a picture and nothing has to be dragged across the artwork. */}
-            <div className="ba-mobile">
-              <input className="ba-mrange" type="range" min="0" max="100" defaultValue="0" aria-label={copy.wipe} />
-            </div>
 
             <aside className="sc-notes" aria-live="polite">
+              <div className="sc-nav-row">
               <nav className="sc-note-nav" aria-label="Studies">
                 <button type="button" data-chapter="0" aria-pressed="true">
                   <span className="sc-coin"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 6h9l.7 6.9a1.1 1.1 0 0 1-1.1 1.2H3.9a1.1 1.1 0 0 1-1.1-1.2z" /><path d="M5.8 6V5.2a2.2 2.2 0 0 1 4.4 0V6" /></svg></span>
@@ -606,6 +620,14 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
                   <span className="sc-coin-lbl">Service</span>
                 </button>
               </nav>
+              {/* Phones drive the needle from here rather than from inside the frame, so the
+                   stage stays a picture and nothing has to be dragged across the artwork. */}
+              <div className="ba-mobile">
+                <button type="button" className="ba-toggle" role="switch" aria-checked="false" aria-label={copy.wipe}>
+                  <span className="ba-toggle-knob" />
+                </button>
+              </div>
+              </div>
               <div className="sc-note-swap">
                 <div className="sc-note-block">
                   <p className="eyebrow">{copy.approach}</p>
