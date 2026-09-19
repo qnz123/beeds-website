@@ -37,27 +37,21 @@ const GROUND = ['#eeeeee', '#efe9df', '#f1eee8'] // light grey · cream · bone
       note: 'Performance brands shout specifications at everyone. This study speaks to high performing athletes, the people who know that preparation decides the result long before the race begins. Every scroll is a rehearsal. The frame breaks open, the headline shears apart, the pace climbs to 4:12 and the cut lands on the diagonal. Nothing is sold until the runner has felt the stride. Preparation is the key to a higher rate of success in anything, and the page is built to feel like it.',
       motion: 'Frame breaks open · headline shears · pace counts up · diagonal cut to the next frame.',
       baBefore: '/showcase/img/ba-performance-before.webp',
-      baAfter: '/showcase/img/ba-performance-after.webp',
       baBeforeAlt: 'Before: a typical performance running site',
-      baAfterAlt: 'After: the TEMPO direction',
     },
     {
       num: '02', industry: 'Booking', title: 'Coming home to rest',
       note: 'Most hotel sites sell the daytime: bright rooms, blue skies, a lobby at noon. We believe guests care most about the moment they come back after a full day of travel and want a proper rest. So this study focuses on the transition to night. The door opens on the room in daylight, then the light goes, the lamps come on and the headline turns from arriving to staying. The room rate is still one click away. It simply arrives after the visitor has already decided they want to be there.',
       motion: 'Scroll opens the door · the headline gives way to a second invitation · day turns to evening.',
       baBefore: '/showcase/img/ba-hospitality-before.webp',
-      baAfter: '/showcase/img/ba-hospitality-after.webp',
       baBeforeAlt: 'Before: a typical hotel site',
-      baAfterAlt: 'After: the Solar direction, the room at dusk',
     },
     {
       num: '03', industry: 'Service', title: 'Mindfulness, close to home',
       note: 'Wellness sites tend to be either a clinical dashboard or a pastel blur. The local market is asking for something more specific: a genuine focus on mindfulness. So the page breathes. A ring expands and settles with the scroll, inhale, hold, exhale, while a small window widens into soft morning light. The numbers arrive last, small and gentle, as texture rather than proof. Calm first, then the data, the way a good coach does it.',
       motion: 'Breathing ring follows the scroll · the window widens · the numbers arrive last.',
       baBefore: '/showcase/img/ba-wellness-before.webp',
-      baAfter: '/showcase/img/ba-wellness-after.webp',
       baBeforeAlt: 'Before: a typical wellness dashboard',
-      baAfterAlt: 'After: the hush direction',
     },
   ];
 
@@ -72,9 +66,7 @@ const NOTES_JA = [
     "note": "多くのパフォーマンスブランドは、誰に対してもスペックを声高に語ります。\n\nこのスタディが語りかけるのは、結果はレースが始まるずっと前、準備の段階で決まると知っているハイパフォーマンスなアスリートたち。\n\nスクロールのひとつひとつが、リハーサルです。フレームが開き、見出しが裂け、ペースは4:12へと上がり、斜めのカットが次のシーンへ導く。ランナー自身がストライドを感じるまで、何も売りません。\n\n何事も、準備こそが成功の確率を高める鍵。このページは、それを目で見るのではなく、体感できるように設計されています。",
     "motion": "フレームが開く · 見出しが裂ける · ペースが上がる · 斜めのカットで次のフレームへ",
     "baBefore": "/showcase/img/ba-performance-before.webp",
-    "baAfter": "/showcase/img/ba-performance-after.webp",
-    "baBeforeAlt": "ビフォー：一般的なランニングブランドのサイト",
-    "baAfterAlt": "アフター：TEMPO の方向性"
+    "baBeforeAlt": "ビフォー：一般的なランニングブランドのサイト"
   },
   {
     "num": "02",
@@ -83,9 +75,7 @@ const NOTES_JA = [
     "note": "多くのホテルサイトが売っているのは、「昼」です。明るい客室、青い空、正午のロビー。\n\nけれど私たちは、ゲストが本当に大切にしているのは、一日の旅を終え、部屋に戻り、ようやくゆっくり休めるその瞬間だと考えています。だからこのスタディは、夜へと移り変わる時間に焦点を当てました。\n\n扉が開くと、そこには昼の光に満ちた部屋。スクロールするにつれて光はゆっくりと落ち、ランプが灯り、見出しは「到着」から「滞在」へと変わっていきます。\n\n料金はこれまでと同じく、1クリック先にあります。ただし、それが現れるのは、訪れた人が「ここに泊まりたい」と感じた、その後です。",
     "motion": "スクロールで扉が開く · 見出しが次の誘いへ · 昼から夕暮れへ",
     "baBefore": "/showcase/img/ba-hospitality-before.webp",
-    "baAfter": "/showcase/img/ba-hospitality-after.webp",
-    "baBeforeAlt": "ビフォー：一般的なホテルサイト",
-    "baAfterAlt": "アフター：Solar の方向性、夕暮れの客室"
+    "baBeforeAlt": "ビフォー：一般的なホテルサイト"
   },
   {
     "num": "03",
@@ -94,14 +84,12 @@ const NOTES_JA = [
     "note": "ウェルネスのサイトは、無機質なダッシュボードか、パステルカラーに包まれた曖昧な世界観か。そのどちらかになりがちです。\n\nけれど、この市場が求めているのは、もっと具体的なもの。マインドフルネスに、本当に集中できる体験です。\n\nだから、このページは呼吸します。スクロールに合わせてリングが広がり、静かに戻る。吸って、止めて、吐く。その間、小さな窓はゆっくりと広がり、柔らかな朝の光が差し込みます。\n\n数字が現れるのは最後。小さく、穏やかに。証明としてではなく、体験の質感として。まず静けさ。そのあとにデータ。良いコーチがそうするように。",
     "motion": "呼吸のリングがスクロールに応える · 窓が広がる · 数字は最後に",
     "baBefore": "/showcase/img/ba-wellness-before.webp",
-    "baAfter": "/showcase/img/ba-wellness-after.webp",
-    "baBeforeAlt": "ビフォー：一般的なウェルネスのダッシュボード",
-    "baAfterAlt": "アフター：hush の方向性"
+    "baBeforeAlt": "ビフォー：一般的なウェルネスのダッシュボード"
   }
 ]
 const COPY = {
-  en: { notes: NOTES_EN, approach: 'Approach', beforeAfter: 'Before / After', caption: 'Left, what the category usually ships. Right, the direction.', wipe: 'Wipe between before and after' },
-  ja: { notes: NOTES_JA, approach: 'アプローチ', beforeAfter: 'Before / After', caption: '左は、その業界でよく見られる作り。右は、私たちの方向性。', wipe: 'ビフォーとアフターを切り替える' },
+  en: { notes: NOTES_EN, approach: 'Approach', beforeAfter: 'Before / After', caption: 'Left, what the category usually ships. Right, the direction.', wipe: 'Pull the before view across' },
+  ja: { notes: NOTES_JA, approach: 'アプローチ', beforeAfter: 'Before / After', caption: '左は、その業界でよく見られる作り。右は、私たちの方向性。', wipe: 'ビフォーの画面を引き出す' },
 }
 
 export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
@@ -138,6 +126,7 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
     let lastChapter = -1;
     let chapterOffset = 0;
     let resetSlider = () => {};   // set once the Before / After slider is wired
+    let setSlideAt: (v: number) => void = () => {};   // move the needle to a percentage (QA hook)
     let onSliderUp = () => {};   // set by a click so a study can be chosen without moving the page
 
     // ---- colour lerp for the stage ground ----
@@ -191,9 +180,8 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
         return span;
       }));
       set('[data-motion]', n.motion);
-      const bb = $('[data-ba-before]', notes), ba = $('[data-ba-after]', notes);
+      const bb = $('[data-ba-before]');
       if (bb) { bb.setAttribute('src', n.baBefore); bb.setAttribute('alt', n.baBeforeAlt); }
-      if (ba) { ba.setAttribute('src', n.baAfter); ba.setAttribute('alt', n.baAfterAlt); }
       resetSlider();
       rail.forEach((b, k) => b.setAttribute('aria-pressed', String(k === i)));
     }
@@ -205,6 +193,7 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
       title: $('.arrival-title', sceneEl.hotel), reveal: $('.arrival-reveal', sceneEl.hotel), stay: $('.arrival-stay', sceneEl.hotel),
       room: $('.room:not(.evening) img', sceneEl.hotel), evening: $('.room.evening', sceneEl.hotel),
       clock: $('.s-clock', sceneEl.hotel), bar: $('.s-progress i', sceneEl.hotel),
+      book: $('.stay', sceneEl.hotel),
     };
     function renderHotel(t: number) {
       if (!hotel) return;
@@ -219,11 +208,13 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
       hotel.reveal.style.opacity = String(r * (1 - clamp((t - 0.72) * 5)));
       hotel.reveal.style.transform = `translateY(${(1 - r) * 35}px)`;
       hotel.evening.style.opacity = String(ev);
-      const s = clamp((t - 0.8) * 5);
+      const s = clamp((t - 0.78) * 7);
       hotel.stay.style.opacity = String(s);
       hotel.stay.style.transform = `translateY(${(1 - s) * 30}px)`;
       const minutes = Math.round(840 + (1122 - 840) * ev);
       if (hotel.clock) hotel.clock.textContent = `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
+      // the booking card arrives with the closing headline, not before it
+      if (hotel.book) { hotel.book.style.opacity = String(String(s)); hotel.book.style.transform = `translateX(${(1 - s) * 26}px)`; }
       hotel.el.classList.toggle('revealed', t > 0.42);
       hotel.bar.style.transform = `scaleX(${t})`;
     }
@@ -372,7 +363,8 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
     // Before / After row: a button + grid-rows body so the reveal eases open (native <details> can't animate).
     // Before / After slider: an invisible range drives the needle (--sc-p); the ribbon unties as the
     // needle travels right of centre (--sc-loose); the needle tilts on hover and holds through a drag.
-    const slider = $('.ba', notes);
+    const SLIDE_START = 0;   // the needle rests on the frame's left edge, the scene in full view
+    const slider = $('.sc-frame');
     if (slider) {
       const range = $('.ba-range', slider) as HTMLInputElement;
       const setSlide = (v: number) => { slider.style.setProperty('--sc-p', v + '%'); slider.style.setProperty('--sc-loose', String(Math.max(0, (v - 50) / 50))); };
@@ -383,20 +375,10 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
       slider.addEventListener('pointerdown', () => { dragging = true; slider.classList.add('is-tilted'); });
       onSliderUp = () => { if (!dragging) return; dragging = false; if (!slider.matches(':hover')) slider.classList.remove('is-tilted'); };
       window.addEventListener('pointerup', onSliderUp);
-      resetSlider = () => { range.value = '50'; setSlide(50); };
+      setSlideAt = (v: number) => { range.value = String(v); setSlide(v); };
+      resetSlider = () => setSlideAt(SLIDE_START);
+      resetSlider();
     }
-    const baToggle = $('.sc-note-ba-toggle');
-    if (baToggle) baToggle.addEventListener('click', () => {
-      const open = (baToggle.parentElement as HTMLElement).classList.toggle('is-open');
-      baToggle.setAttribute('aria-expanded', String(open));
-    });
-    if (calm) calm.steps.forEach((b, i) => b.addEventListener('click', () => {
-      if (paused) return;
-      const at = [0.02, 0.4, 0.72][i];
-      jumpTo(solo !== null ? at : CH[2].start + (CH[2].end - CH[2].start) * at);
-      schedule();
-    }));
-
     function updateMotion() {
       root.classList.toggle('motion-paused', paused);
       schedule();
@@ -416,7 +398,9 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
     if (at !== null) { forcedP = clamp(parseFloat(at)); root.classList.add('debug-at'); }
     const pin = params.get('pin');
     if (pin !== null) forcedP = clamp(parseFloat(pin));
-    if (params.get('ba') !== null) { $('.sc-note-ba')?.classList.add('is-open'); $('.sc-note-ba-toggle')?.setAttribute('aria-expanded', 'true'); }
+    const ba = params.get('ba');
+    // two frames out: the first render runs setNotes, which returns the needle to its start
+    if (ba !== null) requestAnimationFrame(() => requestAnimationFrame(() => setSlideAt(clamp(parseFloat(ba), 0, 100))));
 
     navHeight();
     updateMotion();
@@ -439,7 +423,8 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
       <div className="sc-track">
         <div className="sc-sticky">
           <div className="container-x sc-layout">
-            <div className="sc-stage" aria-live="off">
+            <div className="sc-frame">
+              <div className="sc-stage" aria-live="off">
             <section className="scene run" data-scene="1" aria-label="Performance study: Split Second">
                           <div className="run-inner">
                             <div className="frame frame-a"><img src="/showcase/img/running_02.webp" alt="A runner holds a pale blue running shoe against the sky" /></div>
@@ -447,11 +432,11 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
                             <div className="run-shade"></div>
                             <div className="kinetic" aria-hidden="true">
                               <span className="k-line k-one">Built for the</span>
-                              <span className="k-line k-two">next stride.</span>
+                              <span className="k-line k-two">next stride</span>
                             </div>
-                            <h3 className="run-title">Built for the next stride.</h3>
+                            <h3 className="run-title">Built for the next stride</h3>
                             <div className="run-second">
-                              <h3>Your pace.<br /><em>Your terms.</em></h3>
+                              <h3>Your pace<br /><em>Your terms</em></h3>
                               <p>Cushion tuned to the runner, not the spec sheet.</p>
                             </div>
                             <div className="pace"><span className="pace-label">Pace</span><span className="pace-value">0:00</span><span className="pace-unit">/km</span></div>
@@ -472,7 +457,7 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
                           <div className="door door-left">
                             <div className="door-border"></div>
                             <div className="arrival-title">
-                              <h3>You have<br /><em>arrived.</em></h3>
+                              <h3>You have<br /><em>arrived</em></h3>
                             </div>
                           </div>
                           <div className="door door-right">
@@ -484,12 +469,12 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
                             <span className="s-button s-icon" role="img" aria-label="Book the stay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="8" cy="12" r="4"/><path d="M12 12h9M18 12v3M15 12v2.5"/></svg></span>
                           </div>
                           <div className="arrival-reveal">
-                            <h3>Make yourself<br /><em>at home.</em></h3>
+                            <h3>Make yourself<br /><em>at home</em></h3>
                           </div>
                           <div className="arrival-stay">
-                            <h3>Stay a little<br /><em>longer.</em></h3>
+                            <h3>Stay a little</h3>
                           </div>
-                          <div className="s-progress"><i></i></div>
+                          <aside className="stay" aria-label="Reserve a stay"><div className="stay-dates"><div><span>Check in</span><b>Tue 15 Sep</b></div><div><span>Check out</span><b>Fri 18 Sep</b></div></div><p className="stay-month">September 2026</p><div className="stay-grid"><i>Mon</i><i>Tue</i><i>Wed</i><i>Thu</i><i>Fri</i><i>Sat</i><i>Sun</i><span></span><span>1</span><span>2</span><span className="off">3</span><span className="off">4</span><span>5</span><span>6</span><span>7</span><span>8</span><span className="off">9</span><span className="off">10</span><span>11</span><span>12</span><span>13</span><span>14</span><span className="on edge in">15</span><span className="on">16</span><span className="on">17</span><span className="on edge out">18</span><span>19</span><span>20</span><span>21</span><span className="off">22</span><span className="off">23</span><span>24</span><span>25</span><span className="off">26</span><span className="off">27</span><span>28</span><span>29</span><span>30</span></div><div className="stay-row"><span>Guests</span><b>0</b></div><span className="stay-cta">Reserve</span></aside><div className="s-progress"><i></i></div>
                         </section>
 
             <section className="scene calm" data-scene="2" aria-label="Wellness study: The Quiet Hour">
@@ -504,8 +489,8 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
                             </div>
                             <div className="calm-copy">
                               <p className="s-eyebrow">The quiet hour</p>
-                              <h3 className="calm-one">Move a little.<br /><em>Feel a lot.</em></h3>
-                              <h3 className="calm-two">Data can be<br /><em>gentle too.</em></h3>
+                              <h3 className="calm-one">Move a little<br /><em>Feel a lot</em></h3>
+                              <h3 className="calm-two">Data can be<br /><em>gentle too</em></h3>
                             </div>
                             <div className="stats" aria-hidden="true">
                               <span><b className="st-bpm">60</b> bpm</span><span><b className="st-min">0</b> min</span><span><b className="st-rounds">0</b> rounds</span>
@@ -522,6 +507,20 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
                               <div className="s-progress"><i></i></div>
                           </div>
                         </section>
+
+                <div className="ba-before"><img data-ba-before src={copy.notes[0].baBefore} alt={copy.notes[0].baBeforeAlt} width={1280} height={800} loading="lazy" /></div>
+              </div>
+              <div className="ba-line">
+                <svg className="ba-needle" viewBox="0 0 12 400" preserveAspectRatio="none" aria-hidden="true"><path fill="#000" fillRule="evenodd" d="M6 0C8.7 0 10.6 7 10.6 24L6.6 400H5.4L1.4 24C1.4 7 3.3 0 6 0zM6 8c-1 0-1.6 3.2-1.6 8.5S5 25 6 25s1.6-3.2 1.6-8.5S7 8 6 8z" /></svg>
+                <svg className="ba-bow" viewBox="0 0 46 36" aria-hidden="true" fill="#fff" stroke="#000" strokeWidth="1" strokeLinejoin="round" strokeLinecap="round">
+                  <g className="tail-l"><path d="M19.6 20.2 13.2 33.6l4.2-2.1 2.8 3.4 3.2-14.7z" /><path className="ink" fill="none" strokeWidth=".8" d="M18.2 23.4 15.6 30.2" /></g>
+                  <g className="tail-r"><path d="M26.4 20.2 32.8 33.6l-4.2-2.1-2.8 3.4-3.2-14.7z" /><path className="ink" fill="none" strokeWidth=".8" d="M27.8 23.4l2.6 6.8" /></g>
+                  <g className="loop-l"><path d="M20.5 16.5C17 9.5 8 5.5 3.6 9.2c-3.4 2.8-1.2 8.6 4.2 11.2 4.6 2.2 9.6 1.3 12.7-3.9z" /><path className="ink" fill="none" strokeWidth=".8" d="M18.4 15.2C14.6 10.6 8.8 9.4 6 11.6M17.6 18.2c-3.4 2.4-7.6 2.6-10.6.6" /></g>
+                  <g className="loop-r"><path d="M25.5 16.5c3.5-7 12.5-11 16.9-7.3 3.4 2.8 1.2 8.6-4.2 11.2-4.6 2.2-9.6 1.3-12.7-3.9z" /><path className="ink" fill="none" strokeWidth=".8" d="M27.6 15.2c3.8-4.6 9.6-5.8 12.4-3.6M28.4 18.2c3.4 2.4 7.6 2.6 10.6.6" /></g>
+                  <g className="knot"><rect x="19" y="12.6" width="8" height="8.4" rx="2.4" /><path className="ink" fill="none" strokeWidth=".8" d="M21.6 13.6v6.4M24.4 13.6v6.4" /></g>
+                </svg>
+              </div>
+              <input className="ba-range" type="range" min="0" max="100" defaultValue="0" aria-label={copy.wipe} />
             </div>
 
             <aside className="sc-notes" aria-live="polite">
@@ -545,27 +544,6 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
                   <p className="sc-note-copy" data-note></p>
                 </div>
                 <p className="sc-note-motion" data-motion></p>
-              </div>
-              <div className="sc-note-ba">
-                <button type="button" className="sc-note-ba-toggle" aria-expanded="false" aria-controls="sc-note-ba-body">{copy.beforeAfter}<i aria-hidden="true"></i></button>
-                <div className="sc-note-ba-body" id="sc-note-ba-body"><div>
-                  <div className="ba">
-                    <img data-ba-after src={copy.notes[0].baAfter} alt={copy.notes[0].baAfterAlt} width={1280} height={800} loading="lazy" />
-                    <div className="ba-before"><img data-ba-before src={copy.notes[0].baBefore} alt={copy.notes[0].baBeforeAlt} width={1280} height={800} loading="lazy" /></div>
-                    <div className="ba-line">
-                      <svg className="ba-needle" viewBox="0 0 12 400" preserveAspectRatio="none" aria-hidden="true"><path fill="#000" fillRule="evenodd" d="M6 0C8.7 0 10.6 7 10.6 24L6.6 400H5.4L1.4 24C1.4 7 3.3 0 6 0zM6 8c-1 0-1.6 3.2-1.6 8.5S5 25 6 25s1.6-3.2 1.6-8.5S7 8 6 8z" /></svg>
-                      <svg className="ba-bow" viewBox="0 0 46 36" aria-hidden="true" fill="#fff" stroke="#000" strokeWidth="1" strokeLinejoin="round" strokeLinecap="round">
-                        <g className="tail-l"><path d="M19.6 20.2 13.2 33.6l4.2-2.1 2.8 3.4 3.2-14.7z" /><path className="ink" fill="none" strokeWidth=".8" d="M18.2 23.4 15.6 30.2" /></g>
-                        <g className="tail-r"><path d="M26.4 20.2 32.8 33.6l-4.2-2.1-2.8 3.4-3.2-14.7z" /><path className="ink" fill="none" strokeWidth=".8" d="M27.8 23.4l2.6 6.8" /></g>
-                        <g className="loop-l"><path d="M20.5 16.5C17 9.5 8 5.5 3.6 9.2c-3.4 2.8-1.2 8.6 4.2 11.2 4.6 2.2 9.6 1.3 12.7-3.9z" /><path className="ink" fill="none" strokeWidth=".8" d="M18.4 15.2C14.6 10.6 8.8 9.4 6 11.6M17.6 18.2c-3.4 2.4-7.6 2.6-10.6.6" /></g>
-                        <g className="loop-r"><path d="M25.5 16.5c3.5-7 12.5-11 16.9-7.3 3.4 2.8 1.2 8.6-4.2 11.2-4.6 2.2-9.6 1.3-12.7-3.9z" /><path className="ink" fill="none" strokeWidth=".8" d="M27.6 15.2c3.8-4.6 9.6-5.8 12.4-3.6M28.4 18.2c3.4 2.4 7.6 2.6 10.6.6" /></g>
-                        <g className="knot"><rect x="19" y="12.6" width="8" height="8.4" rx="2.4" /><path className="ink" fill="none" strokeWidth=".8" d="M21.6 13.6v6.4M24.4 13.6v6.4" /></g>
-                      </svg>
-                    </div>
-                    <input className="ba-range" type="range" min="0" max="100" defaultValue="50" aria-label={copy.wipe} />
-                  </div>
-                  <p className="sc-note-ba-cap">{copy.caption}</p>
-                </div></div>
               </div>
             </aside>
           </div>
