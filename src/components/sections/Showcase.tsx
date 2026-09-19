@@ -624,14 +624,14 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
                    stage stays a picture and nothing has to be dragged across the artwork. */}
               <div className="ba-mobile">
                 <button type="button" className="ba-coin" role="switch" aria-checked="false" aria-label={copy.wipe}>
-                  <span className="sc-coin"><svg viewBox="0 0 16 16" aria-hidden="true">
-                    <g className="bw-l"><path d="M7.4 8C5.4 4.8 1.8 5.2 1.8 8s3.6 3.2 5.6 0z" /></g>
-                    <g className="bw-r"><path d="M8.6 8c2-3.2 5.6-2.8 5.6 0s-3.6 3.2-5.6 0z" /></g>
-                    <circle cx="8" cy="8" r="1.15" />
-                    <g className="bw-tl"><path d="M7.4 8.9 6.2 13.6" /></g>
-                    <g className="bw-tr"><path d="M8.6 8.9l1.2 4.7" /></g>
-                  </svg></span>
-                  <span className="sc-coin-lbl">Before</span>
+                  {/* the needle's own bow, same shapes, in red so it reads as a control */}
+                  <svg className="ba-bowicon" viewBox="0 0 46 36" aria-hidden="true">
+                    <g className="bw-tl"><path d="M19.6 20.2 13.2 33.6l4.2-2.1 2.8 3.4 3.2-14.7z" /></g>
+                    <g className="bw-tr"><path d="M26.4 20.2 32.8 33.6l-4.2-2.1-2.8 3.4-3.2-14.7z" /></g>
+                    <g className="bw-l"><path d="M20.5 16.5C17 9.5 8 5.5 3.6 9.2c-3.4 2.8-1.2 8.6 4.2 11.2 4.6 2.2 9.6 1.3 12.7-3.9z" /></g>
+                    <g className="bw-r"><path d="M25.5 16.5c3.5-7 12.5-11 16.9-7.3 3.4 2.8 1.2 8.6-4.2 11.2-4.6 2.2-9.6 1.3-12.7-3.9z" /></g>
+                    <g className="bw-k"><rect x="19" y="12.6" width="8" height="8.4" rx="2.4" /></g>
+                  </svg>
                 </button>
               </div>
               </div>
