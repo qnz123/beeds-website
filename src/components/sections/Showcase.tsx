@@ -429,32 +429,11 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
       onSliderUp = () => { if (!dragging) return; dragging = false; if (!slider.matches(':hover')) slider.classList.remove('is-tilted'); };
       window.addEventListener('pointerup', onSliderUp);
 
-      // Touch: a horizontal swipe anywhere on the stage carries the needle with the finger, while a
-      // vertical one still scrolls the page, because the whole section is scroll-driven. We do this
-      // ourselves rather than leave it to the range input, whose touch behaviour is jump-to-tap. On
-      // coarse pointers the range is pointer-events:none (see the CSS) so it cannot fight us.
-      const SWIPE_SLOP = 8;   // px of travel before a gesture commits to one axis
-      let swipe: { id: number; x: number; y: number; from: number; on: boolean } | null = null;
-      slider.addEventListener('pointerdown', (e: PointerEvent) => {
-        if (e.pointerType !== 'touch') return;
-        swipe = { id: e.pointerId, x: e.clientX, y: e.clientY, from: +range.value, on: false };
-      });
-      slider.addEventListener('pointermove', (e: PointerEvent) => {
-        if (!swipe || e.pointerId !== swipe.id) return;
-        const dx = e.clientX - swipe.x, dy = e.clientY - swipe.y;
-        if (!swipe.on) {
-          if (Math.abs(dx) < SWIPE_SLOP && Math.abs(dy) < SWIPE_SLOP) return;
-          if (Math.abs(dx) <= Math.abs(dy)) { swipe = null; return; }   // vertical: let the page scroll
-          swipe.on = true;
-          try { slider.setPointerCapture(e.pointerId); } catch (err) { /* pointer already gone */ }
-        }
-        if (e.cancelable) e.preventDefault();
-        setSlideAt(clamp(swipe.from + (dx / slider.clientWidth) * 100, 0, 100));
-      }, { passive: false });
-      const endSwipe = () => { swipe = null; };
-      slider.addEventListener('pointerup', endSwipe);
-      slider.addEventListener('pointercancel', endSwipe);
-      setSlideAt = (v: number) => { range.value = String(v); setSlide(v); };
+      // Phones drive the needle from the slider below the frame (.ba-mrange), not by dragging
+      // across the artwork, so the stage carries no touch control of its own.
+      const mrange = $('.ba-mrange') as HTMLInputElement | null;
+      if (mrange) mrange.addEventListener('input', () => setSlideAt(+mrange.value));
+      setSlideAt = (v: number) => { range.value = String(v); if (mrange) mrange.value = String(v); setSlide(v); };
       // a chapter swap re-hangs the ribbon rather than throwing it across the frame
       resetSlider = () => { setSlideAt(SLIDE_START); restRibbon(); };
       stopRibbon = () => { if (ribbonFrame) cancelAnimationFrame(ribbonFrame); ribbonFrame = 0; };
@@ -604,6 +583,12 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
                 </svg>
               </div>
               <input className="ba-range" type="range" min="0" max="100" defaultValue="0" aria-label={copy.wipe} />
+            </div>
+
+            {/* Phones drive the needle from here rather than from inside the frame, so the
+                 stage stays a picture and nothing has to be dragged across the artwork. */}
+            <div className="ba-mobile">
+              <input className="ba-mrange" type="range" min="0" max="100" defaultValue="0" aria-label={copy.wipe} />
             </div>
 
             <aside className="sc-notes" aria-live="polite">

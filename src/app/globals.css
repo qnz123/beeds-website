@@ -2155,6 +2155,19 @@ textarea.blank:focus {
    horizontal gestures, which showcase.js turns into a needle swipe. The range input is taken
    out of the touch path entirely so its jump-to-tap behaviour cannot fight the swipe; it stays
    keyboard reachable, since pointer-events does not affect focus. */
+/* The needle's own control on phones: a plain slider sitting between the frame and the study
+   coins. The thumb is drawn as a thin black bar so it reads as the needle it moves. Hidden on
+   the two-column layout, where the needle is dragged in the frame directly. */
+.sc-showcase .ba-mobile { display: none; }
+@media (max-width: 1000px) {
+  .sc-showcase .ba-mobile { display: block; margin: 16px 0 20px; }
+}
+.sc-showcase .ba-mrange { -webkit-appearance: none; appearance: none; width: 100%; height: 26px; margin: 0; padding: 0; background: none; border: 0; cursor: ew-resize; touch-action: none; }
+.sc-showcase .ba-mrange::-webkit-slider-runnable-track { height: 1px; background: #000; }
+.sc-showcase .ba-mrange::-moz-range-track { height: 1px; background: #000; }
+.sc-showcase .ba-mrange::-webkit-slider-thumb { -webkit-appearance: none; width: 3px; height: 24px; margin-top: -11.5px; background: #000; border: 0; border-radius: 0; }
+.sc-showcase .ba-mrange::-moz-range-thumb { width: 3px; height: 24px; background: #000; border: 0; border-radius: 0; }
+.sc-showcase .ba-mrange:focus-visible { outline: 2px solid #000; outline-offset: 4px; }
 @media (pointer: coarse) {
   .sc-showcase .ba-range { pointer-events: none; }
   /* No tilt on touch: the -15deg lean answers a hovering cursor, and a finger never hovers.
