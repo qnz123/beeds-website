@@ -1,10 +1,15 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { Nunito } from 'next/font/google'
 import type { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
+// Button face: a rounded, simple sans (client direction 2026-09-19), served
+// as a CSS variable on the button row and read by .hero-btn in globals.css.
+const nunito = Nunito({ weight: ['500', '600'], subsets: ['latin'], variable: '--font-nunito', display: 'swap' })
 
 // In-memory flag (resets on full page load): the hero animates on every fresh
 // visit or reload, but sits static when the visitor navigates back to the
@@ -205,9 +210,29 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
 
         <p className="text-base max-w-[600px] leading-[1.8]">{t.body}</p>
 
-        <a href="#contact" className="hero-cta">
-          {t.cta}
-        </a>
+        {/* Two pill buttons (design 03 "Ink and blue"): Work first in solid
+            blue with a film-frame icon, then the booking section in frosted
+            glass with a speech-bubble icon. */}
+        <div className={`hero-actions ${nunito.variable}`}>
+          <a href="#work" className="hero-btn hero-btn-work">
+            <span className="hero-btn-ic" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <rect x="3" y="5" width="18" height="14" rx="2.5" />
+                <path d="M7.5 5v14M16.5 5v14M3 9.5h4.5M3 14.5h4.5M16.5 9.5H21M16.5 14.5H21" />
+              </svg>
+            </span>
+            {t.ctaWork}
+          </a>
+          <a href="#contact" className="hero-btn hero-btn-connect">
+            <span className="hero-btn-ic" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M20.5 11.6c0 4.2-3.8 7.4-8.5 7.4-1 0-2-.1-2.9-.4L4 20l1.2-3.6C4.1 15 3.5 13.4 3.5 11.6c0-4.2 3.8-7.4 8.5-7.4s8.5 3.2 8.5 7.4z" />
+                <path d="M9 11.6h.01M12 11.6h.01M15 11.6h.01" strokeWidth="2.6" />
+              </svg>
+            </span>
+            {t.cta}
+          </a>
+        </div>
       </div>
 
       {/* Constant gentle water for the neon hover reveal (.hero-rainbow) —

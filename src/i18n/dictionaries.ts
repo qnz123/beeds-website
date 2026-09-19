@@ -18,6 +18,7 @@ type Dict = {
     line1: string
     line2: string
     body: string
+    ctaWork: string
     cta: string
   }
   footer: {
@@ -106,7 +107,8 @@ const en: Dict = {
     line1: 'SMALL FRAMES',
     line2: 'BIG IMPACT',
     body: 'Your story is your brand. BEEDS keeps every creative asset on point — our AI engine audits tone and relevance while human strategists weave in local nuance, pattern, and governance.',
-    cta: "Let's connect →",
+    ctaWork: 'Learn more',
+    cta: 'I want to build…',
   },
   footer: {
     contact: 'Contact',
@@ -213,7 +215,8 @@ const ja: Dict = {
     line1: 'SMALL FRAMES',
     line2: 'BIG IMPACT',
     body: 'ストーリーを、ブランドへ。BEEDSは、あらゆるクリエイティブアセットを戦略的に磨き上げます。AIエンジンがブランドのトーンと関連性を分析し、人のストラテジストがその土地ならではの文化やニュアンス、行動パターン、ブランドガバナンスを織り込み、一貫性と成果につながるクリエイティブへと導きます。',
-    cta: 'ご相談はこちら →',
+    ctaWork: '詳しく見る',
+    cta: 'ご相談はこちら',
   },
   footer: {
     contact: 'お問い合わせ',

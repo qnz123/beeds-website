@@ -1404,7 +1404,8 @@ figure[data-animate='visible'] .impact-lift-label {
 
 /* Hero CTAs (2026-09-19, design 03 "Ink and blue", chosen by the client) —
    two free-standing pills under the intro copy, icon left of the label, type
-   set exactly like the intro paragraph (16px serif, sentence case).
+   in Nunito (rounded, simple sans — client direction; the --font-nunito
+   variable is set on .hero-actions by Hero.tsx), sentence case.
    "Learn more" is solid palette blue (#1685f8, the stripe blue of the hidden
    headline) and jumps to the Work section; "Let's connect" is frosted glass
    with a hairline and a pink icon, and jumps to the booking section. Client
@@ -1423,7 +1424,10 @@ figure[data-animate='visible'] .impact-lift-label {
   padding: 13px 26px 13px 20px;
   border: 1px solid transparent;
   border-radius: 999px;
-  font-size: 16px;
+  font-family: var(--font-nunito), 'Nunito', system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
   line-height: 1;
   text-decoration: none;
   white-space: nowrap;
