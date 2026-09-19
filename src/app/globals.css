@@ -2136,7 +2136,8 @@ textarea.blank:focus {
    an old sewing-kit illustration. */
 @property --sc-tilt { syntax: '<number>'; inherits: true; initial-value: 0; }
 @property --sc-loose { syntax: '<number>'; inherits: true; initial-value: 0; }
-.sc-showcase .sc-frame { --sc-p: 8%; --sc-tilt: 0; --sc-loose: 0; --sc-slant: 8.4%; position: relative; user-select: none; transition: --sc-tilt .5s cubic-bezier(.83,0,.17,1), --sc-loose .25s ease-out; }
+@property --sc-swing { syntax: '<number>'; inherits: true; initial-value: 0; }
+.sc-showcase .sc-frame { --sc-p: 8%; --sc-tilt: 0; --sc-loose: 0; --sc-swing: 0; --sc-slant: 8.4%; position: relative; user-select: none; transition: --sc-tilt .5s cubic-bezier(.83,0,.17,1), --sc-loose .25s ease-out; }
 .sc-showcase .sc-frame.is-tilted { --sc-tilt: 1; }
 .sc-showcase .ba-before { position: absolute; inset: 0; z-index: 6; clip-path: polygon(0 0, calc(var(--sc-p) - var(--sc-tilt) * var(--sc-slant)) 0, calc(var(--sc-p) + var(--sc-tilt) * var(--sc-slant)) 100%, 0 100%); }
 .sc-showcase .ba-before img { display: block; width: 100%; height: 100%; object-fit: cover; margin: 0; border: 0; }
@@ -2146,13 +2147,13 @@ textarea.blank:focus {
 .sc-showcase .sc-frame:focus-within .sc-stage { outline: 2px solid #000; outline-offset: 6px; }
 .sc-showcase .ba-line { position: absolute; top: -26px; bottom: -22px; left: var(--sc-p); width: 12px; pointer-events: none; z-index: 8; transform: translateX(-50%) rotate(calc(var(--sc-tilt) * -15deg)); transform-origin: 50% 50%; }
 .sc-showcase .ba-needle { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.sc-showcase .ba-bow { position: absolute; left: 50%; top: 50%; width: 46px; height: 36px; transform: translate(-50%, calc(-46% + var(--sc-loose) * 9px)); display: block; overflow: visible; }
+.sc-showcase .ba-bow { position: absolute; left: 50%; top: 50%; width: 46px; height: 36px; transform: translate(-50%, calc(-46% + var(--sc-loose) * 9px)) rotate(calc(var(--sc-swing) * 13deg)); transform-origin: 50% 47%; display: block; overflow: visible; }
 .sc-showcase .ba-bow g { transform-box: fill-box; }
-.sc-showcase .ba-bow .loop-l { transform-origin: 100% 55%; transform: rotate(calc(var(--sc-loose) * -30deg)) scale(calc(1 + var(--sc-loose) * .14)); }
-.sc-showcase .ba-bow .loop-r { transform-origin: 0% 55%; transform: rotate(calc(var(--sc-loose) * 30deg)) scale(calc(1 + var(--sc-loose) * .14)); }
-.sc-showcase .ba-bow .knot { transform-origin: 50% 50%; transform: scale(calc(1 + var(--sc-loose) * .55), calc(1 - var(--sc-loose) * .2)); }
-.sc-showcase .ba-bow .tail-l { transform-origin: 85% 0%; transform: rotate(calc(var(--sc-loose) * -18deg)) scaleY(calc(1 + var(--sc-loose) * .35)); }
-.sc-showcase .ba-bow .tail-r { transform-origin: 15% 0%; transform: rotate(calc(var(--sc-loose) * 18deg)) scaleY(calc(1 + var(--sc-loose) * .35)); }
+.sc-showcase .ba-bow .loop-l { transform-origin: 100% 55%; transform: rotate(calc(var(--sc-loose) * -30deg + var(--sc-swing) * 10deg)) scale(calc(1 + var(--sc-loose) * .14)); }
+.sc-showcase .ba-bow .loop-r { transform-origin: 0% 55%; transform: rotate(calc(var(--sc-loose) * 30deg + var(--sc-swing) * 10deg)) scale(calc(1 + var(--sc-loose) * .14)); }
+.sc-showcase .ba-bow .knot { transform-origin: 50% 50%; transform: scale(calc(1 + var(--sc-loose) * .55 + var(--sc-swing) * var(--sc-swing) * .1), calc(1 - var(--sc-loose) * .2)); }
+.sc-showcase .ba-bow .tail-l { transform-origin: 85% 0%; transform: rotate(calc(var(--sc-loose) * -18deg + var(--sc-swing) * 26deg)) scaleY(calc(1 + var(--sc-loose) * .35)); }
+.sc-showcase .ba-bow .tail-r { transform-origin: 15% 0%; transform: rotate(calc(var(--sc-loose) * 18deg + var(--sc-swing) * 26deg)) scaleY(calc(1 + var(--sc-loose) * .35)); }
 .sc-showcase .ba-bow .ink { opacity: calc(1 - var(--sc-loose) * .6); }
 /* the scene's own controls sit under the drag surface, so they no longer invite a click */
 .sc-showcase .steps button { pointer-events: none; }

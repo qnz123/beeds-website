@@ -128,6 +128,7 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
     let resetSlider = () => {};   // set once the Before / After slider is wired
     let setSlideAt: (v: number) => void = () => {};   // move the needle to a percentage (QA hook)
     let onSliderUp = () => {};   // set by a click so a study can be chosen without moving the page
+    let stopRibbon = () => {};   // cancels the ribbon's own animation frame on teardown
 
     // ---- colour lerp for the stage ground ----
     const hex = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
@@ -365,9 +366,57 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
     // needle travels right of centre (--sc-loose); the needle tilts on hover and holds through a drag.
     const SLIDE_START = 0;   // the needle rests on the frame's left edge, the scene in full view
     const slider = $('.sc-frame');
+    let ribbonScroll = () => {};   // the page's own motion tugs at the ribbon as well
     if (slider) {
       const range = $('.ba-range', slider) as HTMLInputElement;
-      const setSlide = (v: number) => { slider.style.setProperty('--sc-p', v + '%'); slider.style.setProperty('--sc-loose', String(Math.max(0, (v - 50) / 50))); };
+      // ---- ribbon physics -------------------------------------------------
+      // The knot is tied to the pin and never leaves it; only the loops and the
+      // two tails carry momentum. They hang off a damped spring that trails the
+      // pin: while the needle travels, drag streams the ribbon the other way, and
+      // the moment it stops -- hardest when it lands against either edge -- it
+      // swings back through one or two shrinking bounces before it settles.
+      // SPRING sets the period (~0.25s), DAMPING how much of each swing survives
+      // into the next, and it is deliberately under-damped so a second bounce
+      // still reads at a glance.
+      // Tuned so a hard fling into an edge answers with two shrinking bounces and is
+      // still inside half a second, while a slow drag only ever sways.
+      const SPRING = 0.28, DAMPING = 0.78;
+      const DRAG = 0.11;       // how far a given needle speed streams the ribbon
+      const GUST = 0.004;      // how much the page's scroll speed sways it
+      const IMPACT = 0.07;     // extra kick on the frame the needle lands on an edge
+      let pos = SLIDE_START, prevPos = SLIDE_START;
+      let swing = 0, swingV = 0, gust = 0, scrollDelta = 0, ribbonFrame = 0;
+
+      function stepRibbon() {
+        ribbonFrame = 0;
+        const vel = pos - prevPos;
+        prevPos = pos;
+        // landing against an edge with speed behind it snaps the ribbon forward
+        if ((pos === 0 || pos === 100) && Math.abs(vel) > 0.5) swingV -= vel * IMPACT;
+        // gust is a smoothed scroll speed in px per frame, so GUST stays readable
+        gust = gust * 0.8 + scrollDelta * 0.2;
+        scrollDelta = 0;
+        const target = clamp(-vel * DRAG + gust * GUST, -1, 1);
+        swingV = (swingV + (target - swing) * SPRING) * DAMPING;
+        swing += swingV;
+        slider.style.setProperty('--sc-swing', swing.toFixed(4));
+        if (Math.abs(swingV) > 1e-4 || Math.abs(swing) > 1e-4 || Math.abs(gust) > 0.4) runRibbon();
+      }
+      function runRibbon() { if (!ribbonFrame && !paused) ribbonFrame = requestAnimationFrame(stepRibbon); }
+      function restRibbon() {
+        if (ribbonFrame) cancelAnimationFrame(ribbonFrame);
+        ribbonFrame = 0; swing = 0; swingV = 0; gust = 0; scrollDelta = 0; prevPos = pos;
+        slider.style.setProperty('--sc-swing', '0');
+      }
+      let lastScroll = window.scrollY;
+      ribbonScroll = () => {
+        const y = window.scrollY;
+        scrollDelta += y - lastScroll;
+        lastScroll = y;
+        runRibbon();
+      };
+
+      const setSlide = (v: number) => { pos = v; slider.style.setProperty('--sc-p', v + '%'); slider.style.setProperty('--sc-loose', String(Math.max(0, (v - 50) / 50))); runRibbon(); };
       range.addEventListener('input', () => setSlide(+range.value));
       let dragging = false;
       slider.addEventListener('pointerenter', () => slider.classList.add('is-tilted'));
@@ -376,7 +425,9 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
       onSliderUp = () => { if (!dragging) return; dragging = false; if (!slider.matches(':hover')) slider.classList.remove('is-tilted'); };
       window.addEventListener('pointerup', onSliderUp);
       setSlideAt = (v: number) => { range.value = String(v); setSlide(v); };
-      resetSlider = () => setSlideAt(SLIDE_START);
+      // a chapter swap re-hangs the ribbon rather than throwing it across the frame
+      resetSlider = () => { setSlideAt(SLIDE_START); restRibbon(); };
+      stopRibbon = () => { if (ribbonFrame) cancelAnimationFrame(ribbonFrame); ribbonFrame = 0; };
       resetSlider();
     }
     function updateMotion() {
@@ -385,8 +436,9 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
     }
     const onReduce = () => { paused = reduce.matches; updateMotion(); };
     const onResize = () => { navHeight(); schedule(); };
+    const onScroll = () => { schedule(); ribbonScroll(); };
     reduce.addEventListener('change', onReduce);
-    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onResize);
     const ro = new ResizeObserver(schedule);
     ro.observe(stage);
@@ -407,11 +459,12 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
 
     return () => {
       reduce.removeEventListener('change', onReduce);
-      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
       window.removeEventListener('pointerup', onSliderUp);
       ro.disconnect();
       if (frame) cancelAnimationFrame(frame);
+      stopRibbon();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
