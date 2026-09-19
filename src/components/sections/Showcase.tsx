@@ -183,7 +183,8 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
       set('[data-motion]', n.motion);
       const bb = $('[data-ba-before]');
       if (bb) { bb.setAttribute('src', n.baBefore); bb.setAttribute('alt', n.baBeforeAlt); }
-      resetSlider();
+      // Only the "before" image behind the needle changes. Where the visitor left the needle is
+      // their choice, so a study swap leaves it exactly where it is (client direction 2026-09-19).
       rail.forEach((b, k) => b.setAttribute('aria-pressed', String(k === i)));
     }
 
@@ -457,7 +458,7 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
     const pin = params.get('pin');
     if (pin !== null) forcedP = clamp(parseFloat(pin));
     const ba = params.get('ba');
-    // two frames out: the first render runs setNotes, which returns the needle to its start
+    // the needle keeps whatever position the visitor left it at, so set it two frames out
     if (ba !== null) requestAnimationFrame(() => requestAnimationFrame(() => setSlideAt(clamp(parseFloat(ba), 0, 100))));
 
     navHeight();
