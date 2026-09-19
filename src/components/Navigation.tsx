@@ -46,7 +46,22 @@ export default function Navigation({
     document.documentElement.lang = lang
   }, [lang])
 
+  // While the full-screen menu is up, the page behind it must not scroll, and
+  // Escape should close it the way any dialog does.
+  useEffect(() => {
+    if (!isOpen) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setIsOpen(false) }
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = prev
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [isOpen])
+
   return (
+    <>
     <nav className="nav sticky top-0 z-50">
       <div>
         <Link href={home}>BEEDS</Link>
@@ -75,24 +90,55 @@ export default function Navigation({
 
       {/* Mobile Menu Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setIsOpen(true)}
         className="md:hidden text-base"
-        aria-label="Toggle menu"
+        aria-label="Open menu"
+        aria-expanded={isOpen}
+        aria-controls="mobile-menu"
       >
         ☰
       </button>
 
-      {/* Mobile Menu */}
-      {isOpen && (
-        <div className="absolute top-full left-0 w-full bg-light border-b border-black px-10 py-4 flex flex-col gap-4 md:hidden">
+    </nav>
+
+    {/* Mobile menu: a full-screen sheet, not a dropdown. It sits above the nav so the
+        nav's own bottom rule is covered, and it draws no horizontal rules itself. */}
+    {isOpen && (
+      <div
+        id="mobile-menu"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menu"
+        className="fixed inset-0 z-[60] bg-light md:hidden flex flex-col"
+      >
+        <div className="flex items-center justify-between px-10 py-5">
+          <Link href={home} onClick={() => setIsOpen(false)} className="text-xs uppercase tracking-[1px]">
+            BEEDS
+          </Link>
+          <button onClick={() => setIsOpen(false)} className="text-base" aria-label="Close menu">
+            ✕
+          </button>
+        </div>
+
+        <div className="flex-1 flex flex-col justify-center gap-7 px-10 pb-10">
           {navLinks.map((link) => (
-            <Link key={link.href} href={link.href} onClick={() => setIsOpen(false)}>
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setIsOpen(false)}
+              className="text-[34px] leading-none"
+            >
               {link.label}
             </Link>
           ))}
+        </div>
+
+        {/* The language switch is a utility, not a sixth destination, so it sits
+            apart from the list rather than reading as one more link. */}
+        <div className="px-10 pb-12">
           <a
             href={switchHref}
-            className="text-[#666]"
+            className="text-xs uppercase tracking-[2px] text-[#666]"
             onClick={() => {
               rememberChoice()
               setIsOpen(false)
@@ -101,7 +147,8 @@ export default function Navigation({
             {toggleLabel}
           </a>
         </div>
-      )}
-    </nav>
+      </div>
+    )}
+    </>
   )
 }
