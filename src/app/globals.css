@@ -1489,14 +1489,20 @@ figure[data-animate='visible'] .impact-lift-label {
   color: #f52789;
 }
 
-/* Hover fills blue with white type. The blue is #0f6fd6, the same shade the
-   primary already hovers to, rather than the lighter #1685f8 — white on that
-   measures 3.66:1 and fails AA, where this clears it at 4.92:1. The icon
-   follows the label to white; pink on blue would fight. */
+/* Hover renders this button exactly as the primary next to it (client
+   direction 2026-09-19, from a screenshot of the two side by side): same
+   #1685f8, same white label and icon, no edge of its own. `box-shadow: none`
+   is load-bearing — the rest state's inset white top line stays painted
+   otherwise and reads as a light ring around the fill, which is what set the
+   two apart in his screenshot. Note the contrast: white on #1685f8 is 3.66:1
+   and under the 4.5:1 AA floor. That is the same shortfall the primary has,
+   so the two now match in that respect as well; moving both to #0f6fd6
+   (4.92:1) would clear it and keep them identical. */
 .hero-btn-connect:hover {
-  background: #0f6fd6;
+  background: #1685f8;
   color: #fff;
-  border-color: #0f6fd6;
+  border-color: #1685f8;
+  box-shadow: none;
 }
 
 .hero-btn-connect:hover .hero-btn-ic {
