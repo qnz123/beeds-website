@@ -98,6 +98,16 @@ h6 {
   opacity: 0.5;
 }
 
+/* Nav links in the sans (client direction 2026-09-19); the BEEDS wordmark
+   stays serif, so this is scoped to the link row rather than .nav a. Weight
+   500, not the hero's 300 — a light weight goes grey and fragile at 12px
+   uppercase, especially off a Mac. Japanese fallbacks are here for the
+   日本語 toggle, which is a control in this row rather than Japanese copy. */
+.nav-links a {
+  font-family: var(--font-hanken), 'Hanken Grotesk', 'Hiragino Sans', 'Noto Sans JP', system-ui, -apple-system, sans-serif;
+  font-weight: 500;
+}
+
 /* ---- Featured Work — "The Folio", Edition B filmstrip ----
    Approved 2026-07-09 (replaces the "Signed Reel" projection bands).
    Four 3:4 specimen plates on the brand color fields in a horizontal

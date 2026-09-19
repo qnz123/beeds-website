@@ -120,7 +120,10 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
     const notes = $('.sc-notes');
     const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 
-    let paused = reduce.matches;
+    // Phones show each study as a still frame: no scroll-driven scene, the page simply scrolls
+    // past it and the study buttons choose which one is shown.
+    const stillQ = matchMedia('(max-width: 1000px)');
+    let paused = reduce.matches || stillQ.matches;
     let staticChapter = 0;
     let frame = 0;
     let lastChapter = -1;
@@ -346,7 +349,9 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
 
     // ---- navigation ----
     function goChapter(i: number) {
-      if (paused) { staticChapter = i; setNotes(-1); lastChapter = -1; schedule(); return; }
+      // Still-frame mode: swap which study is shown. lastChapter is reset so the next render
+      // re-renders the note; setNotes(-1) would index NOTES[-1] and throw.
+      if (paused) { staticChapter = i; lastChapter = -1; schedule(); return; }
       // The page stays exactly where it is; the scene and the new text fade in on the spot.
       const swap = $('.sc-note-swap', notes) || notes;
       [swap, stage].forEach((el) => {
@@ -461,10 +466,11 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
       root.classList.toggle('motion-paused', paused);
       schedule();
     }
-    const onReduce = () => { paused = reduce.matches; updateMotion(); };
+    const onReduce = () => { paused = reduce.matches || stillQ.matches; updateMotion(); };
     const onResize = () => { navHeight(); schedule(); };
     const onScroll = () => { schedule(); ribbonScroll(); };
     reduce.addEventListener('change', onReduce);
+    stillQ.addEventListener('change', onReduce);
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onResize);
     const ro = new ResizeObserver(schedule);
@@ -486,6 +492,7 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
 
     return () => {
       reduce.removeEventListener('change', onReduce);
+      stillQ.removeEventListener('change', onReduce);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
       window.removeEventListener('pointerup', onSliderUp);
