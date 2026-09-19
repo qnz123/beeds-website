@@ -231,9 +231,8 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
     function renderRun(t: number) {
       if (!run) return;
       const w = stage.clientWidth;
-      const narrow = w < 700 || matchMedia('(max-width: 1000px)').matches;
       const brk = ease(clamp(t / 0.38));
-      const v = narrow ? 18 : 11, h = narrow ? 22 : 35;
+      const v = 11, h = 35;   // the stage is landscape at every width, so one framing serves both
       run.frameA.style.clipPath = `inset(${(1 - brk) * v}% ${(1 - brk) * h}% ${(1 - brk) * v}% ${(1 - brk) * h}%)`;
       run.imgA.style.transform = `scale(${1.25 - brk * 0.25}) translateY(${(1 - brk) * -3}%)`;
       const shear = t * w * 0.6, fade = 1 - clamp((t - 0.22) * 4);
@@ -266,7 +265,6 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
     };
     function renderCalm(t: number) {
       if (!calm) return;
-      const narrow = matchMedia('(max-width: 1000px)').matches;
       // breathing: inhale 0–.36, hold .36–.64, exhale .64–1
       let s, label;
       if (t < 0.36) { s = 1 + 0.35 * ease(t / 0.36); label = 'Inhale'; }
@@ -275,8 +273,7 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
       calm.ring.style.transform = `scale(${s})`;
       if (calm.ringLabel.textContent !== label) calm.ringLabel.textContent = label;
       const w = ease(clamp((t - 0.08) / 0.42));
-      const from = narrow ? [60, 50, 14, 6] : [50, 60, 12, 8];
-      const to = narrow ? [46, 0, 0, 0] : [44, 0, 0, 0];
+      const from = [50, 60, 12, 8], to = [44, 0, 0, 0];
       const ins = from.map((f, i) => f + (to[i] - f) * w);
       calm.window.style.clipPath = `inset(${ins[0]}% ${ins[1]}% ${ins[2]}% ${ins[3]}%)`;
       // Start shifted left so the small window frames the watch; settle to centre as it widens.
@@ -431,6 +428,32 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
       range.addEventListener('blur', () => { slider.classList.remove('is-key-focus'); pointerFocus = false; });
       onSliderUp = () => { if (!dragging) return; dragging = false; if (!slider.matches(':hover')) slider.classList.remove('is-tilted'); };
       window.addEventListener('pointerup', onSliderUp);
+
+      // Touch: a horizontal swipe anywhere on the stage carries the needle with the finger, while a
+      // vertical one still scrolls the page, because the whole section is scroll-driven. We do this
+      // ourselves rather than leave it to the range input, whose touch behaviour is jump-to-tap. On
+      // coarse pointers the range is pointer-events:none (see the CSS) so it cannot fight us.
+      const SWIPE_SLOP = 8;   // px of travel before a gesture commits to one axis
+      let swipe: { id: number; x: number; y: number; from: number; on: boolean } | null = null;
+      slider.addEventListener('pointerdown', (e: PointerEvent) => {
+        if (e.pointerType !== 'touch') return;
+        swipe = { id: e.pointerId, x: e.clientX, y: e.clientY, from: +range.value, on: false };
+      });
+      slider.addEventListener('pointermove', (e: PointerEvent) => {
+        if (!swipe || e.pointerId !== swipe.id) return;
+        const dx = e.clientX - swipe.x, dy = e.clientY - swipe.y;
+        if (!swipe.on) {
+          if (Math.abs(dx) < SWIPE_SLOP && Math.abs(dy) < SWIPE_SLOP) return;
+          if (Math.abs(dx) <= Math.abs(dy)) { swipe = null; return; }   // vertical: let the page scroll
+          swipe.on = true;
+          try { slider.setPointerCapture(e.pointerId); } catch (err) { /* pointer already gone */ }
+        }
+        if (e.cancelable) e.preventDefault();
+        setSlideAt(clamp(swipe.from + (dx / slider.clientWidth) * 100, 0, 100));
+      }, { passive: false });
+      const endSwipe = () => { swipe = null; };
+      slider.addEventListener('pointerup', endSwipe);
+      slider.addEventListener('pointercancel', endSwipe);
       setSlideAt = (v: number) => { range.value = String(v); setSlide(v); };
       // a chapter swap re-hangs the ribbon rather than throwing it across the frame
       resetSlider = () => { setSlideAt(SLIDE_START); restRibbon(); };
