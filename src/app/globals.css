@@ -1411,17 +1411,16 @@ figure[data-animate='visible'] .impact-lift-label {
 }
 
 /* Hero CTAs (2026-09-19, design 03 "Ink and blue", chosen by the client) —
-   two free-standing pills under the intro copy, icon left of the label, type
-   in Hanken Grotesk at AKQA's subtext spec — 15px / 21px leading / weight 400
-   / zero tracking (weight dropped to 300 at the client's request 2026-09-19), read off akqa.com/about (their own
-   face, Season Sans, is licensed and cannot be shipped; he picked Hanken
-   Grotesk from the substitutes we measured against it). The --font-hanken
-   variable is set on the whole .hero section by Hero.tsx, so the intro
-   paragraph can use it too. Vertical padding is 10px rather than 13px so the
-   21px leading keeps the pill at the same height as before.
+   two free-standing pills under the intro copy, icon left of the label, set
+   in the site's own Times New Roman. A sans (Hanken Grotesk, standing in for
+   AKQA's licensed Season Sans) was tried here through the afternoon and
+   reverted: the client asked to step back to the house face and keep the
+   button design as it stands. Vertical padding is 10px rather than 13px so
+   the 21px line box keeps the pill at the height he approved.
    "Learn more" is solid palette blue (#1685f8, the stripe blue of the hidden
-   headline) and jumps to the Work section; "Let's connect" is frosted glass
-   with a hairline and a pink icon, and jumps to the booking section. Client
+   headline) and jumps to the Work section; "I want to build…" is the quiet
+   one — a grey label and pink icon on a near-transparent fill that hovers to
+   the primary's exact blue — and jumps to the booking section. Client
    requested exception to the sharp-corner house rule. */
 .hero-actions {
   display: flex;
@@ -1437,9 +1436,9 @@ figure[data-animate='visible'] .impact-lift-label {
   padding: 10px 26px 10px 20px;
   border: 1px solid transparent;
   border-radius: 999px;
-  font-family: var(--font-hanken), 'Hanken Grotesk', 'Hiragino Sans', 'Noto Sans JP', system-ui, -apple-system, sans-serif;
+  font-family: 'Times New Roman', Times, serif;
   font-size: 15px;
-  font-weight: 300;
+  font-weight: 400;
   letter-spacing: 0;
   line-height: 21px;
   text-decoration: none;
@@ -1875,34 +1874,18 @@ textarea.blank:focus {
   overflow: hidden;
 }
 
-/* Hero intro paragraph — same face as the buttons (client direction
-   2026-09-19). The Japanese fallbacks keep JA copy in a sans too, so Latin
-   and Japanese don't mix a sans with the system serif. */
+/* Hero intro paragraph — the house serif at the size and leading it had
+   before the sans experiment. Kept as a named class rather than inline
+   utilities so both locales read from one place; Japanese glyphs fall
+   through to the system serif as they always have, so no per-locale rule is
+   needed any more. */
 .hero-body {
-  font-family: var(--font-hanken), 'Hanken Grotesk', 'Hiragino Sans', 'Noto Sans JP', system-ui, -apple-system, sans-serif;
-  font-size: 15px;
-  font-weight: 300;
-  letter-spacing: 0;
-  line-height: 1.6;
-  max-width: 600px;
-}
-
-/* Japanese hero keeps the pre-2026-09-19 type: the site's Times New Roman
-   stack, which Japanese glyphs fall through to the system serif (Hiragino
-   Mincho / Yu Mincho) exactly as they did before. Only the face and the
-   paragraph's former size and leading come back — the pill geometry, colours
-   and icons are unchanged, so both locales keep the same buttons. */
-.hero-ja .hero-body {
   font-family: 'Times New Roman', Times, serif;
   font-size: 16px;
   font-weight: 400;
+  letter-spacing: 0;
   line-height: 1.8;
-}
-
-.hero-ja .hero-btn {
-  font-family: 'Times New Roman', Times, serif;
-  font-size: 15px;
-  font-weight: 400;
+  max-width: 600px;
 }
 
 /* ---- Hero rainbow hover reveal ----

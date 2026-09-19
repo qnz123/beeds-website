@@ -1,16 +1,10 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Hanken_Grotesk } from 'next/font/google'
 import type { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
-
-// The hero is the only thing on the site set in this face — the nav went back
-// to the house serif on 2026-09-19 — so it loads here rather than in the root
-// layout, and secondary pages don't pay for a font they never render.
-const hanken = Hanken_Grotesk({ weight: ['300', '400'], subsets: ['latin'], variable: '--font-hanken', display: 'swap' })
 
 // In-memory flag (resets on full page load): the hero animates on every fresh
 // visit or reload, but sits static when the visitor navigates back to the
@@ -141,17 +135,7 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
   }, [lang])
 
   return (
-    // Hanken Grotesk is an ENGLISH-ONLY treatment (client direction
-    // 2026-09-19): the Japanese hero keeps the site's original serif, so the
-    // font variable is only attached on /en and `hero-ja` restores the former
-    // type in globals.css. Without that class the stack would fall past the
-    // unresolved variable to Hiragino Sans, i.e. a sans, which is what he
-    // asked us to undo.
-    <section
-      className={`hero min-h-screen flex items-center px-10 py-16 ${
-        lang === 'ja' ? 'hero-ja' : hanken.variable
-      }`}
-    >
+    <section className="hero min-h-screen flex items-center px-10 py-16">
       <div className="container-x w-full max-w-full">
         <h1
           ref={titleRef}

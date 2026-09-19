@@ -81,7 +81,7 @@ export default function StudyLightbox({
         style={{ maxWidth: 'min(1100px, 94vw)' }}
       >
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black px-5 py-3">
-          <span className="eyebrow text-[#666]">{name} — Review</span>
+          <span className="eyebrow text-[#666]">{name}</span>
 
           <div className="flex items-center gap-4">
             {/* Desktop / Mobile rounded pill switch. */}
@@ -92,20 +92,15 @@ export default function StudyLightbox({
               type="button"
               onClick={onClose}
               aria-label="Close review"
-              className="text-[13px] uppercase tracking-[1.5px] underline underline-offset-4 hover:opacity-55"
+              className="flex h-8 w-8 items-center justify-center text-xl leading-none hover:opacity-55"
             >
-              Close ✕
+              ×
             </button>
           </div>
         </div>
 
         <div className="p-1 md:p-4">
           <ReviewCanvas key={mode} slug={slug} name={name} mode={mode} />
-          <p className="mt-2 px-2 pb-1 text-sm text-[#666] md:mt-3 md:px-0 md:pb-0">
-            {mode === 'mobile'
-              ? 'Scroll up and down to review the mobile layout.'
-              : 'Scroll up and down to review the design.'}
-          </p>
         </div>
       </div>
     </div>
