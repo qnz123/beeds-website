@@ -2173,8 +2173,9 @@ textarea.blank:focus {
 @media (pointer: coarse) {
   .sc-showcase .ba-range { pointer-events: none; }
   /* No tilt on touch from hovering or dragging: the -15deg lean answers a cursor, and a finger
-     never hovers. The toggle's own tilt is a separate class, so it is not caught by this. */
-  .sc-showcase .sc-frame.is-tilted { --sc-tilt: 0; }
+     never hovers. The toggle's lean must survive it though: a tap on the artwork still fires
+     pointerenter and adds is-tilted, which would otherwise cancel the lean the toggle set. */
+  .sc-showcase .sc-frame.is-tilted:not(.is-pinned) { --sc-tilt: 0; }
 }
 /* the scene's own controls sit under the drag surface, so they no longer invite a click */
 .sc-showcase .steps button { pointer-events: none; }
