@@ -1956,6 +1956,14 @@ textarea.blank:focus {
   }
 }
 
+/* Explore, first section: on phones the study cards run on the same gutter as the showcase
+   frame below them. The section carried 40px of its own padding on top of the container's
+   40px, holding the cards 80px off each edge while the frame sat 22px off. */
+@media (max-width: 1000px) {
+  .study-showcase { padding-left: 0; padding-right: 0; }
+  .study-showcase .container-x { padding-left: 22px; padding-right: 22px; }
+}
+
 /* ---- Explore — Showcase (three fictional-brand studies in a sticky stage) ----
    Ported 2026-09-16 from Studio_Landing/showcase.css (Performance scene approved
    by the client that day). Everything is scoped under .sc-showcase; the scene
@@ -2307,10 +2315,9 @@ textarea.blank:focus {
 /* the scene's own controls sit under the drag surface, so they no longer invite a click */
 .sc-showcase .steps button { pointer-events: none; }
 @media (max-width: 1000px) {
-  /* Only the note scrolls. A scroll container clips anything outside it, and the bow's loops
-     swing beyond their own box as it unties, so the row above must not be one. The stage is
-     width-driven at 4/3 until the cap bites, so reserve whichever is smaller. */
-  .sc-showcase .sc-note-swap { overflow-y: auto; max-height: calc(100svh - var(--nav-h) - min(75vw, 46svh) - 130px); }
+  /* The Approach note is read, not scrolled: no inner scroller anywhere in this column. The
+     row holding the coins and the bow must not be one either, since the bow's loops swing
+     beyond their own box as it unties and a scroll container would clip them. */
   /* the button's bow tracks the needle's bow exactly, including the phone size */
   .sc-showcase .ba-bow, .sc-showcase .ba-bowicon { width: 36px; height: 28px; }
 }

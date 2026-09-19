@@ -396,14 +396,6 @@ function StudyCard({
           )}
         </div>
 
-        {/* Hover affordance — desktop only; touch screens have no hover and
-            taps would flash it meaninglessly */}
-        {isDesktop && (
-          <span className="pointer-events-none absolute bottom-0 left-0 right-0 flex items-center justify-between px-3 py-2 text-[11px] uppercase tracking-[0.12em] text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100 bg-gradient-to-t from-black/70 to-transparent">
-            <span>Hover to scroll</span>
-            <span>{granted ? 'Click to review →' : 'Full study — customers only'}</span>
-          </span>
-        )}
       </div>
 
       {/* Caption — BEEDS editorial */}
@@ -423,9 +415,6 @@ function StudyCard({
               {line}
             </span>
           ))}
-        </p>
-        <p className="mt-2 text-[11px] uppercase tracking-[0.12em] text-[#999]">
-          {copy.tag}
         </p>
       </div>
     </div>
@@ -450,7 +439,7 @@ export default function StudyShowcase({ lang = 'en' }: { lang?: Locale }) {
   const activeStudy = STUDIES.find((s) => s.slug === active) ?? null
 
   return (
-    <section className="py-14 px-10">
+    <section className="study-showcase py-14 px-10">
       <div className="container-x">
         <h2 className="eyebrow mb-3">Explore what fits</h2>
         <p className="text-sm leading-[1.6] text-[#666] max-w-[560px] mb-10">
@@ -479,11 +468,7 @@ export default function StudyShowcase({ lang = 'en' }: { lang?: Locale }) {
           ))}
         </div>
 
-        {granted ? (
-          <p className="mt-12 eyebrow text-[#666]">
-            Access granted — click any study above to open its full review.
-          </p>
-        ) : (
+        {!granted && (
           // Single gated CTA — one-click Google sign-in + email fallback.
           <DeckAccess onGranted={handleGranted} lang={lang} />
         )}
