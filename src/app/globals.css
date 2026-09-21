@@ -2329,27 +2329,21 @@ textarea.blank:focus {
 /* The phone wipe control. It used to borrow the needle's ribbon; it now draws the thing it
    actually does — a frame with the wipe line in it. No circle behind it and no label, so it
    still reads as a control rather than a fourth study, and it takes currentColor so it holds
-   on either ground.
+   on either ground. Outline only: no shaded half, so the line's travel is the whole gesture.
 
-   The switch is the same gesture the slider makes: the line travels to the middle of the frame
-   and the half it leaves behind darkens, which is the "before" view being pulled across. The
-   numbers are exact rather than eyeballed. The inner area runs x 6..40, so its centre is 23.
-   The shaded rect is x 6..23 (width 17) anchored at its left edge, so scaleX(.5) puts its right
-   edge at 14.5 and scaleX(1) puts it at 23. The line sits at 23 and is pushed back by 8.5 at
-   rest, landing at the same 14.5. Both therefore arrive together, on one curve. */
+   The line runs to the middle of the frame, which is the same move the slider makes. The
+   numbers are exact rather than eyeballed. The inner area runs x 6..40, so its centre is 23;
+   the line sits at 23 and is pushed back by 8.5 at rest, landing at 14.5. */
 .sc-showcase .ba-coin { display: block; width: auto; padding: 0; border: 0; background: none; cursor: pointer; color: #111; }
 .sc-showcase .ba-split { display: block; width: 46px; height: 36px; }
-.sc-showcase .ba-split .sp-fill,
 .sc-showcase .ba-split .sp-div {
   transform-box: fill-box;
-  transition: transform .5s cubic-bezier(.83, 0, .17, 1), opacity .5s ease;
+  transform: translateX(-8.5px);
+  transition: transform .5s cubic-bezier(.83, 0, .17, 1);
 }
-.sc-showcase .ba-split .sp-fill { transform-origin: 0% 50%; transform: scaleX(.5); opacity: .16; }
-.sc-showcase .ba-split .sp-div { transform: translateX(-8.5px); }
-.sc-showcase .ba-coin[aria-checked="true"] .sp-fill { transform: scaleX(1); opacity: .42; }
 .sc-showcase .ba-coin[aria-checked="true"] .sp-div { transform: translateX(0); }
 @media (prefers-reduced-motion: reduce) {
-  .sc-showcase .ba-split .sp-fill, .sc-showcase .ba-split .sp-div { transition: none; }
+  .sc-showcase .ba-split .sp-div { transition: none; }
 }
 .sc-showcase .ba-coin:focus-visible { outline: 2px solid #000; outline-offset: 4px; }
 .sc-showcase .ba-toggle:focus-visible { outline: 2px solid #000; outline-offset: 4px; }
