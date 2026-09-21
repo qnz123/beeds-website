@@ -1452,7 +1452,17 @@ figure[data-animate='visible'] .impact-lift-label {
   line-height: 21px;
   text-decoration: none;
   white-space: nowrap;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  /* Every property the hover changes is listed. It used to carry only
+     background-color and transform, so the border, label and inner highlight
+     snapped to their hover values while the fill was still easing — a solid
+     blue ring around a pale button for 200ms, which read as a blink and as an
+     edge out of register with the fill. */
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
 .hero-btn-ic {
@@ -1489,12 +1499,11 @@ figure[data-animate='visible'] .impact-lift-label {
   color: #666;
   border-color: rgba(0, 0, 0, 0.12);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
 }
 
 .hero-btn-connect .hero-btn-ic {
   color: #f52789;
+  transition: color 0.2s ease;
 }
 
 /* Hover renders this button exactly as the primary next to it (client
@@ -1510,7 +1519,7 @@ figure[data-animate='visible'] .impact-lift-label {
   background: #1685f8;
   color: #fff;
   border-color: #1685f8;
-  box-shadow: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0);
 }
 
 .hero-btn-connect:hover .hero-btn-ic {
