@@ -2339,13 +2339,14 @@ textarea.blank:focus {
    on either ground. Outline only: no shaded half, so the line's travel is the whole gesture.
 
    The line runs to the middle of the frame, which is the same move the slider makes. The
-   numbers are exact rather than eyeballed. The inner area runs x 6..40, so its centre is 23;
-   the line sits at 23 and is pushed back by 8.5 at rest, landing at 14.5. */
+   numbers are exact rather than eyeballed. The inner area runs x 6..86, so its centre is 46;
+   the line sits at 46 and is pushed back by 20 at rest, landing at 26 — a quarter of the way
+   in, which is where it sat before the frame was lengthened. */
 .sc-showcase .ba-coin { display: block; width: auto; padding: 0; border: 0; background: none; cursor: pointer; color: #111; }
-.sc-showcase .ba-split { display: block; width: 46px; height: 36px; }
+.sc-showcase .ba-split { display: block; width: 92px; height: 36px; }
 .sc-showcase .ba-split .sp-div {
   transform-box: fill-box;
-  transform: translateX(-8.5px);
+  transform: translateX(-20px);
   transition: transform .5s cubic-bezier(.83, 0, .17, 1);
 }
 .sc-showcase .ba-coin[aria-checked="true"] .sp-div { transform: translateX(0); }
@@ -2370,7 +2371,7 @@ textarea.blank:focus {
   /* the needle's ribbon shrinks with the frame; the control keeps its own size */
   .sc-showcase .ba-bow { width: 36px; height: 28px; }
   /* a third smaller again on phones — it is a control, not a fourth study */
-  .sc-showcase .ba-split { width: 25px; height: 20px; }
+  .sc-showcase .ba-split { width: 51px; height: 20px; }
 }
 /* QA pin (?at=): stage shown static at a progress, page chrome untouched. */
 .sc-showcase.debug-at .sc-track { height: auto; }
