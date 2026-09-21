@@ -631,13 +631,21 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
                    stage stays a picture and nothing has to be dragged across the artwork. */}
               <div className="ba-mobile">
                 <button type="button" className="ba-coin" role="switch" aria-checked="false" aria-label={copy.wipe}>
-                  {/* the needle's own bow, same shapes, in red so it reads as a control */}
-                  <svg className="ba-bowicon" viewBox="0 0 46 36" aria-hidden="true" fill="#d7261f" stroke="#111" strokeWidth="1" strokeLinejoin="round" strokeLinecap="round">
-                    <g className="bw-tl"><path d="M19.6 20.2 13.2 33.6l4.2-2.1 2.8 3.4 3.2-14.7z" /><path className="ink" fill="none" strokeWidth=".8" d="M18.2 23.4 15.6 30.2" /></g>
-                    <g className="bw-tr"><path d="M26.4 20.2 32.8 33.6l-4.2-2.1-2.8 3.4-3.2-14.7z" /><path className="ink" fill="none" strokeWidth=".8" d="M27.8 23.4l2.6 6.8" /></g>
-                    <g className="bw-l"><path d="M20.5 16.5C17 9.5 8 5.5 3.6 9.2c-3.4 2.8-1.2 8.6 4.2 11.2 4.6 2.2 9.6 1.3 12.7-3.9z" /><path className="ink" fill="none" strokeWidth=".8" d="M18.4 15.2C14.6 10.6 8.8 9.4 6 11.6M17.6 18.2c-3.4 2.4-7.6 2.6-10.6.6" /></g>
-                    <g className="bw-r"><path d="M25.5 16.5c3.5-7 12.5-11 16.9-7.3 3.4 2.8 1.2 8.6-4.2 11.2-4.6 2.2-9.6 1.3-12.7-3.9z" /><path className="ink" fill="none" strokeWidth=".8" d="M27.6 15.2c3.8-4.6 9.6-5.8 12.4-3.6M28.4 18.2c3.4 2.4 7.6 2.6 10.6.6" /></g>
-                    <g className="bw-k"><rect x="19" y="12.6" width="8" height="8.4" rx="2.4" /><path className="ink" fill="none" strokeWidth=".8" d="M21.6 13.6v6.4M24.4 13.6v6.4" /></g>
+                  {/* A frame with the wipe line in it: the control now shows what it does
+                      rather than borrowing the needle's ribbon. Geometry is exact — the inner
+                      area runs x 6..40, so its centre is 23, and both the line and the right
+                      edge of the shaded half land there when the switch is on. */}
+                  <svg className="ba-split" viewBox="0 0 46 36" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2">
+                    <defs>
+                      <clipPath id="sc-split-clip">
+                        <rect x="6" y="8" width="34" height="20" rx="2.5" />
+                      </clipPath>
+                    </defs>
+                    <g clipPath="url(#sc-split-clip)">
+                      <rect className="sp-fill" x="6" y="8" width="17" height="20" fill="currentColor" stroke="none" />
+                    </g>
+                    <rect className="sp-frame" x="5" y="7" width="36" height="22" rx="3.5" />
+                    <path className="sp-div" d="M23 8V28" />
                   </svg>
                 </button>
               </div>
