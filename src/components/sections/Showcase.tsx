@@ -634,23 +634,22 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
                 <p className="eyebrow">{copy.approach}</p>
                 <div className="ba-mobile">
                 <button type="button" className="ba-coin" role="switch" aria-checked="false" aria-label={copy.wipe}>
-                  {/* A comparison bar: the left half of the box is solid, always, and the
-                      wipe line travels across it. The line is cut in the page ground rather
-                      than drawn in ink, because ink on the solid half would be invisible.
-                      Inner area x 6..86; the solid half is 6..46 and the line rests far left
-                      at 14, running to 44 — just inside the half's edge, where it still
-                      reads, rather than merging with the boundary at 46. */}
-                  <svg className="ba-split" viewBox="0 0 92 36" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  {/* A comparison bar, no outline: two halves in one rounded shape — ink
+                      on the left, the study coins' own grey on the right — with the wipe
+                      line cut through the ink in the page ground. The box spans x 5..87, so
+                      the halves meet at 46; the line rests hard left at 14 and runs to 44,
+                      just inside the ink's edge where it still reads. */}
+                  <svg className="ba-split" viewBox="0 0 92 36" aria-hidden="true" strokeWidth="1.5">
                     <defs>
                       <clipPath id="sc-split-clip">
-                        <rect x="6" y="8" width="80" height="20" rx="2.75" />
+                        <rect x="5" y="7" width="82" height="22" rx="3.5" />
                       </clipPath>
                     </defs>
                     <g clipPath="url(#sc-split-clip)">
-                      <rect className="sp-fill" x="6" y="8" width="40" height="20" fill="currentColor" stroke="none" />
-                      <path className="sp-div" d="M44 11V25" />
+                      <rect className="sp-rest" x="46" y="7" width="41" height="22" />
+                      <rect className="sp-fill" x="5" y="7" width="41" height="22" />
+                      <path className="sp-div" d="M44 11V25" fill="none" />
                     </g>
-                    <rect className="sp-frame" x="5" y="7" width="82" height="22" rx="3.5" />
                   </svg>
                 </button>
                 </div>
