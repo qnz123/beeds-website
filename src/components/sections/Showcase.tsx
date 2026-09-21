@@ -120,10 +120,11 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
     const notes = $('.sc-notes');
     const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 
-    // Phones show each study as a still frame: no scroll-driven scene, the page simply scrolls
-    // past it and the study buttons choose which one is shown.
-    const stillQ = matchMedia('(max-width: 1000px)');
-    let paused = reduce.matches || stillQ.matches;
+    // Phones scrub with the scroll exactly as the desktop does (client direction 2026-09-21):
+    // the stage pins and the page carries the visitor through Shop, Booking and Service. It
+    // used to freeze below 1000px and let the study buttons pick a still frame; only a
+    // reduced-motion preference stills it now.
+    let paused = reduce.matches;
     let staticChapter = 0;
     let frame = 0;
     let lastChapter = -1;
@@ -466,11 +467,10 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
       root.classList.toggle('motion-paused', paused);
       schedule();
     }
-    const onReduce = () => { paused = reduce.matches || stillQ.matches; updateMotion(); };
+    const onReduce = () => { paused = reduce.matches; updateMotion(); };
     const onResize = () => { navHeight(); schedule(); };
     const onScroll = () => { schedule(); ribbonScroll(); };
     reduce.addEventListener('change', onReduce);
-    stillQ.addEventListener('change', onReduce);
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onResize);
     const ro = new ResizeObserver(schedule);
@@ -492,7 +492,6 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
 
     return () => {
       reduce.removeEventListener('change', onReduce);
-      stillQ.removeEventListener('change', onReduce);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
       window.removeEventListener('pointerup', onSliderUp);
