@@ -630,15 +630,23 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
                    stage stays a picture and nothing has to be dragged across the artwork. */}
               <div className="ba-mobile">
                 <button type="button" className="ba-coin" role="switch" aria-checked="false" aria-label={copy.wipe}>
-                  {/* A frame with the wipe line in it: the control shows what it does
-                      rather than borrowing the needle's ribbon. Outline only — no fill — so
-                      the line travelling to the centre is the whole of the gesture. Twice as
-                      long as it is tall twice over, which reads as a comparison bar rather
-                      than a window. Inner area x 6..86, so the centre is 46; the line rests a
-                      quarter of the way in at 26 and is released to the middle. */}
+                  {/* A comparison bar: the left half of the box is solid, always, and the
+                      wipe line travels across it. The line is cut in the page ground rather
+                      than drawn in ink, because ink on the solid half would be invisible.
+                      Inner area x 6..86; the solid half is 6..46 and the line rests far left
+                      at 14, running to 44 — just inside the half's edge, where it still
+                      reads, rather than merging with the boundary at 46. */}
                   <svg className="ba-split" viewBox="0 0 92 36" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <defs>
+                      <clipPath id="sc-split-clip">
+                        <rect x="6" y="8" width="80" height="20" rx="2.75" />
+                      </clipPath>
+                    </defs>
+                    <g clipPath="url(#sc-split-clip)">
+                      <rect className="sp-fill" x="6" y="8" width="40" height="20" fill="currentColor" stroke="none" />
+                      <path className="sp-div" d="M44 11V25" />
+                    </g>
                     <rect className="sp-frame" x="5" y="7" width="82" height="22" rx="3.5" />
-                    <path className="sp-div" d="M46 11V25" />
                   </svg>
                 </button>
               </div>
