@@ -2350,6 +2350,9 @@ textarea.blank:focus {
    in the page ground, so it reads as a cut through the solid half; ink would vanish into it. */
 .sc-showcase .ba-coin { display: block; width: auto; padding: 0; border: 0; background: none; cursor: pointer; color: #111; }
 .sc-showcase .ba-split { display: block; width: 92px; height: 36px; }
+/* The frame takes the same muted grey as the Approach label it now sits beside — the token,
+   not a copy of its value, so the two can never drift. The solid half keeps the ink. */
+.sc-showcase .ba-split .sp-frame { stroke: var(--muted); }
 .sc-showcase .ba-split .sp-div {
   stroke: #f5f5f5;
   transform-box: fill-box;
