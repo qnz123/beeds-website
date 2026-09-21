@@ -2195,7 +2195,12 @@ textarea.blank:focus {
 .sc-showcase .sc-note-index { color: var(--muted); margin-bottom: 14px; }
 .sc-showcase .sc-note-title { font-size: clamp(28px, 2.6vw, 40px); line-height: 1.1; letter-spacing: -.01em; margin-bottom: 30px; }
 .sc-showcase .sc-note-block { border-top: 1px solid #000; padding: 16px 0 22px; }
-.sc-showcase .sc-note-block .eyebrow { color: var(--muted); margin-bottom: 10px; }
+/* The Approach label and, on phones, the wipe control share one line. The label's old
+   bottom margin moves onto the row, so the control centres on the label rather than being
+   pushed down by it. On the desktop the control is display:none and the row is just the
+   label, exactly as it read before. */
+.sc-showcase .sc-approach-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 10px; }
+.sc-showcase .sc-approach-row .eyebrow { color: var(--muted); margin: 0; }
 .sc-showcase .sc-note-copy { font-size: 15px; line-height: 1.65; }
 .sc-showcase .sc-note-motion { border-top: 1px solid #000; padding-top: 14px; font-size: 12px; line-height: 1.7; color: var(--muted); letter-spacing: .02em; }
 .sc-showcase .motion-paused .scroll-cue { display: none; }
@@ -2215,7 +2220,8 @@ textarea.blank:focus {
   .sc-showcase .sc-note-index { margin-bottom: 6px; }
   .sc-showcase .sc-note-title { font-size: 22px; margin-bottom: 10px; }
   .sc-showcase .sc-note-block { padding: 8px 0 10px; }
-  .sc-showcase .sc-note-block .eyebrow { margin-bottom: 4px; font-size: 10px; }
+  .sc-showcase .sc-approach-row { margin-bottom: 4px; }
+  .sc-showcase .sc-approach-row .eyebrow { font-size: 10px; }
   .sc-showcase .sc-note-copy { font-size: 12.5px; line-height: 1.45; }
   .sc-showcase .sc-note-motion { display: none; }
   .sc-showcase .s-eyebrow { font-size: 1.7cqw; }

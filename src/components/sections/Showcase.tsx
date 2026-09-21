@@ -626,9 +626,13 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
                   <span className="sc-coin-lbl">Service</span>
                 </button>
               </nav>
-              {/* Phones drive the needle from here rather than from inside the frame, so the
-                   stage stays a picture and nothing has to be dragged across the artwork. */}
-              <div className="ba-mobile">
+              </div>
+              {/* The Approach label is static, so it sits outside the swap: it no longer
+                  fades on every chapter change, and on phones it shares its line with the
+                  wipe control, which must not fade either. */}
+              <div className="sc-approach-row">
+                <p className="eyebrow">{copy.approach}</p>
+                <div className="ba-mobile">
                 <button type="button" className="ba-coin" role="switch" aria-checked="false" aria-label={copy.wipe}>
                   {/* A comparison bar: the left half of the box is solid, always, and the
                       wipe line travels across it. The line is cut in the page ground rather
@@ -649,11 +653,10 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
                     <rect className="sp-frame" x="5" y="7" width="82" height="22" rx="3.5" />
                   </svg>
                 </button>
-              </div>
+                </div>
               </div>
               <div className="sc-note-swap">
                 <div className="sc-note-block">
-                  <p className="eyebrow">{copy.approach}</p>
                   <p className="sc-note-copy" data-note></p>
                 </div>
                 <p className="sc-note-motion" data-motion></p>
