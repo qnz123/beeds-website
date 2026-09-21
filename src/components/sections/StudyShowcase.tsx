@@ -229,12 +229,14 @@ function StudyCard({
     if (!win || !doc) return
     const max = Math.max(0, doc.documentElement.scrollHeight - win.innerHeight)
     if (max <= 0) return
-    // Mobile scrolls slower — the narrow vertical frame reads faster, so ~240px/s
-    // vs ~520px/s on desktop, with a higher cap so long mobile pages stay calm.
+    // Mobile scrolls slower — the narrow vertical frame reads faster, so ~120px/s
+    // vs ~520px/s on desktop. The floor and the cap double alongside the rate, or
+    // a page long enough to hit the cap would not actually slow down at all.
     const slow = mobileHero || cardMode === 'mobile'
-    const pxPerSec = slow ? 240 : 520
-    const cap = slow ? 34 : 18
-    const duration = Math.min(cap, Math.max(6, max / pxPerSec))
+    const pxPerSec = slow ? 120 : 520
+    const cap = slow ? 68 : 18
+    const floor = slow ? 12 : 6
+    const duration = Math.min(cap, Math.max(floor, max / pxPerSec))
     if (win.__lenis) {
       win.__lenis.scrollTo(max, { duration, easing: (t: number) => t })
     } else {
