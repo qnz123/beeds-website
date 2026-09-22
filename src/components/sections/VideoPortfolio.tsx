@@ -171,6 +171,7 @@ type VimeoPlayerLike = {
   on: (event: string, cb: (data: { seconds: number }) => void) => void
   off: (event: string) => void
   setCurrentTime: (s: number) => Promise<number>
+  play: () => Promise<void>
 }
 
 declare global {
@@ -245,22 +246,53 @@ function FeaturedShowcase({
     let player: VimeoPlayerLike | null = null
     let cancelled = false
 
+    // Phones stall this loop where desktops do not: iOS suspends a muted
+    // background film when the tab or the view moves away, and a seek there
+    // can land paused rather than playing. The film then sat on a black frame,
+    // because the poster had already faded out and the cover's own ground is
+    // black. Two guards: ask for playback again whenever it stops, and bring
+    // the still back if it does not resume — so a stall ends on the artwork,
+    // never on black.
+    let recover: number | undefined
+    const restart = () => {
+      player
+        ?.setCurrentTime(0)
+        .then(() => player?.play())
+        .catch(() => {})
+    }
+    const alive = () => {
+      window.clearTimeout(recover)
+      if (!cancelled) setPlaying(true)
+    }
+    const stalled = () => {
+      restart()
+      window.clearTimeout(recover)
+      // a successful restart fires play/timeupdate and cancels this, so the
+      // poster only returns on a stall the player could not recover from
+      recover = window.setTimeout(() => {
+        if (!cancelled) setPlaying(false)
+      }, 600)
+    }
+
     loadVimeoApi().then((vimeo) => {
       if (cancelled || !vimeo || !frameRef.current) return
       player = new vimeo.Player(frameRef.current)
-      player.on('play', () => setPlaying(true))
+      player.on('play', alive)
       player.on('timeupdate', (data) => {
-        if (!cancelled) setPlaying(true)
-        if (data.seconds >= SHOWCASE_LOOP_SECONDS) {
-          player?.setCurrentTime(0).catch(() => {})
-        }
+        alive()
+        if (data.seconds >= SHOWCASE_LOOP_SECONDS) restart()
       })
+      player.on('ended', stalled)
+      player.on('pause', stalled)
     })
 
     return () => {
       cancelled = true
+      window.clearTimeout(recover)
       player?.off('play')
       player?.off('timeupdate')
+      player?.off('ended')
+      player?.off('pause')
     }
   }, [mountPlayer])
 
