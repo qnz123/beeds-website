@@ -310,7 +310,7 @@ function StudyCard({
   return (
     <div ref={rootRef} className="flex flex-col">
       <div
-        className={`group relative block overflow-hidden border border-black bg-white transition-[aspect-ratio] duration-[1400ms] ease-[cubic-bezier(0.83,0,0.17,1)] motion-reduce:transition-none${
+        className={`group relative block overflow-hidden bg-white transition-[aspect-ratio] duration-[1400ms] ease-[cubic-bezier(0.83,0,0.17,1)] motion-reduce:transition-none${
           granted
             ? ' cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black'
             : ''

@@ -2049,7 +2049,7 @@ textarea.blank:focus {
   aspect-ratio: 16 / 10;
   max-height: calc(100svh - var(--nav-h) - 48px);
   width: 100%;
-  border: 1px solid #000;
+  /* no outside rule (client direction 2026-09-22): the artwork meets the page directly */
   background: #efe9df;
   overflow: hidden;
   isolation: isolate;
