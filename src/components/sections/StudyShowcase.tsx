@@ -63,6 +63,8 @@ function StudyCard({
     mobile: null,
   })
   const rafRef = useRef<number | null>(null)
+  // The page-glide loop, so a new device toggle can cancel the previous one
+  const glideRef = useRef<number | null>(null)
 
   const [dims, setDims] = useState({ scale: 1, h: BASE_H })
   const [inView, setInView] = useState(false)
@@ -83,6 +85,7 @@ function StudyCard({
       window.scrollTo(0, targetY)
       return
     }
+
     const startY = window.scrollY
     const delta = targetY - startY
     if (Math.abs(delta) < 2) return
@@ -95,10 +98,16 @@ function StudyCard({
       t < 0.5 ? 16 * t * t * t * t * t : 1 - Math.pow(-2 * t + 2, 5) / 2
     const step = (now: number) => {
       const p = Math.min(1, (now - t0) / dur)
-      window.scrollTo(0, startY + delta * ease(p))
-      if (p < 1) requestAnimationFrame(step)
+      // 'instant' matters: html { scroll-behavior: smooth } would otherwise
+      // turn each of these ~85 per-frame calls into its own smooth scroll
+      // toward a target that has already moved, so the page lagged behind the
+      // frame morph by up to 150px and then caught up in a jump at the end.
+      window.scrollTo({ top: startY + delta * ease(p), behavior: 'instant' })
+      if (p < 1) glideRef.current = requestAnimationFrame(step)
     }
-    requestAnimationFrame(step)
+    // A second toggle mid-glide must not leave two loops fighting each other.
+    if (glideRef.current !== null) cancelAnimationFrame(glideRef.current)
+    glideRef.current = requestAnimationFrame(step)
   }
 
   // On every device switch, glide the page so the sample frame AND the
@@ -428,14 +437,27 @@ export default function StudyShowcase({ lang = 'en' }: { lang?: Locale }) {
   const [granted, setGranted] = useState(false)
   const [active, setActive] = useState<string | null>(null)
 
-  // Returning visitors who already unlocked get the interactive cards straight away.
+  // Returning visitors who already unlocked get the interactive cards straight
+  // away. Both accesses are guarded: with cookies blocked for the site the
+  // localStorage getter itself throws a SecurityError, and an unguarded throw
+  // in this effect replaced the whole route with Next's "Application error"
+  // screen — so blocking cookies took /explore down entirely.
   useEffect(() => {
-    if (window.localStorage.getItem('deckAccess') === '1') setGranted(true)
+    try {
+      if (window.localStorage.getItem('deckAccess') === '1') setGranted(true)
+    } catch {
+      /* storage denied — the visitor simply unlocks again */
+    }
   }, [])
 
   const handleGranted = () => {
-    window.localStorage.setItem('deckAccess', '1')
+    // Unlock first: remembering it is a convenience, not a condition.
     setGranted(true)
+    try {
+      window.localStorage.setItem('deckAccess', '1')
+    } catch {
+      /* storage denied — nothing to remember, the cards are open regardless */
+    }
   }
 
   const activeStudy = STUDIES.find((s) => s.slug === active) ?? null

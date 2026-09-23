@@ -1406,6 +1406,7 @@ figure[data-animate='visible'] .impact-lift-label {
   display: inline-block;
   width: 3px;
   height: 1em;
+  vertical-align: -0.2em;
   background: #000;
   margin-left: 4px;
   animation: blink-cursor 0.8s infinite;
@@ -1890,6 +1891,10 @@ textarea.blank:focus {
 .hero {
   position: relative;
   overflow: hidden;
+  /* Its own stacking context, so the rain layer can sit at z-index -1
+     underneath every piece of copy — headline, paragraph and buttons alike —
+     without falling behind the page background. */
+  isolation: isolate;
 }
 
 /* Hero intro paragraph — the house serif at the size and leading it had
@@ -1916,6 +1921,15 @@ textarea.blank:focus {
   position: relative;
 }
 
+/* Each line keeps its line box from the start, so the headline does not
+   grow — and the whole centred hero does not jump — when the second line
+   begins to type. The cursor is pulled down onto the descender so its
+   inline-block never grows the line either. */
+.hero-ink > div,
+.hero-rainbow > div {
+  min-height: 1.2em;
+}
+
 .hero-rainbow {
   position: absolute;
   inset: 0;
@@ -1929,7 +1943,12 @@ textarea.blank:focus {
   /* Water ripple inside the reveal circle (constant, never settles) */
   filter: url(#hero-bubble);
   opacity: 0;
-  transition: opacity 0.35s ease;
+  /* No transition on purpose. The hole in the ink (a mask) cannot fade, so
+     a fade here left the letters blank for a few frames on every hover-in —
+     and when the pointer was merely resting on the headline as the
+     typewriter finished, that read as the title blinking by itself. On the
+     way out it flashed a magnified colour circle over the ink instead. Both
+     layers now change in the same frame. */
   /* Sharp reveal window — zero softness at the circle's edge. Radius is 70px
      in local coordinates: the 1.15 lens magnification (below) scales it back
      up to ~80px on screen, matching the hole in the ink layer. */
@@ -1943,15 +1962,20 @@ textarea.blank:focus {
   transform-origin: var(--mx, 50%) var(--my, 50%);
 }
 
-/* Hover only arms after the prism pass has finished (.reveal-ready, Hero.tsx) */
-.hero-title.reveal-ready:hover .hero-rainbow {
+/* Hover arms only once the prism pass has finished (.reveal-ready) AND a real
+   pointer event has placed the lens (.lens, set on the first move or enter).
+   :hover alone is not enough: it can be true with no pointer event at all —
+   the pointer was resting there before hydration, or the headline grew under
+   it — and the reveal would then open at the middle of the box instead of
+   under the pointer, lighting letters nobody pointed at. */
+.hero-title.reveal-ready.lens:hover .hero-rainbow {
   opacity: 1;
 }
 
 /* While hovering, punch the same circle OUT of the black ink layer — the
    rippling neon is then the only text inside the circle (otherwise the water
    displacement shifts the color off the ink and both show as doubles). */
-.hero-title.reveal-ready:hover .hero-ink {
+.hero-title.reveal-ready.lens:hover .hero-ink {
   -webkit-mask-image: radial-gradient(circle 80px at var(--mx, 50%) var(--my, 50%),
     transparent 99%, #000 100%);
   mask-image: radial-gradient(circle 80px at var(--mx, 50%) var(--my, 50%),
@@ -1960,7 +1984,7 @@ textarea.blank:focus {
 
 /* ================================================================
    Hero rain (Hero.tsx, 2026-09-23)
-   Desktop only. The typewriter finishes, then sixteen drops fall
+   Desktop only. The typewriter finishes, then seventeen drops fall
    across the hero over about seven seconds. The last of them is wider
    than the rest and rises through the headline: its band lights the
    water hidden under the letters as it passes, then closes.
@@ -1974,13 +1998,16 @@ textarea.blank:focus {
    weight and opacity instead.
    ================================================================ */
 
-/* Behind the copy: the rain is background, it never touches the words. */
+/* Underneath all of the copy. The hero isolates its stacking, so -1 here
+   sits above the hero's own background but below every in-flow box —
+   headline, paragraph and buttons. (At z-index 0 the rings painted over the
+   paragraph and the pills, since positioned boxes paint after in-flow ones.) */
 .hero-fx {
   position: absolute;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
-  z-index: 0;
+  z-index: -1;
 }
 
 /* A drop spans the hero so a ring's % size resolves against the hero, not a
@@ -2030,8 +2057,9 @@ textarea.blank:focus {
    it — both driven by the same two registered lengths on the ring's own
    clock, so the colour is always exactly where the circle is.
 
-   The class is armed only while the ripple is actually crossing, never
-   ahead of it; :not(:hover) so the pointer's own reveal still wins. */
+   The class is armed from the ring's own animationstart and dropped at its
+   animationend, so the band and the ring share one clock; :not(:hover) so
+   the pointer's own reveal still wins. */
 @property --wr { syntax: '<length>'; inherits: true; initial-value: 0px; }
 @property --wb { syntax: '<length>'; inherits: true; initial-value: 0px; }
 
@@ -2051,10 +2079,6 @@ textarea.blank:focus {
 
 .hero-title.wipe:not(:hover) .hero-rainbow {
   opacity: 1;
-  /* no fade: the band alone decides what shows. Transitioning opacity here
-     let the layer ramp up while its mask was still empty, which read as the
-     whole headline blinking the moment the typewriter finished. */
-  transition: none;
   transform: none;
   -webkit-mask-image: radial-gradient(circle at var(--wcx) var(--wcy),
     transparent calc(var(--wr) - var(--wb) * 3.0),
@@ -2103,6 +2127,8 @@ textarea.blank:focus {
 
 @media (prefers-reduced-motion: reduce) {
   .hero-fx { display: none; }
+  .typewriter-cursor { animation: none; }
+  .typewriter-cursor.blinking-out { opacity: 0; }
   .hero-title.wipe { animation: none; }
   .hero-title.wipe:not(:hover) .hero-rainbow { opacity: 0; }
   .hero-title.wipe:not(:hover) .hero-ink { -webkit-mask-image: none; mask-image: none; }

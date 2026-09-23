@@ -10,7 +10,9 @@ import { getDictionary } from '@/i18n/dictionaries'
 // Defaults keep the existing English pages working unchanged.
 export default function Navigation({
   lang = 'en',
-  switchHref = '/ja',
+  // Trailing slash on purpose: next.config sets trailingSlash, so '/ja' would
+  // cost every visitor who uses the toggle a 308 hop before the page loads.
+  switchHref = '/ja/',
 }: {
   lang?: Locale
   switchHref?: string
@@ -54,9 +56,18 @@ export default function Navigation({
     document.body.style.overflow = 'hidden'
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setIsOpen(false) }
     document.addEventListener('keydown', onKey)
+    // The sheet is hidden by a `md:hidden` utility, so growing the viewport
+    // past the breakpoint used to take it off screen while this lock stayed
+    // on — a scroll-locked page with no visible way to close it. Close it
+    // with the breakpoint instead.
+    const wide = window.matchMedia('(min-width: 768px)')
+    const closeIfWide = () => { if (wide.matches) setIsOpen(false) }
+    closeIfWide()
+    wide.addEventListener('change', closeIfWide)
     return () => {
       document.body.style.overflow = prev
       document.removeEventListener('keydown', onKey)
+      wide.removeEventListener('change', closeIfWide)
     }
   }, [isOpen])
 

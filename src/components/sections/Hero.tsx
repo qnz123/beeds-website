@@ -6,6 +6,24 @@ import { getDictionary } from '@/i18n/dictionaries'
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
+// Resolve on the caret's next blink boundary, where its opacity is 1, so the
+// fade-out can take over without a jump. Falls back on a timer for anyone
+// whose caret does not blink at all (reduced motion) or if the span is gone.
+const nextBlinkBoundary = (el: HTMLElement | null) =>
+  new Promise<void>((resolve) => {
+    if (!el) return resolve()
+    let done = false
+    const finish = () => {
+      if (done) return
+      done = true
+      clearTimeout(timer)
+      el.removeEventListener('animationiteration', finish)
+      resolve()
+    }
+    const timer = setTimeout(finish, 900)
+    el.addEventListener('animationiteration', finish)
+  })
+
 // In-memory flag (resets on full page load): the hero animates on every fresh
 // visit or reload, but sits static when the visitor navigates back to the
 // homepage from another page of the site (client-side navigation keeps the
@@ -20,19 +38,20 @@ function charDelay() {
   return Math.random() * 30 + 40 // moderate
 }
 
-// ---- Hero rain (ported from the Studio_Landing study, 2026-09-23) ----
-// Sixteen drops fall once the typewriter has finished, purely as background:
-// the rings sit behind the copy and never touch it. The last drop is the
-// exception — it is wider than the rest and its band carries the water
-// hidden under the headline across the letters as it grows past them, then
-// closes. Desktop only: that reveal needs .hero-rainbow, which only renders
-// there.
-// The closing ripple — the last drop of the rain, wider than the rest, and
-// the one the headline mask follows as it rises through the letters. Centred
-// off to the right so its band crosses the title from that side.
+// ---- Hero rain ----
+// Seventeen drops fall once the typewriter has finished, purely as
+// background: the rings sit under every piece of copy and never touch it.
+// The last drop is the exception — it is wider than the rest and its band
+// carries the water hidden under the headline across the letters as it grows
+// past them, then closes. Desktop only: that reveal needs .hero-rainbow,
+// which only renders there.
+//
+// The closing ripple, centred off to the right so its band crosses the title
+// from that side. Its timing lives here once, as CSS: the headline's mask is
+// armed and disarmed by this very ring's own animation events, so the two can
+// never drift — including in a background tab, where timers are throttled and
+// CSS animations are not.
 const CLOSER = { x: 0.72, y: 0.5, d: 160, t: '4.8s', delay: '7s' }
-const CLOSER_DELAY = 7000 // ms: when it lands, matching CLOSER.delay
-const CLOSER_LIFE = 4800 // ms: how long it takes to grow out, matching CLOSER.t
 
 type Ring = { c: string; s: Record<string, string> }
 const DROPS: { x: string; y: string; rings: Ring[] }[] = [
@@ -109,7 +128,6 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
 
   const [typed, setTyped] = useState<string[]>(['', ''])
   const [activeLine, setActiveLine] = useState(0)
-  const [cursorVisible, setCursorVisible] = useState(true)
   const [cursorBlinkOut, setCursorBlinkOut] = useState(false)
   // The neon hover reveal arms once the typewriter has finished
   const [revealReady, setRevealReady] = useState(false)
@@ -119,9 +137,16 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
   // The rain, and the two ways it touches the headline
   const [raining, setRaining] = useState(false)
   const [wiping, setWiping] = useState(false)
-  const cancelled = useRef(false)
+  // Set by the first real pointer event on the headline. Until then the lens
+  // has no position, so the reveal stays shut even if :hover is already true.
+  const [lens, setLens] = useState(false)
+  // A per-run token, not a shared flag: cleanup bumps it, so a run still
+  // sleeping inside the typewriter can never be revived by the next effect.
+  const runId = useRef(0)
   const titleRef = useRef<HTMLHeadingElement>(null)
   const heroRef = useRef<HTMLElement>(null)
+  const closerRef = useRef<HTMLElement>(null)
+  const cursorRef = useRef<HTMLSpanElement>(null)
   // The typewriter effect closes over isDesktop, so read it through a ref
   const desktopRef = useRef(false)
 
@@ -157,17 +182,21 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
     setStripes(`linear-gradient(90deg, ${stops.join(', ')})`)
   }, [])
 
-  // Feed the cursor position to the rainbow reveal mask (see .hero-rainbow)
+  // Feed the pointer position to the rainbow reveal mask (see .hero-rainbow).
+  // Until this runs the headline carries no .lens class, so the reveal stays
+  // shut: :hover can be true with no pointer event at all.
   const handleTitleMove = (e: React.MouseEvent) => {
     const el = titleRef.current
     if (!el) return
     const r = el.getBoundingClientRect()
     el.style.setProperty('--mx', `${e.clientX - r.left}px`)
     el.style.setProperty('--my', `${e.clientY - r.top}px`)
+    if (!lens) setLens(true)
   }
 
   useEffect(() => {
-    cancelled.current = false
+    const myRun = ++runId.current
+    const alive = () => runId.current === myRun
 
     if (playedThisPageLoad) {
       setTyped([...LINES])
@@ -186,7 +215,7 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
 
         for (const word of words) {
           for (const char of word) {
-            if (cancelled.current) return
+            if (!alive()) return
             full += char
             setTyped((prev) => {
               const next = [...prev]
@@ -207,13 +236,15 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
         if (i < LINES.length - 1) await sleep(300)
       }
 
-      // Blink the final cursor a couple times, then fade out
-      for (let b = 0; b < 4; b++) {
-        if (cancelled.current) return
-        setCursorVisible((v) => !v)
-        await sleep(300)
-      }
-      setCursorVisible(true)
+      // Hold the blinking cursor a beat, then fade it out. The fade has to
+      // start on a blink boundary: .typewriter-cursor blinks from CSS, and a
+      // CSS animation beats an inline opacity, so swapping in blink-out at an
+      // arbitrary moment snapped the cursor from invisible to solid black
+      // before fading — a flick right as the typewriter finished.
+      await sleep(1200)
+      if (!alive()) return
+      await nextBlinkBoundary(cursorRef.current)
+      if (!alive()) return
       setCursorBlinkOut(true)
 
       setRevealReady(true)
@@ -230,25 +261,38 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
       title.style.setProperty('--wre', `${(hb.width * CLOSER.d) / 200}px`)
       title.style.setProperty('--wt', CLOSER.t)
 
+      // The headline is armed by the closing ripple itself (see the effect
+      // below), never by a timer of its own.
       setRaining(true)
-
-      // Arm the headline only while the closing ripple is actually crossing
-      // it. Arming it with the rain meant touching the title the instant the
-      // typewriter finished, which showed as a blink.
-      await sleep(CLOSER_DELAY)
-      if (cancelled.current) return
-      setWiping(true)
-      await sleep(CLOSER_LIFE + 80)
-      if (cancelled.current) return
-      setWiping(false) // hand the headline back to the pointer
     }
 
     run()
     return () => {
-      cancelled.current = true
+      runId.current++
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang])
+
+  // The closing ripple arms and disarms the headline's band on its own clock.
+  // Listening to the ring means the band is on screen for exactly as long as
+  // the circle it rides, whatever the browser does to timers in the meantime.
+  useEffect(() => {
+    const ring = closerRef.current
+    if (!raining || !ring) return
+    const on = (e: AnimationEvent) => {
+      if (e.animationName === 'hero-grow') setWiping(true)
+    }
+    const off = (e: AnimationEvent) => {
+      if (e.animationName === 'hero-grow') setWiping(false)
+    }
+    ring.addEventListener('animationstart', on)
+    ring.addEventListener('animationend', off)
+    return () => {
+      ring.removeEventListener('animationstart', on)
+      ring.removeEventListener('animationend', off)
+      setWiping(false)
+    }
+  }, [raining])
 
   return (
     <section
@@ -268,6 +312,7 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
             style={{ '--x': `${CLOSER.x * 100}%`, '--y': `${CLOSER.y * 100}%` } as React.CSSProperties}
           >
             <i
+              ref={closerRef}
               className="hero-ring hr-b"
               style={{
                 '--d': `${CLOSER.d}%`,
@@ -298,8 +343,9 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
           // reveal-ready (and with it every hover rule — including the mask
           // hole punched in the ink) only ever applies on desktop; mobile is
           // purely the typewriter.
-          className={`hero-title text-5xl leading-[1.2]${revealReady && isDesktop ? ' reveal-ready' : ''}${wiping ? ' wipe' : ''}`}
+          className={`hero-title text-5xl leading-[1.2]${revealReady && isDesktop ? ' reveal-ready' : ''}${lens ? ' lens' : ''}${wiping && isDesktop ? ' wipe' : ''}`}
           onMouseMove={isDesktop ? handleTitleMove : undefined}
+          onMouseEnter={isDesktop ? handleTitleMove : undefined}
         >
           {/* Black ink layer — while the reveal is hovered, a hole matching
               the reveal circle is masked out of it so the rippling neon
@@ -309,8 +355,8 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
               <span className="typewriter-text">{typed[0]}</span>
               {activeLine === 0 && (
                 <span
+                  ref={cursorRef}
                   className={`typewriter-cursor ${cursorBlinkOut ? 'blinking-out' : ''}`}
-                  style={{ opacity: cursorVisible ? 1 : 0 }}
                 />
               )}
             </div>
@@ -318,8 +364,8 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
               <span className="typewriter-text">{typed[1]}</span>
               {activeLine === 1 && (
                 <span
+                  ref={cursorRef}
                   className={`typewriter-cursor ${cursorBlinkOut ? 'blinking-out' : ''}`}
-                  style={{ opacity: cursorVisible ? 1 : 0 }}
                 />
               )}
             </div>
