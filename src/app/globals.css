@@ -118,6 +118,21 @@ h6 {
   background-color: rgba(245, 245, 245, 0.88);
 }
 
+/* Frosted glass, once the page has moved and only where the browser can
+   actually blur a backdrop. Without support the bar keeps the flat
+   translucent ground above: a see-through nav over unblurred content is
+   worse than a plain one. The filter is scoped to .is-scrolled rather than
+   living on .nav at blur(0), so the bar is not held on a backdrop-root layer
+   while it is simply sitting at the top of the page. With the blur carrying
+   the separation, the ground can sit lighter than it does without. */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .nav.is-scrolled {
+    background-color: rgba(245, 245, 245, 0.7);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+  }
+}
+
 .nav.is-scrolled::after {
   opacity: 1;
 }
