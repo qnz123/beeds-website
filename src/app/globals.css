@@ -115,7 +115,12 @@ h6 {
 }
 
 .nav.is-scrolled {
-  background-color: rgba(245, 245, 245, 0.88);
+  /* See-through, not solid: the page reads through the bar as it passes
+     under. The blur is what keeps the links legible at this little cover —
+     without it, type crossing underneath fights them. */
+  background-color: rgba(245, 245, 245, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 /* Frosted glass, once the page has moved and only where the browser can

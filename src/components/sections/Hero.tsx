@@ -58,8 +58,8 @@ const CLOSER = { x: 0.72, y: 0.5, d: 160, t: '4.8s', delay: '5s' }
 
 type Ring = { c: string; s: Record<string, string> }
 const DROPS: { x: string; y: string; rings: Ring[] }[] = [
-  { x: '18%', y: '22%', rings: [
-    { c: 'hr-c', s: { '--d': '14%', '--t': '2.24s', '--delay': '0.17s', '--a': '.28', '--w': '1px', '--from': '120deg' } },
+  { x: '18%', y: '4%', rings: [
+    { c: 'hr-c', s: { '--d': '26%', '--t': '2.24s', '--delay': '0.17s', '--a': '.3', '--w': '1px', '--from': '120deg' } },
   ] },
   { x: '84%', y: '58%', rings: [
     { c: 'hr-a', s: { '--d': '110%', '--t': '3.91s', '--delay': '0.86s', '--a': '.14', '--w': '3px', '--from': '30deg' } },
