@@ -31,7 +31,8 @@ function charDelay() {
 // the one the headline mask follows as it rises through the letters. Centred
 // off to the right so its band crosses the title from that side.
 const CLOSER = { x: 0.72, y: 0.5, d: 160, t: '4.8s', delay: '7s' }
-const CLOSER_END = 11900 // ms: its delay plus its life, plus a beat
+const CLOSER_DELAY = 7000 // ms: when it lands, matching CLOSER.delay
+const CLOSER_LIFE = 4800 // ms: how long it takes to grow out, matching CLOSER.t
 
 type Ring = { c: string; s: Record<string, string> }
 const DROPS: { x: string; y: string; rings: Ring[] }[] = [
@@ -228,13 +229,16 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
       title.style.setProperty('--wcy', `${hb.top + hb.height * CLOSER.y - box.top}px`)
       title.style.setProperty('--wre', `${(hb.width * CLOSER.d) / 200}px`)
       title.style.setProperty('--wt', CLOSER.t)
-      title.style.setProperty('--wd', CLOSER.delay)
 
-      // The mask waits out its own animation-delay, so it can be armed with
-      // the rain and simply ride the closing ripple when that arrives.
       setRaining(true)
+
+      // Arm the headline only while the closing ripple is actually crossing
+      // it. Arming it with the rain meant touching the title the instant the
+      // typewriter finished, which showed as a blink.
+      await sleep(CLOSER_DELAY)
+      if (cancelled.current) return
       setWiping(true)
-      await sleep(CLOSER_END)
+      await sleep(CLOSER_LIFE + 80)
       if (cancelled.current) return
       setWiping(false) // hand the headline back to the pointer
     }

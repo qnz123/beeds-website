@@ -2030,16 +2030,15 @@ textarea.blank:focus {
    it — both driven by the same two registered lengths on the ring's own
    clock, so the colour is always exactly where the circle is.
 
-   :not(:hover) because the class is armed for the whole rain while its
-   animation waits out its delay — without it the pointer's own reveal would
-   be masked away for those first several seconds. */
+   The class is armed only while the ripple is actually crossing, never
+   ahead of it; :not(:hover) so the pointer's own reveal still wins. */
 @property --wr { syntax: '<length>'; inherits: true; initial-value: 0px; }
 @property --wb { syntax: '<length>'; inherits: true; initial-value: 0px; }
 
 .hero-title.wipe {
   animation:
-    hero-wipe-r var(--wt) cubic-bezier(0.16, 0.6, 0.22, 1) var(--wd) forwards,
-    hero-wipe-b var(--wt) cubic-bezier(0.4, 0, 0.35, 1) var(--wd) forwards;
+    hero-wipe-r var(--wt) cubic-bezier(0.16, 0.6, 0.22, 1) forwards,
+    hero-wipe-b var(--wt) cubic-bezier(0.4, 0, 0.35, 1) forwards;
 }
 
 @keyframes hero-wipe-r { from { --wr: 0px; } to { --wr: var(--wre, 0px); } }
@@ -2052,6 +2051,10 @@ textarea.blank:focus {
 
 .hero-title.wipe:not(:hover) .hero-rainbow {
   opacity: 1;
+  /* no fade: the band alone decides what shows. Transitioning opacity here
+     let the layer ramp up while its mask was still empty, which read as the
+     whole headline blinking the moment the typewriter finished. */
+  transition: none;
   transform: none;
   -webkit-mask-image: radial-gradient(circle at var(--wcx) var(--wcy),
     transparent calc(var(--wr) - var(--wb) * 3.0),
