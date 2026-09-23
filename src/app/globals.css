@@ -64,7 +64,11 @@ h6 {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: #f5f5f5;
+  /* See-through at the top of the page, so the hero's rain reads straight
+     through the bar; once the page moves, a translucent ground fades in and
+     keeps the links legible over whatever is passing underneath. */
+  background-color: transparent;
+  transition: background-color 0.45s ease;
   padding: 20px 40px;
   display: flex;
   justify-content: space-between;
@@ -110,12 +114,16 @@ h6 {
   );
 }
 
+.nav.is-scrolled {
+  background-color: rgba(245, 245, 245, 0.88);
+}
+
 .nav.is-scrolled::after {
   opacity: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .nav { animation: none; }
+  .nav { animation: none; transition: none; }
   .nav::after { transition: none; }
 }
 
@@ -1915,6 +1923,14 @@ textarea.blank:focus {
 .hero {
   position: relative;
   overflow: hidden;
+  /* The hero starts at the very top of the page, behind the sticky bar, so
+     the rain covers the strip under it. Everything is offset by the bar's own
+     height (--nav-h, published by Navigation.tsx): pulled up by it, padded
+     back down by it, and made that much taller — so the copy lands exactly
+     where it did before, and only the rain gains the extra ground. */
+  margin-top: calc(-1 * var(--nav-h, 64px));
+  padding-top: calc(64px + var(--nav-h, 64px));
+  min-height: calc(100vh + var(--nav-h, 64px));
   /* Its own stacking context, so the rain layer can sit at z-index -1
      underneath every piece of copy — headline, paragraph and buttons alike —
      without falling behind the page background. */

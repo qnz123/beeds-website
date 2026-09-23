@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 
@@ -22,6 +22,7 @@ export default function Navigation({
   // the page has moved, so the nav reads as part of the hero until it starts
   // to overlap content.
   const [scrolled, setScrolled] = useState(false)
+  const navRef = useRef<HTMLElement>(null)
   const t = getDictionary(lang).nav
   const isJa = lang === 'ja'
   const home = isJa ? '/ja' : '/'
@@ -44,6 +45,18 @@ export default function Navigation({
   const rememberChoice = () => {
     document.cookie = `NEXT_LOCALE=${targetLocale}; path=/; max-age=31536000; samesite=lax`
   }
+
+  // Publish the bar's own height, so the hero can reach up underneath it and
+  // let the rain fill the strip behind a now-transparent nav.
+  useEffect(() => {
+    const publish = () => {
+      const h = navRef.current?.offsetHeight
+      if (h) document.documentElement.style.setProperty('--nav-h', `${h}px`)
+    }
+    publish()
+    window.addEventListener('resize', publish)
+    return () => window.removeEventListener('resize', publish)
+  }, [])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 4)
@@ -84,7 +97,7 @@ export default function Navigation({
 
   return (
     <>
-    <nav className={`nav sticky top-0 z-50${scrolled ? ' is-scrolled' : ''}`}>
+    <nav ref={navRef} className={`nav sticky top-0 z-50${scrolled ? ' is-scrolled' : ''}`}>
       {/* The wordmark stays in the house serif; only the link row goes sans. */}
       <div className="nav-wordmark">
         <Link href={home}>BEEDS</Link>
