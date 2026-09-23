@@ -18,9 +18,9 @@ export default function Navigation({
   switchHref?: string
 }) {
   const [isOpen, setIsOpen] = useState(false)
-  // The bar's bottom edge is absent at the top of the page and fades in once
-  // the page has moved, so the nav reads as part of the hero until it starts
-  // to overlap content.
+  // The bar's bottom edge is absent until the page has scrolled past the
+  // bar's own height, so the nav reads as part of the hero until content
+  // genuinely passes behind it.
   const [scrolled, setScrolled] = useState(false)
   const navRef = useRef<HTMLElement>(null)
   const t = getDictionary(lang).nav
@@ -59,10 +59,24 @@ export default function Navigation({
   }, [])
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 4)
+    // The edge and the frosted ground wait until the page has scrolled past
+    // the bar's own bottom. Before that the content sliding up is still the
+    // strip the bar was sitting on, and nothing has really gone behind it;
+    // from that point on it has, and the bar needs its own ground to stay
+    // legible. Height is read from the element, so it holds at any breakpoint.
+    let depth = navRef.current?.offsetHeight ?? 64
+    const onScroll = () => setScrolled(window.scrollY > depth)
+    const remeasure = () => {
+      depth = navRef.current?.offsetHeight ?? 64
+      onScroll()
+    }
     onScroll()                                    // a page restored mid-scroll starts with its edge
     window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    window.addEventListener('resize', remeasure)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', remeasure)
+    }
   }, [])
 
   // Keep the document language in sync with the page locale. The root layout
