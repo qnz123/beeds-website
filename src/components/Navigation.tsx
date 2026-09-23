@@ -59,15 +59,20 @@ export default function Navigation({
   }, [])
 
   useEffect(() => {
-    // The edge and the frosted ground wait until the page has scrolled past
-    // the bar's own bottom. Before that the content sliding up is still the
-    // strip the bar was sitting on, and nothing has really gone behind it;
-    // from that point on it has, and the bar needs its own ground to stay
-    // legible. Height is read from the element, so it holds at any breakpoint.
-    let depth = navRef.current?.offsetHeight ?? 64
+    // The edge and the frosted ground wait until the page has scrolled well
+    // past the bar's own bottom. Before that the content sliding up is still
+    // the strip the bar was sitting on, and nothing has really gone behind
+    // it; past it the page is running underneath, and the bar takes its
+    // ground to stay legible. Height is read from the element, so the
+    // distance holds at any breakpoint and is re-read on resize.
+    // Twice the bar's height, not once: at exactly its bottom the change
+    // lands the moment the first pixel slips behind, which reads as eager.
+    // A second bar-height of travel lets the page commit to moving first.
+    const depthOf = () => (navRef.current?.offsetHeight ?? 64) * 2
+    let depth = depthOf()
     const onScroll = () => setScrolled(window.scrollY > depth)
     const remeasure = () => {
-      depth = navRef.current?.offsetHeight ?? 64
+      depth = depthOf()
       onScroll()
     }
     onScroll()                                    // a page restored mid-scroll starts with its edge
