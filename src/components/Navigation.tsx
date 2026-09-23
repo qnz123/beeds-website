@@ -18,9 +18,9 @@ export default function Navigation({
   switchHref?: string
 }) {
   const [isOpen, setIsOpen] = useState(false)
-  // The bar's bottom edge is absent until the page has scrolled past the
-  // bar's own height, so the nav reads as part of the hero until content
-  // genuinely passes behind it.
+  // The bar's bottom edge is absent at the top of the page and fades in once
+  // the page has moved, so the nav reads as part of the hero until it starts
+  // to overlap content.
   const [scrolled, setScrolled] = useState(false)
   const navRef = useRef<HTMLElement>(null)
   const t = getDictionary(lang).nav
@@ -59,29 +59,13 @@ export default function Navigation({
   }, [])
 
   useEffect(() => {
-    // The edge and the frosted ground wait until the page has scrolled well
-    // past the bar's own bottom. Before that the content sliding up is still
-    // the strip the bar was sitting on, and nothing has really gone behind
-    // it; past it the page is running underneath, and the bar takes its
-    // ground to stay legible. Height is read from the element, so the
-    // distance holds at any breakpoint and is re-read on resize.
-    // Twice the bar's height, not once: at exactly its bottom the change
-    // lands the moment the first pixel slips behind, which reads as eager.
-    // A second bar-height of travel lets the page commit to moving first.
-    const depthOf = () => (navRef.current?.offsetHeight ?? 64) * 2
-    let depth = depthOf()
-    const onScroll = () => setScrolled(window.scrollY > depth)
-    const remeasure = () => {
-      depth = depthOf()
-      onScroll()
-    }
+    // The edge and the frosted ground come in as soon as the page moves,
+    // which is the behaviour this was specified with. The delayed thresholds
+    // tried on 2026-09-24 (one bar-height, then two) are gone.
+    const onScroll = () => setScrolled(window.scrollY > 4)
     onScroll()                                    // a page restored mid-scroll starts with its edge
     window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', remeasure)
-    return () => {
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', remeasure)
-    }
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   // Keep the document language in sync with the page locale. The root layout
