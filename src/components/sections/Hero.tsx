@@ -276,26 +276,6 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
           compositor. Depth reads through line weight and opacity. */}
       {isDesktop && (
         <div className="hero-fx" aria-hidden="true">
-          {/* The closing ripple, drawn with the rest so the band on the
-              headline always sits exactly on a ring the visitor can see.
-              Its animation events are what arm and disarm the reveal. */}
-          <div
-            className="hero-drop"
-            style={{ '--x': `${CLOSER.x * 100}%`, '--y': `${CLOSER.y * 100}%` } as React.CSSProperties}
-          >
-            <i
-              ref={closerRef}
-              className="hero-ring hr-b"
-              style={{
-                '--d': `${CLOSER.d}%`,
-                '--t': CLOSER.t,
-                '--delay': CLOSER.delay,
-                '--a': '.16',
-                '--w': '3px',
-                '--from': '210deg',
-              } as React.CSSProperties}
-            />
-          </div>
           {DROPS.map((d, i) => (
             <div
               key={i}
@@ -307,6 +287,32 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
               ))}
             </div>
           ))}
+        </div>
+      )}
+
+      {/* The closing ripple rides in its own layer, IN FRONT of the copy. The
+          rain belongs behind the words, but this is the ring whose band lights
+          the headline, and behind the letters it disappeared at exactly the
+          moment it mattered. Its animation events arm and disarm the reveal. */}
+      {isDesktop && (
+        <div className="hero-fx hero-fx-front" aria-hidden="true">
+          <div
+            className="hero-drop"
+            style={{ '--x': `${CLOSER.x * 100}%`, '--y': `${CLOSER.y * 100}%` } as React.CSSProperties}
+          >
+            <i
+              ref={closerRef}
+              className="hero-ring hr-b"
+              style={{
+                '--d': `${CLOSER.d}%`,
+                '--t': CLOSER.t,
+                '--delay': CLOSER.delay,
+                '--a': '.75',
+                '--w': '2px',
+                '--from': '210deg',
+              } as React.CSSProperties}
+            />
+          </div>
         </div>
       )}
       <div className="container-x w-full max-w-full">

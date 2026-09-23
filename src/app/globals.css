@@ -2012,6 +2012,11 @@ textarea.blank:focus {
   z-index: -1;
 }
 
+/* The closing ripple alone rides in front of the copy. The rain belongs behind
+   the words, but this is the ring whose band lights the headline, and behind
+   the letters it vanished at exactly the moment it mattered. */
+.hero-fx-front { z-index: 2; }
+
 /* A drop spans the hero so a ring's % size resolves against the hero, not a
    point; the drop's centre travels down to the rings as --x/--y. The
    aspect-ratio keeps them circular, and the % margins re-centre. */
