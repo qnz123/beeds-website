@@ -18,6 +18,10 @@ export default function Navigation({
   switchHref?: string
 }) {
   const [isOpen, setIsOpen] = useState(false)
+  // The bar's bottom edge is absent at the top of the page and fades in once
+  // the page has moved, so the nav reads as part of the hero until it starts
+  // to overlap content.
+  const [scrolled, setScrolled] = useState(false)
   const t = getDictionary(lang).nav
   const isJa = lang === 'ja'
   const home = isJa ? '/ja' : '/'
@@ -40,6 +44,13 @@ export default function Navigation({
   const rememberChoice = () => {
     document.cookie = `NEXT_LOCALE=${targetLocale}; path=/; max-age=31536000; samesite=lax`
   }
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 4)
+    onScroll()                                    // a page restored mid-scroll starts with its edge
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   // Keep the document language in sync with the page locale. The root layout
   // renders a single <html lang> for all routes, so on the client we correct it
@@ -73,7 +84,7 @@ export default function Navigation({
 
   return (
     <>
-    <nav className="nav sticky top-0 z-50">
+    <nav className={`nav sticky top-0 z-50${scrolled ? ' is-scrolled' : ''}`}>
       {/* The wordmark stays in the house serif; only the link row goes sans. */}
       <div className="nav-wordmark">
         <Link href={home}>BEEDS</Link>
