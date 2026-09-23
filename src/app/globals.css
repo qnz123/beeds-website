@@ -1958,6 +1958,105 @@ textarea.blank:focus {
     transparent 99%, #000 100%);
 }
 
+/* ================================================================
+   Hero rain (ported from Studio_Landing/hero-rain.html, 2026-09-23)
+   Desktop only — Hero.tsx renders the layer behind the same isDesktop
+   gate as .hero-rainbow, since the reveal needs that layer to exist.
+   Sequence: the typewriter finishes, sixteen drops fall over ~7s,
+   six of them light the water under the letters as they cross, then
+   the hover window wipes itself across the title right to left.
+   ================================================================ */
+
+/* the touch: where a ring's edge crosses the letters, the water hidden under
+   the title shows through. Each band below is one drop's own ring — same
+   centre, same clock, same easing — drawn as a mask on the title's two
+   layers, so the colour appears only along the edge as it passes. */
+@property --b1 { syntax:'<length>'; inherits:true; initial-value:0px; }
+@property --b2 { syntax:'<length>'; inherits:true; initial-value:0px; }
+@property --b3 { syntax:'<length>'; inherits:true; initial-value:0px; }
+@property --b4 { syntax:'<length>'; inherits:true; initial-value:0px; }
+@property --b5 { syntax:'<length>'; inherits:true; initial-value:0px; }
+@property --b6 { syntax:'<length>'; inherits:true; initial-value:0px; }
+@property --r1 { syntax:'<length>'; inherits:true; initial-value:0px; }
+@property --r2 { syntax:'<length>'; inherits:true; initial-value:0px; }
+@property --r3 { syntax:'<length>'; inherits:true; initial-value:0px; }
+@property --r4 { syntax:'<length>'; inherits:true; initial-value:0px; }
+@property --r5 { syntax:'<length>'; inherits:true; initial-value:0px; }
+@property --r6 { syntax:'<length>'; inherits:true; initial-value:0px; }
+.hero-title.lit { animation: hero-r1 2.24s cubic-bezier(.16,.6,.22,1) 0.17s forwards, hero-r2 3.39s cubic-bezier(.16,.6,.22,1) 1.35s forwards, hero-r3 3.91s cubic-bezier(.16,.6,.22,1) 2.67s forwards, hero-r4 3.04s cubic-bezier(.16,.6,.22,1) 3.95s forwards, hero-r5 3.91s cubic-bezier(.16,.6,.22,1) 4.74s forwards, hero-r6 3.39s cubic-bezier(.16,.6,.22,1) 5.49s forwards, hero-b1 2.24s cubic-bezier(.4,0,.35,1) 0.17s forwards, hero-b2 3.39s cubic-bezier(.4,0,.35,1) 1.35s forwards, hero-b3 3.91s cubic-bezier(.4,0,.35,1) 2.67s forwards, hero-b4 3.04s cubic-bezier(.4,0,.35,1) 3.95s forwards, hero-b5 3.91s cubic-bezier(.4,0,.35,1) 4.74s forwards, hero-b6 3.39s cubic-bezier(.4,0,.35,1) 5.49s forwards; }
+@keyframes hero-r1 { from { --r1:calc(var(--hw) * 0.00140); } to { --r1:calc(var(--hw) * 0.0700); } }
+@keyframes hero-r2 { from { --r2:calc(var(--hw) * 0.00800); } to { --r2:calc(var(--hw) * 0.4000); } }
+@keyframes hero-r3 { from { --r3:calc(var(--hw) * 0.01100); } to { --r3:calc(var(--hw) * 0.5500); } }
+@keyframes hero-r4 { from { --r4:calc(var(--hw) * 0.00600); } to { --r4:calc(var(--hw) * 0.3000); } }
+@keyframes hero-r5 { from { --r5:calc(var(--hw) * 0.01100); } to { --r5:calc(var(--hw) * 0.5500); } }
+@keyframes hero-r6 { from { --r6:calc(var(--hw) * 0.00800); } to { --r6:calc(var(--hw) * 0.4000); } }
+@keyframes hero-b1 { 0% { --b1:0px; } 22% { --b1:24px; } 62% { --b1:24px; } 100% { --b1:0px; } }
+@keyframes hero-b2 { 0% { --b2:0px; } 22% { --b2:24px; } 62% { --b2:24px; } 100% { --b2:0px; } }
+@keyframes hero-b3 { 0% { --b3:0px; } 22% { --b3:24px; } 62% { --b3:24px; } 100% { --b3:0px; } }
+@keyframes hero-b4 { 0% { --b4:0px; } 22% { --b4:24px; } 62% { --b4:24px; } 100% { --b4:0px; } }
+@keyframes hero-b5 { 0% { --b5:0px; } 22% { --b5:24px; } 62% { --b5:24px; } 100% { --b5:0px; } }
+@keyframes hero-b6 { 0% { --b6:0px; } 22% { --b6:24px; } 62% { --b6:24px; } 100% { --b6:0px; } }
+.hero-title.lit .hero-rainbow { opacity:1; transform:none;
+  -webkit-mask-image:radial-gradient(circle at var(--c1x) var(--c1y), transparent calc(var(--r1) - var(--b1) * 2.7), rgba(0,0,0,.12) calc(var(--r1) - var(--b1) * 2.0), rgba(0,0,0,.42) calc(var(--r1) - var(--b1) * 1.3), rgba(0,0,0,.8) calc(var(--r1) - var(--b1) * 0.6), #000 var(--r1), rgba(0,0,0,.8) calc(var(--r1) + var(--b1) * 0.6), rgba(0,0,0,.42) calc(var(--r1) + var(--b1) * 1.3), rgba(0,0,0,.12) calc(var(--r1) + var(--b1) * 2.0), transparent calc(var(--r1) + var(--b1) * 2.7)), radial-gradient(circle at var(--c2x) var(--c2y), transparent calc(var(--r2) - var(--b2) * 2.7), rgba(0,0,0,.12) calc(var(--r2) - var(--b2) * 2.0), rgba(0,0,0,.42) calc(var(--r2) - var(--b2) * 1.3), rgba(0,0,0,.8) calc(var(--r2) - var(--b2) * 0.6), #000 var(--r2), rgba(0,0,0,.8) calc(var(--r2) + var(--b2) * 0.6), rgba(0,0,0,.42) calc(var(--r2) + var(--b2) * 1.3), rgba(0,0,0,.12) calc(var(--r2) + var(--b2) * 2.0), transparent calc(var(--r2) + var(--b2) * 2.7)), radial-gradient(circle at var(--c3x) var(--c3y), transparent calc(var(--r3) - var(--b3) * 2.7), rgba(0,0,0,.12) calc(var(--r3) - var(--b3) * 2.0), rgba(0,0,0,.42) calc(var(--r3) - var(--b3) * 1.3), rgba(0,0,0,.8) calc(var(--r3) - var(--b3) * 0.6), #000 var(--r3), rgba(0,0,0,.8) calc(var(--r3) + var(--b3) * 0.6), rgba(0,0,0,.42) calc(var(--r3) + var(--b3) * 1.3), rgba(0,0,0,.12) calc(var(--r3) + var(--b3) * 2.0), transparent calc(var(--r3) + var(--b3) * 2.7)), radial-gradient(circle at var(--c4x) var(--c4y), transparent calc(var(--r4) - var(--b4) * 2.7), rgba(0,0,0,.12) calc(var(--r4) - var(--b4) * 2.0), rgba(0,0,0,.42) calc(var(--r4) - var(--b4) * 1.3), rgba(0,0,0,.8) calc(var(--r4) - var(--b4) * 0.6), #000 var(--r4), rgba(0,0,0,.8) calc(var(--r4) + var(--b4) * 0.6), rgba(0,0,0,.42) calc(var(--r4) + var(--b4) * 1.3), rgba(0,0,0,.12) calc(var(--r4) + var(--b4) * 2.0), transparent calc(var(--r4) + var(--b4) * 2.7)), radial-gradient(circle at var(--c5x) var(--c5y), transparent calc(var(--r5) - var(--b5) * 2.7), rgba(0,0,0,.12) calc(var(--r5) - var(--b5) * 2.0), rgba(0,0,0,.42) calc(var(--r5) - var(--b5) * 1.3), rgba(0,0,0,.8) calc(var(--r5) - var(--b5) * 0.6), #000 var(--r5), rgba(0,0,0,.8) calc(var(--r5) + var(--b5) * 0.6), rgba(0,0,0,.42) calc(var(--r5) + var(--b5) * 1.3), rgba(0,0,0,.12) calc(var(--r5) + var(--b5) * 2.0), transparent calc(var(--r5) + var(--b5) * 2.7)), radial-gradient(circle at var(--c6x) var(--c6y), transparent calc(var(--r6) - var(--b6) * 2.7), rgba(0,0,0,.12) calc(var(--r6) - var(--b6) * 2.0), rgba(0,0,0,.42) calc(var(--r6) - var(--b6) * 1.3), rgba(0,0,0,.8) calc(var(--r6) - var(--b6) * 0.6), #000 var(--r6), rgba(0,0,0,.8) calc(var(--r6) + var(--b6) * 0.6), rgba(0,0,0,.42) calc(var(--r6) + var(--b6) * 1.3), rgba(0,0,0,.12) calc(var(--r6) + var(--b6) * 2.0), transparent calc(var(--r6) + var(--b6) * 2.7));
+  mask-image:radial-gradient(circle at var(--c1x) var(--c1y), transparent calc(var(--r1) - var(--b1) * 2.7), rgba(0,0,0,.12) calc(var(--r1) - var(--b1) * 2.0), rgba(0,0,0,.42) calc(var(--r1) - var(--b1) * 1.3), rgba(0,0,0,.8) calc(var(--r1) - var(--b1) * 0.6), #000 var(--r1), rgba(0,0,0,.8) calc(var(--r1) + var(--b1) * 0.6), rgba(0,0,0,.42) calc(var(--r1) + var(--b1) * 1.3), rgba(0,0,0,.12) calc(var(--r1) + var(--b1) * 2.0), transparent calc(var(--r1) + var(--b1) * 2.7)), radial-gradient(circle at var(--c2x) var(--c2y), transparent calc(var(--r2) - var(--b2) * 2.7), rgba(0,0,0,.12) calc(var(--r2) - var(--b2) * 2.0), rgba(0,0,0,.42) calc(var(--r2) - var(--b2) * 1.3), rgba(0,0,0,.8) calc(var(--r2) - var(--b2) * 0.6), #000 var(--r2), rgba(0,0,0,.8) calc(var(--r2) + var(--b2) * 0.6), rgba(0,0,0,.42) calc(var(--r2) + var(--b2) * 1.3), rgba(0,0,0,.12) calc(var(--r2) + var(--b2) * 2.0), transparent calc(var(--r2) + var(--b2) * 2.7)), radial-gradient(circle at var(--c3x) var(--c3y), transparent calc(var(--r3) - var(--b3) * 2.7), rgba(0,0,0,.12) calc(var(--r3) - var(--b3) * 2.0), rgba(0,0,0,.42) calc(var(--r3) - var(--b3) * 1.3), rgba(0,0,0,.8) calc(var(--r3) - var(--b3) * 0.6), #000 var(--r3), rgba(0,0,0,.8) calc(var(--r3) + var(--b3) * 0.6), rgba(0,0,0,.42) calc(var(--r3) + var(--b3) * 1.3), rgba(0,0,0,.12) calc(var(--r3) + var(--b3) * 2.0), transparent calc(var(--r3) + var(--b3) * 2.7)), radial-gradient(circle at var(--c4x) var(--c4y), transparent calc(var(--r4) - var(--b4) * 2.7), rgba(0,0,0,.12) calc(var(--r4) - var(--b4) * 2.0), rgba(0,0,0,.42) calc(var(--r4) - var(--b4) * 1.3), rgba(0,0,0,.8) calc(var(--r4) - var(--b4) * 0.6), #000 var(--r4), rgba(0,0,0,.8) calc(var(--r4) + var(--b4) * 0.6), rgba(0,0,0,.42) calc(var(--r4) + var(--b4) * 1.3), rgba(0,0,0,.12) calc(var(--r4) + var(--b4) * 2.0), transparent calc(var(--r4) + var(--b4) * 2.7)), radial-gradient(circle at var(--c5x) var(--c5y), transparent calc(var(--r5) - var(--b5) * 2.7), rgba(0,0,0,.12) calc(var(--r5) - var(--b5) * 2.0), rgba(0,0,0,.42) calc(var(--r5) - var(--b5) * 1.3), rgba(0,0,0,.8) calc(var(--r5) - var(--b5) * 0.6), #000 var(--r5), rgba(0,0,0,.8) calc(var(--r5) + var(--b5) * 0.6), rgba(0,0,0,.42) calc(var(--r5) + var(--b5) * 1.3), rgba(0,0,0,.12) calc(var(--r5) + var(--b5) * 2.0), transparent calc(var(--r5) + var(--b5) * 2.7)), radial-gradient(circle at var(--c6x) var(--c6y), transparent calc(var(--r6) - var(--b6) * 2.7), rgba(0,0,0,.12) calc(var(--r6) - var(--b6) * 2.0), rgba(0,0,0,.42) calc(var(--r6) - var(--b6) * 1.3), rgba(0,0,0,.8) calc(var(--r6) - var(--b6) * 0.6), #000 var(--r6), rgba(0,0,0,.8) calc(var(--r6) + var(--b6) * 0.6), rgba(0,0,0,.42) calc(var(--r6) + var(--b6) * 1.3), rgba(0,0,0,.12) calc(var(--r6) + var(--b6) * 2.0), transparent calc(var(--r6) + var(--b6) * 2.7)); }
+.hero-title.lit .hero-ink {
+  mask-image:linear-gradient(#000 0 0), radial-gradient(circle at var(--c1x) var(--c1y), transparent calc(var(--r1) - var(--b1) * 3.186), rgba(0,0,0,.2) calc(var(--r1) - var(--b1) * 2.36), rgba(0,0,0,.55) calc(var(--r1) - var(--b1) * 1.534), rgba(0,0,0,.9) calc(var(--r1) - var(--b1) * 0.708), #000 var(--r1), rgba(0,0,0,.9) calc(var(--r1) + var(--b1) * 0.708), rgba(0,0,0,.55) calc(var(--r1) + var(--b1) * 1.534), rgba(0,0,0,.2) calc(var(--r1) + var(--b1) * 2.36), transparent calc(var(--r1) + var(--b1) * 3.186)), radial-gradient(circle at var(--c2x) var(--c2y), transparent calc(var(--r2) - var(--b2) * 3.186), rgba(0,0,0,.2) calc(var(--r2) - var(--b2) * 2.36), rgba(0,0,0,.55) calc(var(--r2) - var(--b2) * 1.534), rgba(0,0,0,.9) calc(var(--r2) - var(--b2) * 0.708), #000 var(--r2), rgba(0,0,0,.9) calc(var(--r2) + var(--b2) * 0.708), rgba(0,0,0,.55) calc(var(--r2) + var(--b2) * 1.534), rgba(0,0,0,.2) calc(var(--r2) + var(--b2) * 2.36), transparent calc(var(--r2) + var(--b2) * 3.186)), radial-gradient(circle at var(--c3x) var(--c3y), transparent calc(var(--r3) - var(--b3) * 3.186), rgba(0,0,0,.2) calc(var(--r3) - var(--b3) * 2.36), rgba(0,0,0,.55) calc(var(--r3) - var(--b3) * 1.534), rgba(0,0,0,.9) calc(var(--r3) - var(--b3) * 0.708), #000 var(--r3), rgba(0,0,0,.9) calc(var(--r3) + var(--b3) * 0.708), rgba(0,0,0,.55) calc(var(--r3) + var(--b3) * 1.534), rgba(0,0,0,.2) calc(var(--r3) + var(--b3) * 2.36), transparent calc(var(--r3) + var(--b3) * 3.186)), radial-gradient(circle at var(--c4x) var(--c4y), transparent calc(var(--r4) - var(--b4) * 3.186), rgba(0,0,0,.2) calc(var(--r4) - var(--b4) * 2.36), rgba(0,0,0,.55) calc(var(--r4) - var(--b4) * 1.534), rgba(0,0,0,.9) calc(var(--r4) - var(--b4) * 0.708), #000 var(--r4), rgba(0,0,0,.9) calc(var(--r4) + var(--b4) * 0.708), rgba(0,0,0,.55) calc(var(--r4) + var(--b4) * 1.534), rgba(0,0,0,.2) calc(var(--r4) + var(--b4) * 2.36), transparent calc(var(--r4) + var(--b4) * 3.186)), radial-gradient(circle at var(--c5x) var(--c5y), transparent calc(var(--r5) - var(--b5) * 3.186), rgba(0,0,0,.2) calc(var(--r5) - var(--b5) * 2.36), rgba(0,0,0,.55) calc(var(--r5) - var(--b5) * 1.534), rgba(0,0,0,.9) calc(var(--r5) - var(--b5) * 0.708), #000 var(--r5), rgba(0,0,0,.9) calc(var(--r5) + var(--b5) * 0.708), rgba(0,0,0,.55) calc(var(--r5) + var(--b5) * 1.534), rgba(0,0,0,.2) calc(var(--r5) + var(--b5) * 2.36), transparent calc(var(--r5) + var(--b5) * 3.186)), radial-gradient(circle at var(--c6x) var(--c6y), transparent calc(var(--r6) - var(--b6) * 3.186), rgba(0,0,0,.2) calc(var(--r6) - var(--b6) * 2.36), rgba(0,0,0,.55) calc(var(--r6) - var(--b6) * 1.534), rgba(0,0,0,.9) calc(var(--r6) - var(--b6) * 0.708), #000 var(--r6), rgba(0,0,0,.9) calc(var(--r6) + var(--b6) * 0.708), rgba(0,0,0,.55) calc(var(--r6) + var(--b6) * 1.534), rgba(0,0,0,.2) calc(var(--r6) + var(--b6) * 2.36), transparent calc(var(--r6) + var(--b6) * 3.186));
+  mask-composite:subtract, add, add, add, add, add, add; }
+
+/* the wipe: once the rain has settled, the same window the pointer opens
+   travels across the title on its own, right to left, showing the water
+   under the letters as it passes and leaving the ink as it was. Registering
+   --mx/--my is what lets them animate; they inherit down to the two layers. */
+@property --mx { syntax:'<length-percentage>'; inherits:true; initial-value:50%; }
+@property --my { syntax:'<length-percentage>'; inherits:true; initial-value:50%; }
+.hero-title.wipe { animation: hero-wipe 1.9s cubic-bezier(.5,.02,.3,1) forwards; }
+.hero-title.wipe .hero-rainbow { opacity:1; }
+.hero-title.wipe .hero-ink {
+  -webkit-mask-image:radial-gradient(circle 80px at var(--mx) var(--my), transparent 99%, #000 100%);
+  mask-image:radial-gradient(circle 80px at var(--mx) var(--my), transparent 99%, #000 100%); }
+@keyframes hero-wipe {
+  from { --mx:var(--x0,100%); --my:var(--y1,30%); }
+  to   { --mx:var(--x1,0px);  --my:var(--y2,70%); }
+}
+
+.hero-fx { position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:2; } /* over the copy: the near rings blur across the words */
+/* .hero-drop spans the plate so the rings' % sizes resolve against the plate, not a point;
+   the drop's centre travels down to the rings as --x/--y. aspect-ratio keeps them
+   circular in a 16:9 box, and the % margins (which resolve against width) re-centre. */
+.hero-drop { position:absolute; inset:0; }
+@property --rot { syntax:'<angle>'; inherits:false; initial-value:0deg; }
+.hero-ring { position:absolute; left:var(--x); top:var(--y); width:var(--d); height:auto; aspect-ratio:1/1;
+        margin:calc(var(--d) / -2) 0 0 calc(var(--d) / -2); border-radius:50%; opacity:0; transform:scale(.02);
+        --rot:var(--from,0deg); padding:var(--w,1.5px); filter:blur(var(--b,0px)); will-change:transform,opacity;
+        background:conic-gradient(from var(--rot), var(--pal));
+        -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        -webkit-mask-composite:xor; mask-composite:exclude; }
+.hero-ring.hr-a { --pal:#faeb2c, #f52789, #e900ff, #1685f8, #3d144c, #faeb2c; }
+.hero-ring.hr-b { --pal:#1685f8, #e900ff, #faeb2c, #f52789, #1685f8; }
+.hero-ring.hr-c { --pal:#f52789, #3d144c, #1685f8, #faeb2c, #f52789; }
+.rain-on .hero-ring { animation: hero-grow var(--t) cubic-bezier(.16,.6,.22,1) var(--delay) forwards,
+                                     hero-fade var(--t) cubic-bezier(.4,0,.6,1) var(--delay) forwards,
+                                     hero-turn var(--t) linear var(--delay) forwards; }
+@keyframes hero-grow { from { transform:scale(.02); } to { transform:scale(1); } }
+@keyframes hero-fade { from { opacity:var(--a,.32); } to { opacity:0; } }
+@keyframes hero-turn { from { --rot:var(--from,0deg); } to { --rot:calc(var(--from,0deg) + var(--spin,180deg)); } }
+
+/* rack focus: the lens finds the water in the first two seconds, then holds */
+.rain-on .hero-fx { animation: hero-rack 2.2s cubic-bezier(.3,.6,.2,1) forwards; }
+@keyframes hero-rack { from { filter:blur(5px); } to { filter:blur(0); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-fx { display: none; }
+  .hero-title.lit,
+  .hero-title.wipe { animation: none; }
+  .hero-title.lit .hero-rainbow,
+  .hero-title.wipe .hero-rainbow { opacity: 0; }
+  .hero-title.lit .hero-ink,
+  .hero-title.wipe .hero-ink { -webkit-mask-image: none; mask-image: none; }
+}
+
+
+
 
 
 /* ---- Route loading state (explore/loading.tsx) ----

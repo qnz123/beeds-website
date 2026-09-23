@@ -20,6 +20,106 @@ function charDelay() {
   return Math.random() * 30 + 40 // moderate
 }
 
+// ---- Hero rain (ported from the Studio_Landing study, 2026-09-23) ----
+// Sixteen drops fall once the typewriter has finished; six of them are wired
+// to the headline and light the water hidden under the letters as their ring
+// crosses. When the water is still the hover window wipes itself across the
+// title, right to left. Desktop only: the reveal needs .hero-rainbow, which
+// only renders there.
+const RAIN_OUT = 11000 // ms from the first drop to the last ring fading
+const WIPE = 1900 // ms for the window to cross the title
+
+type Ring = { c: string; s: Record<string, string> }
+const DROPS: { x: string; y: string; rings: Ring[] }[] = [
+  { x: '18%', y: '22%', rings: [
+    { c: 'hr-c', s: { '--d': '14%', '--t': '2.24s', '--delay': '0.17s', '--a': '.24', '--w': '1px', '--b': '1.6px', '--from': '120deg', '--spin': '240deg' } },
+    { c: 'hr-c', s: { '--d': '14%', '--t': '2.24s', '--delay': '0.47s', '--a': '.24', '--w': '1px', '--b': '1.6px', '--from': '160deg', '--spin': '240deg' } },
+    { c: 'hr-c', s: { '--d': '14%', '--t': '2.24s', '--delay': '0.77s', '--a': '.24', '--w': '1px', '--b': '1.6px', '--from': '200deg', '--spin': '240deg' } },
+  ] },
+  { x: '64%', y: '14%', rings: [
+    { c: 'hr-a', s: { '--d': '22%', '--t': '2.38s', '--delay': '0.50s', '--a': '.32', '--w': '1px', '--b': '1.6px', '--from': '120deg', '--spin': '240deg' } },
+    { c: 'hr-a', s: { '--d': '22%', '--t': '2.38s', '--delay': '0.80s', '--a': '.32', '--w': '1px', '--b': '1.6px', '--from': '160deg', '--spin': '240deg' } },
+    { c: 'hr-a', s: { '--d': '22%', '--t': '2.38s', '--delay': '1.10s', '--a': '.32', '--w': '1px', '--b': '1.6px', '--from': '200deg', '--spin': '240deg' } },
+  ] },
+  { x: '84%', y: '58%', rings: [
+    { c: 'hr-a', s: { '--d': '110%', '--t': '3.91s', '--delay': '0.86s', '--a': '.26', '--w': '6px', '--b': '14px', '--from': '30deg', '--spin': '240deg' } },
+    { c: 'hr-a', s: { '--d': '110%', '--t': '3.91s', '--delay': '1.16s', '--a': '.26', '--w': '6px', '--b': '14px', '--from': '70deg', '--spin': '240deg' } },
+    { c: 'hr-a', s: { '--d': '110%', '--t': '3.91s', '--delay': '1.46s', '--a': '.26', '--w': '6px', '--b': '14px', '--from': '110deg', '--spin': '240deg' } },
+  ] },
+  { x: '38%', y: '70%', rings: [
+    { c: 'hr-a', s: { '--d': '80%', '--t': '3.39s', '--delay': '1.35s', '--a': '.46', '--w': '1.5px', '--b': '.4px', '--from': '90deg', '--spin': '120deg' } },
+    { c: 'hr-a', s: { '--d': '80%', '--t': '3.39s', '--delay': '1.65s', '--a': '.46', '--w': '1.5px', '--b': '.4px', '--from': '130deg', '--spin': '120deg' } },
+    { c: 'hr-a', s: { '--d': '80%', '--t': '3.39s', '--delay': '1.95s', '--a': '.46', '--w': '1.5px', '--b': '.4px', '--from': '170deg', '--spin': '120deg' } },
+  ] },
+  { x: '72%', y: '86%', rings: [
+    { c: 'hr-a', s: { '--d': '22%', '--t': '2.38s', '--delay': '1.79s', '--a': '.32', '--w': '1px', '--b': '1.6px', '--from': '330deg', '--spin': '-150deg' } },
+    { c: 'hr-a', s: { '--d': '22%', '--t': '2.38s', '--delay': '2.09s', '--a': '.32', '--w': '1px', '--b': '1.6px', '--from': '10deg', '--spin': '-150deg' } },
+    { c: 'hr-a', s: { '--d': '22%', '--t': '2.38s', '--delay': '2.39s', '--a': '.32', '--w': '1px', '--b': '1.6px', '--from': '50deg', '--spin': '-150deg' } },
+  ] },
+  { x: '8%', y: '62%', rings: [
+    { c: 'hr-b', s: { '--d': '44%', '--t': '2.76s', '--delay': '2.21s', '--a': '.52', '--w': '1.5px', '--b': '.4px', '--from': '270deg', '--spin': '120deg' } },
+    { c: 'hr-b', s: { '--d': '44%', '--t': '2.76s', '--delay': '2.51s', '--a': '.52', '--w': '1.5px', '--b': '.4px', '--from': '310deg', '--spin': '120deg' } },
+    { c: 'hr-b', s: { '--d': '44%', '--t': '2.76s', '--delay': '2.81s', '--a': '.52', '--w': '1.5px', '--b': '.4px', '--from': '350deg', '--spin': '120deg' } },
+  ] },
+  { x: '52%', y: '42%', rings: [
+    { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '2.67s', '--a': '.34', '--w': '6px', '--b': '14px', '--from': '300deg', '--spin': '180deg' } },
+    { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '2.97s', '--a': '.34', '--w': '6px', '--b': '14px', '--from': '340deg', '--spin': '180deg' } },
+  ] },
+  { x: '92%', y: '18%', rings: [
+    { c: 'hr-c', s: { '--d': '150%', '--t': '4.6s', '--delay': '2.99s', '--a': '.3', '--w': '6px', '--b': '14px', '--from': '240deg', '--spin': '180deg' } },
+    { c: 'hr-c', s: { '--d': '150%', '--t': '4.6s', '--delay': '3.29s', '--a': '.3', '--w': '6px', '--b': '14px', '--from': '280deg', '--spin': '180deg' } },
+  ] },
+  { x: '26%', y: '90%', rings: [
+    { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '3.47s', '--a': '.28', '--w': '1px', '--b': '1.6px', '--from': '270deg', '--spin': '-150deg' } },
+    { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '3.77s', '--a': '.28', '--w': '1px', '--b': '1.6px', '--from': '310deg', '--spin': '-150deg' } },
+  ] },
+  { x: '58%', y: '64%', rings: [
+    { c: 'hr-b', s: { '--d': '60%', '--t': '3.04s', '--delay': '3.95s', '--a': '.4', '--w': '1.5px', '--b': '.4px', '--from': '120deg', '--spin': '-150deg' } },
+    { c: 'hr-b', s: { '--d': '60%', '--t': '3.04s', '--delay': '4.25s', '--a': '.4', '--w': '1.5px', '--b': '.4px', '--from': '160deg', '--spin': '-150deg' } },
+    { c: 'hr-b', s: { '--d': '60%', '--t': '3.04s', '--delay': '4.55s', '--a': '.4', '--w': '1.5px', '--b': '.4px', '--from': '200deg', '--spin': '-150deg' } },
+  ] },
+  { x: '44%', y: '8%', rings: [
+    { c: 'hr-b', s: { '--d': '150%', '--t': '4.6s', '--delay': '4.36s', '--a': '.26', '--w': '6px', '--b': '14px', '--from': '60deg', '--spin': '120deg' } },
+    { c: 'hr-b', s: { '--d': '150%', '--t': '4.6s', '--delay': '4.66s', '--a': '.26', '--w': '6px', '--b': '14px', '--from': '100deg', '--spin': '120deg' } },
+    { c: 'hr-b', s: { '--d': '150%', '--t': '4.6s', '--delay': '4.96s', '--a': '.26', '--w': '6px', '--b': '14px', '--from': '140deg', '--spin': '120deg' } },
+  ] },
+  { x: '80%', y: '34%', rings: [
+    { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '4.74s', '--a': '.26', '--w': '6px', '--b': '14px', '--from': '240deg', '--spin': '180deg' } },
+    { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '5.04s', '--a': '.26', '--w': '6px', '--b': '14px', '--from': '280deg', '--spin': '180deg' } },
+  ] },
+  { x: '14%', y: '40%', rings: [
+    { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '5.21s', '--a': '.28', '--w': '1px', '--b': '1.6px', '--from': '210deg', '--spin': '120deg' } },
+    { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '5.51s', '--a': '.28', '--w': '1px', '--b': '1.6px', '--from': '250deg', '--spin': '120deg' } },
+    { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '5.81s', '--a': '.28', '--w': '1px', '--b': '1.6px', '--from': '290deg', '--spin': '120deg' } },
+  ] },
+  { x: '68%', y: '50%', rings: [
+    { c: 'hr-a', s: { '--d': '80%', '--t': '3.39s', '--delay': '5.49s', '--a': '.4', '--w': '1.5px', '--b': '.4px', '--from': '90deg', '--spin': '120deg' } },
+    { c: 'hr-a', s: { '--d': '80%', '--t': '3.39s', '--delay': '5.79s', '--a': '.4', '--w': '1.5px', '--b': '.4px', '--from': '130deg', '--spin': '120deg' } },
+    { c: 'hr-a', s: { '--d': '80%', '--t': '3.39s', '--delay': '6.09s', '--a': '.4', '--w': '1.5px', '--b': '.4px', '--from': '170deg', '--spin': '120deg' } },
+  ] },
+  { x: '34%', y: '50%', rings: [
+    { c: 'hr-b', s: { '--d': '9%', '--t': '2.16s', '--delay': '6.06s', '--a': '.32', '--w': '1px', '--b': '1.6px', '--from': '330deg', '--spin': '120deg' } },
+    { c: 'hr-b', s: { '--d': '9%', '--t': '2.16s', '--delay': '6.36s', '--a': '.32', '--w': '1px', '--b': '1.6px', '--from': '10deg', '--spin': '120deg' } },
+    { c: 'hr-b', s: { '--d': '9%', '--t': '2.16s', '--delay': '6.66s', '--a': '.32', '--w': '1px', '--b': '1.6px', '--from': '50deg', '--spin': '120deg' } },
+  ] },
+  { x: '90%', y: '80%', rings: [
+    { c: 'hr-a', s: { '--d': '110%', '--t': '3.91s', '--delay': '6.38s', '--a': '.26', '--w': '6px', '--b': '14px', '--from': '30deg', '--spin': '-150deg' } },
+    { c: 'hr-a', s: { '--d': '110%', '--t': '3.91s', '--delay': '6.68s', '--a': '.26', '--w': '6px', '--b': '14px', '--from': '70deg', '--spin': '-150deg' } },
+    { c: 'hr-a', s: { '--d': '110%', '--t': '3.91s', '--delay': '6.98s', '--a': '.26', '--w': '6px', '--b': '14px', '--from': '110deg', '--spin': '-150deg' } },
+  ] },
+]
+
+// The six drops wired to the headline, as a fraction of the hero box. Order
+// and values match the --r1..--r6 keyframes in globals.css.
+const LIT = [
+  { x: '0.1800', y: '0.2200' },
+  { x: '0.3800', y: '0.7000' },
+  { x: '0.5200', y: '0.4200' },
+  { x: '0.5800', y: '0.6400' },
+  { x: '0.8000', y: '0.3400' },
+  { x: '0.6800', y: '0.5000' },
+]
+
 export default function Hero({ lang = 'en' }: { lang?: Locale }) {
   const t = getDictionary(lang).hero
   const LINES = [t.line1, t.line2]
@@ -33,12 +133,22 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
   // Mobile shows the typewriter only — the neon hover layer renders solely on
   // hover-capable desktop viewports (same gate as the Explore study cards)
   const [isDesktop, setIsDesktop] = useState(false)
+  // The rain, and the two ways it touches the headline
+  const [raining, setRaining] = useState(false)
+  const [lit, setLit] = useState(false)
+  const [wiping, setWiping] = useState(false)
   const cancelled = useRef(false)
   const titleRef = useRef<HTMLHeadingElement>(null)
+  const heroRef = useRef<HTMLElement>(null)
+  // The typewriter effect closes over isDesktop, so read it through a ref
+  const desktopRef = useRef(false)
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 768px) and (pointer: fine)')
-    const sync = () => setIsDesktop(mq.matches)
+    const sync = () => {
+      setIsDesktop(mq.matches)
+      desktopRef.current = mq.matches
+    }
     sync()
     mq.addEventListener('change', sync)
     return () => mq.removeEventListener('change', sync)
@@ -125,6 +235,49 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
       setCursorBlinkOut(true)
 
       setRevealReady(true)
+
+      // ---- the rain, and what it does to the headline ----
+      const title = titleRef.current
+      const hero = heroRef.current
+      if (!desktopRef.current || !title || !hero) return
+
+      // Hand the mask each wired ring's centre in the title's own
+      // coordinates; the radii themselves are keyframed against --hw.
+      const hb = hero.getBoundingClientRect()
+      const box = title.getBoundingClientRect()
+      title.style.setProperty('--hw', `${hb.width}px`)
+      title.style.setProperty('--hh', `${hb.height}px`)
+      title.style.setProperty('--ox', `${hb.left - box.left}px`)
+      title.style.setProperty('--oy', `${hb.top - box.top}px`)
+      LIT.forEach((c, i) => {
+        title.style.setProperty(`--c${i + 1}x`, `calc(var(--ox) + var(--hw) * ${c.x})`)
+        title.style.setProperty(`--c${i + 1}y`, `calc(var(--oy) + var(--hh) * ${c.y})`)
+      })
+
+      // The closing wipe travels across the letters, not the full-width box:
+      // it drops from the first line's centre to the second's as it goes.
+      const rows = title.querySelectorAll<HTMLElement>('.hero-ink > div')
+      const spans = title.querySelectorAll<HTMLElement>('.hero-ink .typewriter-text')
+      if (rows.length === 2 && spans.length === 2) {
+        const r1 = rows[0].getBoundingClientRect()
+        const r2 = rows[1].getBoundingClientRect()
+        const s1 = spans[0].getBoundingClientRect()
+        const s2 = spans[1].getBoundingClientRect()
+        title.style.setProperty('--y1', `${r1.top + r1.height / 2 - box.top}px`)
+        title.style.setProperty('--y2', `${r2.top + r2.height / 2 - box.top}px`)
+        title.style.setProperty('--x0', `${Math.max(s1.right, s2.right) - box.left + 100}px`)
+        title.style.setProperty('--x1', '-100px')
+      }
+
+      setRaining(true)
+      setLit(true)
+      await sleep(RAIN_OUT) // the last ring has faded
+      if (cancelled.current) return
+      setLit(false)
+      setWiping(true)
+      await sleep(WIPE + 60)
+      if (cancelled.current) return
+      setWiping(false) // hand the window back to the pointer
     }
 
     run()
@@ -135,14 +288,35 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
   }, [lang])
 
   return (
-    <section className="hero min-h-screen flex items-center px-10 py-16">
+    <section
+      ref={heroRef}
+      className={`hero min-h-screen flex items-center px-10 py-16${raining ? ' rain-on' : ''}`}
+    >
+      {/* Rain on still water — hairline rings carrying the house colours on
+          their rims, through a shallow depth of field. Over the copy, so the
+          soft foreground rings pass across the words. */}
+      {isDesktop && (
+        <div className="hero-fx" aria-hidden="true">
+          {DROPS.map((d, i) => (
+            <div
+              key={i}
+              className="hero-drop"
+              style={{ '--x': d.x, '--y': d.y } as React.CSSProperties}
+            >
+              {d.rings.map((r, j) => (
+                <i key={j} className={`hero-ring ${r.c}`} style={r.s as React.CSSProperties} />
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
       <div className="container-x w-full max-w-full">
         <h1
           ref={titleRef}
           // reveal-ready (and with it every hover rule — including the mask
           // hole punched in the ink) only ever applies on desktop; mobile is
           // purely the typewriter.
-          className={`hero-title text-5xl leading-[1.2]${revealReady && isDesktop ? ' reveal-ready' : ''}`}
+          className={`hero-title text-5xl leading-[1.2]${revealReady && isDesktop ? ' reveal-ready' : ''}${lit ? ' lit' : ''}${wiping ? ' wipe' : ''}`}
           onMouseMove={isDesktop ? handleTitleMove : undefined}
         >
           {/* Black ink layer — while the reveal is hovered, a hole matching
