@@ -21,104 +21,81 @@ function charDelay() {
 }
 
 // ---- Hero rain (ported from the Studio_Landing study, 2026-09-23) ----
-// Sixteen drops fall once the typewriter has finished; six of them are wired
-// to the headline and light the water hidden under the letters as their ring
-// crosses. When the water is still the hover window wipes itself across the
-// title, right to left. Desktop only: the reveal needs .hero-rainbow, which
-// only renders there.
+// Sixteen drops fall once the typewriter has finished, purely as background:
+// the rings sit behind the copy and never touch it. When the water is still
+// the hover window wipes itself across the title, right to left. Desktop
+// only: that wipe needs .hero-rainbow, which only renders there.
 const RAIN_OUT = 11000 // ms from the first drop to the last ring fading
 const WIPE = 1900 // ms for the window to cross the title
 
 type Ring = { c: string; s: Record<string, string> }
 const DROPS: { x: string; y: string; rings: Ring[] }[] = [
   { x: '18%', y: '22%', rings: [
-    { c: 'hr-c', s: { '--d': '14%', '--t': '2.24s', '--delay': '0.17s', '--a': '.24', '--w': '1px', '--b': '1.6px', '--from': '120deg', '--spin': '240deg' } },
-    { c: 'hr-c', s: { '--d': '14%', '--t': '2.24s', '--delay': '0.47s', '--a': '.24', '--w': '1px', '--b': '1.6px', '--from': '160deg', '--spin': '240deg' } },
-    { c: 'hr-c', s: { '--d': '14%', '--t': '2.24s', '--delay': '0.77s', '--a': '.24', '--w': '1px', '--b': '1.6px', '--from': '200deg', '--spin': '240deg' } },
+    { c: 'hr-c', s: { '--d': '14%', '--t': '2.24s', '--delay': '0.17s', '--a': '.28', '--w': '1px', '--from': '120deg' } },
+    { c: 'hr-c', s: { '--d': '14%', '--t': '2.24s', '--delay': '0.47s', '--a': '.28', '--w': '1px', '--from': '160deg' } },
   ] },
   { x: '64%', y: '14%', rings: [
-    { c: 'hr-a', s: { '--d': '22%', '--t': '2.38s', '--delay': '0.50s', '--a': '.32', '--w': '1px', '--b': '1.6px', '--from': '120deg', '--spin': '240deg' } },
-    { c: 'hr-a', s: { '--d': '22%', '--t': '2.38s', '--delay': '0.80s', '--a': '.32', '--w': '1px', '--b': '1.6px', '--from': '160deg', '--spin': '240deg' } },
-    { c: 'hr-a', s: { '--d': '22%', '--t': '2.38s', '--delay': '1.10s', '--a': '.32', '--w': '1px', '--b': '1.6px', '--from': '200deg', '--spin': '240deg' } },
+    { c: 'hr-a', s: { '--d': '22%', '--t': '2.38s', '--delay': '0.50s', '--a': '.36', '--w': '1px', '--from': '120deg' } },
+    { c: 'hr-a', s: { '--d': '22%', '--t': '2.38s', '--delay': '0.80s', '--a': '.36', '--w': '1px', '--from': '160deg' } },
   ] },
   { x: '84%', y: '58%', rings: [
-    { c: 'hr-a', s: { '--d': '110%', '--t': '3.91s', '--delay': '0.86s', '--a': '.26', '--w': '6px', '--b': '14px', '--from': '30deg', '--spin': '240deg' } },
-    { c: 'hr-a', s: { '--d': '110%', '--t': '3.91s', '--delay': '1.16s', '--a': '.26', '--w': '6px', '--b': '14px', '--from': '70deg', '--spin': '240deg' } },
-    { c: 'hr-a', s: { '--d': '110%', '--t': '3.91s', '--delay': '1.46s', '--a': '.26', '--w': '6px', '--b': '14px', '--from': '110deg', '--spin': '240deg' } },
+    { c: 'hr-a', s: { '--d': '110%', '--t': '3.91s', '--delay': '0.86s', '--a': '.14', '--w': '3px', '--from': '30deg' } },
+    { c: 'hr-a', s: { '--d': '110%', '--t': '3.91s', '--delay': '1.16s', '--a': '.14', '--w': '3px', '--from': '70deg' } },
   ] },
   { x: '38%', y: '70%', rings: [
-    { c: 'hr-a', s: { '--d': '80%', '--t': '3.39s', '--delay': '1.35s', '--a': '.46', '--w': '1.5px', '--b': '.4px', '--from': '90deg', '--spin': '120deg' } },
-    { c: 'hr-a', s: { '--d': '80%', '--t': '3.39s', '--delay': '1.65s', '--a': '.46', '--w': '1.5px', '--b': '.4px', '--from': '130deg', '--spin': '120deg' } },
-    { c: 'hr-a', s: { '--d': '80%', '--t': '3.39s', '--delay': '1.95s', '--a': '.46', '--w': '1.5px', '--b': '.4px', '--from': '170deg', '--spin': '120deg' } },
+    { c: 'hr-a', s: { '--d': '80%', '--t': '3.39s', '--delay': '1.35s', '--a': '.42', '--w': '1.5px', '--from': '90deg' } },
+    { c: 'hr-a', s: { '--d': '80%', '--t': '3.39s', '--delay': '1.65s', '--a': '.42', '--w': '1.5px', '--from': '130deg' } },
   ] },
   { x: '72%', y: '86%', rings: [
-    { c: 'hr-a', s: { '--d': '22%', '--t': '2.38s', '--delay': '1.79s', '--a': '.32', '--w': '1px', '--b': '1.6px', '--from': '330deg', '--spin': '-150deg' } },
-    { c: 'hr-a', s: { '--d': '22%', '--t': '2.38s', '--delay': '2.09s', '--a': '.32', '--w': '1px', '--b': '1.6px', '--from': '10deg', '--spin': '-150deg' } },
-    { c: 'hr-a', s: { '--d': '22%', '--t': '2.38s', '--delay': '2.39s', '--a': '.32', '--w': '1px', '--b': '1.6px', '--from': '50deg', '--spin': '-150deg' } },
+    { c: 'hr-a', s: { '--d': '22%', '--t': '2.38s', '--delay': '1.79s', '--a': '.36', '--w': '1px', '--from': '330deg' } },
+    { c: 'hr-a', s: { '--d': '22%', '--t': '2.38s', '--delay': '2.09s', '--a': '.36', '--w': '1px', '--from': '10deg' } },
   ] },
   { x: '8%', y: '62%', rings: [
-    { c: 'hr-b', s: { '--d': '44%', '--t': '2.76s', '--delay': '2.21s', '--a': '.52', '--w': '1.5px', '--b': '.4px', '--from': '270deg', '--spin': '120deg' } },
-    { c: 'hr-b', s: { '--d': '44%', '--t': '2.76s', '--delay': '2.51s', '--a': '.52', '--w': '1.5px', '--b': '.4px', '--from': '310deg', '--spin': '120deg' } },
-    { c: 'hr-b', s: { '--d': '44%', '--t': '2.76s', '--delay': '2.81s', '--a': '.52', '--w': '1.5px', '--b': '.4px', '--from': '350deg', '--spin': '120deg' } },
+    { c: 'hr-b', s: { '--d': '44%', '--t': '2.76s', '--delay': '2.21s', '--a': '.46', '--w': '1.5px', '--from': '270deg' } },
+    { c: 'hr-b', s: { '--d': '44%', '--t': '2.76s', '--delay': '2.51s', '--a': '.46', '--w': '1.5px', '--from': '310deg' } },
   ] },
   { x: '52%', y: '42%', rings: [
-    { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '2.67s', '--a': '.34', '--w': '6px', '--b': '14px', '--from': '300deg', '--spin': '180deg' } },
-    { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '2.97s', '--a': '.34', '--w': '6px', '--b': '14px', '--from': '340deg', '--spin': '180deg' } },
+    { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '2.67s', '--a': '.2', '--w': '3px', '--from': '300deg' } },
+    { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '2.97s', '--a': '.2', '--w': '3px', '--from': '340deg' } },
   ] },
   { x: '92%', y: '18%', rings: [
-    { c: 'hr-c', s: { '--d': '150%', '--t': '4.6s', '--delay': '2.99s', '--a': '.3', '--w': '6px', '--b': '14px', '--from': '240deg', '--spin': '180deg' } },
-    { c: 'hr-c', s: { '--d': '150%', '--t': '4.6s', '--delay': '3.29s', '--a': '.3', '--w': '6px', '--b': '14px', '--from': '280deg', '--spin': '180deg' } },
+    { c: 'hr-c', s: { '--d': '150%', '--t': '4.6s', '--delay': '2.99s', '--a': '.17', '--w': '3px', '--from': '240deg' } },
+    { c: 'hr-c', s: { '--d': '150%', '--t': '4.6s', '--delay': '3.29s', '--a': '.17', '--w': '3px', '--from': '280deg' } },
   ] },
   { x: '26%', y: '90%', rings: [
-    { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '3.47s', '--a': '.28', '--w': '1px', '--b': '1.6px', '--from': '270deg', '--spin': '-150deg' } },
-    { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '3.77s', '--a': '.28', '--w': '1px', '--b': '1.6px', '--from': '310deg', '--spin': '-150deg' } },
+    { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '3.47s', '--a': '.32', '--w': '1px', '--from': '270deg' } },
+    { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '3.77s', '--a': '.32', '--w': '1px', '--from': '310deg' } },
   ] },
   { x: '58%', y: '64%', rings: [
-    { c: 'hr-b', s: { '--d': '60%', '--t': '3.04s', '--delay': '3.95s', '--a': '.4', '--w': '1.5px', '--b': '.4px', '--from': '120deg', '--spin': '-150deg' } },
-    { c: 'hr-b', s: { '--d': '60%', '--t': '3.04s', '--delay': '4.25s', '--a': '.4', '--w': '1.5px', '--b': '.4px', '--from': '160deg', '--spin': '-150deg' } },
-    { c: 'hr-b', s: { '--d': '60%', '--t': '3.04s', '--delay': '4.55s', '--a': '.4', '--w': '1.5px', '--b': '.4px', '--from': '200deg', '--spin': '-150deg' } },
+    { c: 'hr-b', s: { '--d': '60%', '--t': '3.04s', '--delay': '3.95s', '--a': '.38', '--w': '1.5px', '--from': '120deg' } },
+    { c: 'hr-b', s: { '--d': '60%', '--t': '3.04s', '--delay': '4.25s', '--a': '.38', '--w': '1.5px', '--from': '160deg' } },
   ] },
   { x: '44%', y: '8%', rings: [
-    { c: 'hr-b', s: { '--d': '150%', '--t': '4.6s', '--delay': '4.36s', '--a': '.26', '--w': '6px', '--b': '14px', '--from': '60deg', '--spin': '120deg' } },
-    { c: 'hr-b', s: { '--d': '150%', '--t': '4.6s', '--delay': '4.66s', '--a': '.26', '--w': '6px', '--b': '14px', '--from': '100deg', '--spin': '120deg' } },
-    { c: 'hr-b', s: { '--d': '150%', '--t': '4.6s', '--delay': '4.96s', '--a': '.26', '--w': '6px', '--b': '14px', '--from': '140deg', '--spin': '120deg' } },
+    { c: 'hr-b', s: { '--d': '150%', '--t': '4.6s', '--delay': '4.36s', '--a': '.14', '--w': '3px', '--from': '60deg' } },
+    { c: 'hr-b', s: { '--d': '150%', '--t': '4.6s', '--delay': '4.66s', '--a': '.14', '--w': '3px', '--from': '100deg' } },
   ] },
   { x: '80%', y: '34%', rings: [
-    { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '4.74s', '--a': '.26', '--w': '6px', '--b': '14px', '--from': '240deg', '--spin': '180deg' } },
-    { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '5.04s', '--a': '.26', '--w': '6px', '--b': '14px', '--from': '280deg', '--spin': '180deg' } },
+    { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '4.74s', '--a': '.14', '--w': '3px', '--from': '240deg' } },
+    { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '5.04s', '--a': '.14', '--w': '3px', '--from': '280deg' } },
   ] },
   { x: '14%', y: '40%', rings: [
-    { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '5.21s', '--a': '.28', '--w': '1px', '--b': '1.6px', '--from': '210deg', '--spin': '120deg' } },
-    { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '5.51s', '--a': '.28', '--w': '1px', '--b': '1.6px', '--from': '250deg', '--spin': '120deg' } },
-    { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '5.81s', '--a': '.28', '--w': '1px', '--b': '1.6px', '--from': '290deg', '--spin': '120deg' } },
+    { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '5.21s', '--a': '.32', '--w': '1px', '--from': '210deg' } },
+    { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '5.51s', '--a': '.32', '--w': '1px', '--from': '250deg' } },
   ] },
   { x: '68%', y: '50%', rings: [
-    { c: 'hr-a', s: { '--d': '80%', '--t': '3.39s', '--delay': '5.49s', '--a': '.4', '--w': '1.5px', '--b': '.4px', '--from': '90deg', '--spin': '120deg' } },
-    { c: 'hr-a', s: { '--d': '80%', '--t': '3.39s', '--delay': '5.79s', '--a': '.4', '--w': '1.5px', '--b': '.4px', '--from': '130deg', '--spin': '120deg' } },
-    { c: 'hr-a', s: { '--d': '80%', '--t': '3.39s', '--delay': '6.09s', '--a': '.4', '--w': '1.5px', '--b': '.4px', '--from': '170deg', '--spin': '120deg' } },
+    { c: 'hr-a', s: { '--d': '80%', '--t': '3.39s', '--delay': '5.49s', '--a': '.38', '--w': '1.5px', '--from': '90deg' } },
+    { c: 'hr-a', s: { '--d': '80%', '--t': '3.39s', '--delay': '5.79s', '--a': '.38', '--w': '1.5px', '--from': '130deg' } },
   ] },
   { x: '34%', y: '50%', rings: [
-    { c: 'hr-b', s: { '--d': '9%', '--t': '2.16s', '--delay': '6.06s', '--a': '.32', '--w': '1px', '--b': '1.6px', '--from': '330deg', '--spin': '120deg' } },
-    { c: 'hr-b', s: { '--d': '9%', '--t': '2.16s', '--delay': '6.36s', '--a': '.32', '--w': '1px', '--b': '1.6px', '--from': '10deg', '--spin': '120deg' } },
-    { c: 'hr-b', s: { '--d': '9%', '--t': '2.16s', '--delay': '6.66s', '--a': '.32', '--w': '1px', '--b': '1.6px', '--from': '50deg', '--spin': '120deg' } },
+    { c: 'hr-b', s: { '--d': '9%', '--t': '2.16s', '--delay': '6.06s', '--a': '.36', '--w': '1px', '--from': '330deg' } },
+    { c: 'hr-b', s: { '--d': '9%', '--t': '2.16s', '--delay': '6.36s', '--a': '.36', '--w': '1px', '--from': '10deg' } },
   ] },
   { x: '90%', y: '80%', rings: [
-    { c: 'hr-a', s: { '--d': '110%', '--t': '3.91s', '--delay': '6.38s', '--a': '.26', '--w': '6px', '--b': '14px', '--from': '30deg', '--spin': '-150deg' } },
-    { c: 'hr-a', s: { '--d': '110%', '--t': '3.91s', '--delay': '6.68s', '--a': '.26', '--w': '6px', '--b': '14px', '--from': '70deg', '--spin': '-150deg' } },
-    { c: 'hr-a', s: { '--d': '110%', '--t': '3.91s', '--delay': '6.98s', '--a': '.26', '--w': '6px', '--b': '14px', '--from': '110deg', '--spin': '-150deg' } },
+    { c: 'hr-a', s: { '--d': '110%', '--t': '3.91s', '--delay': '6.38s', '--a': '.14', '--w': '3px', '--from': '30deg' } },
+    { c: 'hr-a', s: { '--d': '110%', '--t': '3.91s', '--delay': '6.68s', '--a': '.14', '--w': '3px', '--from': '70deg' } },
   ] },
 ]
 
-// The six drops wired to the headline, as a fraction of the hero box. Order
-// and values match the --r1..--r6 keyframes in globals.css.
-const LIT = [
-  { x: '0.1800', y: '0.2200' },
-  { x: '0.3800', y: '0.7000' },
-  { x: '0.5200', y: '0.4200' },
-  { x: '0.5800', y: '0.6400' },
-  { x: '0.8000', y: '0.3400' },
-  { x: '0.6800', y: '0.5000' },
-]
 
 export default function Hero({ lang = 'en' }: { lang?: Locale }) {
   const t = getDictionary(lang).hero
@@ -135,7 +112,6 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
   const [isDesktop, setIsDesktop] = useState(false)
   // The rain, and the two ways it touches the headline
   const [raining, setRaining] = useState(false)
-  const [lit, setLit] = useState(false)
   const [wiping, setWiping] = useState(false)
   const cancelled = useRef(false)
   const titleRef = useRef<HTMLHeadingElement>(null)
@@ -236,23 +212,12 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
 
       setRevealReady(true)
 
-      // ---- the rain, and what it does to the headline ----
+      // ---- the rain, then the closing wipe ----
       const title = titleRef.current
       const hero = heroRef.current
       if (!desktopRef.current || !title || !hero) return
 
-      // Hand the mask each wired ring's centre in the title's own
-      // coordinates; the radii themselves are keyframed against --hw.
-      const hb = hero.getBoundingClientRect()
       const box = title.getBoundingClientRect()
-      title.style.setProperty('--hw', `${hb.width}px`)
-      title.style.setProperty('--hh', `${hb.height}px`)
-      title.style.setProperty('--ox', `${hb.left - box.left}px`)
-      title.style.setProperty('--oy', `${hb.top - box.top}px`)
-      LIT.forEach((c, i) => {
-        title.style.setProperty(`--c${i + 1}x`, `calc(var(--ox) + var(--hw) * ${c.x})`)
-        title.style.setProperty(`--c${i + 1}y`, `calc(var(--oy) + var(--hh) * ${c.y})`)
-      })
 
       // The closing wipe travels across the letters, not the full-width box:
       // it drops from the first line's centre to the second's as it goes.
@@ -270,10 +235,8 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
       }
 
       setRaining(true)
-      setLit(true)
       await sleep(RAIN_OUT) // the last ring has faded
       if (cancelled.current) return
-      setLit(false)
       setWiping(true)
       await sleep(WIPE + 60)
       if (cancelled.current) return
@@ -293,8 +256,9 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
       className={`hero min-h-screen flex items-center px-10 py-16${raining ? ' rain-on' : ''}`}
     >
       {/* Rain on still water — hairline rings carrying the house colours on
-          their rims, through a shallow depth of field. Over the copy, so the
-          soft foreground rings pass across the words. */}
+          their rims. Behind the copy, and cheap by construction: only
+          transform and opacity animate, so the layer stays on the
+          compositor. Depth reads through line weight and opacity. */}
       {isDesktop && (
         <div className="hero-fx" aria-hidden="true">
           {DROPS.map((d, i) => (
@@ -316,7 +280,7 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
           // reveal-ready (and with it every hover rule — including the mask
           // hole punched in the ink) only ever applies on desktop; mobile is
           // purely the typewriter.
-          className={`hero-title text-5xl leading-[1.2]${revealReady && isDesktop ? ' reveal-ready' : ''}${lit ? ' lit' : ''}${wiping ? ' wipe' : ''}`}
+          className={`hero-title text-5xl leading-[1.2]${revealReady && isDesktop ? ' reveal-ready' : ''}${wiping ? ' wipe' : ''}`}
           onMouseMove={isDesktop ? handleTitleMove : undefined}
         >
           {/* Black ink layer — while the reveal is hovered, a hole matching
