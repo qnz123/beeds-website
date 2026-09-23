@@ -1968,14 +1968,14 @@ textarea.blank:focus {
    the pointer was resting there before hydration, or the headline grew under
    it — and the reveal would then open at the middle of the box instead of
    under the pointer, lighting letters nobody pointed at. */
-.hero-title.reveal-ready.lens:hover .hero-rainbow {
+.hero-title.reveal-ready.lens:not(.wipe):hover .hero-rainbow {
   opacity: 1;
 }
 
 /* While hovering, punch the same circle OUT of the black ink layer — the
    rippling neon is then the only text inside the circle (otherwise the water
    displacement shifts the color off the ink and both show as doubles). */
-.hero-title.reveal-ready.lens:hover .hero-ink {
+.hero-title.reveal-ready.lens:not(.wipe):hover .hero-ink {
   -webkit-mask-image: radial-gradient(circle 80px at var(--mx, 50%) var(--my, 50%),
     transparent 99%, #000 100%);
   mask-image: radial-gradient(circle 80px at var(--mx, 50%) var(--my, 50%),
@@ -2079,7 +2079,10 @@ textarea.blank:focus {
    clock, so the colour is always exactly where the circle is.
 
    The class is armed from the ring's own animationstart and dropped at its
-   animationend, so the band and the ring share one clock; :not(:hover) so
+   animationend, so the band and the ring share one clock. It is not gated
+   on hover: the headline's box is the full page width, so a pointer merely
+   resting to the right of the words counted as hovering and silently
+   cancelled the reveal. The hover rules stand aside while .wipe is on, so
    the pointer's own reveal still wins. */
 @property --wr { syntax: '<length>'; inherits: true; initial-value: 0px; }
 @property --wb { syntax: '<length>'; inherits: true; initial-value: 0px; }
@@ -2098,7 +2101,7 @@ textarea.blank:focus {
   100% { --wb: 0px; }
 }
 
-.hero-title.wipe:not(:hover) .hero-rainbow {
+.hero-title.wipe .hero-rainbow {
   opacity: 1;
   transform: none;
   -webkit-mask-image: radial-gradient(circle at var(--wcx) var(--wcy),
@@ -2123,7 +2126,7 @@ textarea.blank:focus {
     transparent calc(var(--wr) + var(--wb) * 3.0));
 }
 
-.hero-title.wipe:not(:hover) .hero-ink {
+.hero-title.wipe .hero-ink {
   -webkit-mask-image: radial-gradient(circle at var(--wcx) var(--wcy),
     #000 calc(var(--wr) - var(--wb) * 3.45),
     rgba(0, 0, 0, .88) calc(var(--wr) - var(--wb) * 2.53),
@@ -2151,8 +2154,8 @@ textarea.blank:focus {
   .typewriter-cursor { animation: none; }
   .typewriter-cursor.blinking-out { opacity: 0; }
   .hero-title.wipe { animation: none; }
-  .hero-title.wipe:not(:hover) .hero-rainbow { opacity: 0; }
-  .hero-title.wipe:not(:hover) .hero-ink { -webkit-mask-image: none; mask-image: none; }
+  .hero-title.wipe .hero-rainbow { opacity: 0; }
+  .hero-title.wipe .hero-ink { -webkit-mask-image: none; mask-image: none; }
 }
 
 
