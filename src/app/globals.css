@@ -1984,10 +1984,12 @@ textarea.blank:focus {
 
 /* ================================================================
    Hero rain (Hero.tsx, 2026-09-23)
-   Desktop only. The typewriter finishes, then seventeen drops fall
-   across the hero over about seven seconds. The last of them is wider
-   than the rest and rises through the headline: its band lights the
-   water hidden under the letters as it passes, then closes.
+   Desktop only. The typewriter finishes, then the rain falls: sixteen
+   drops over about four and a half seconds, quick through the middle
+   and thinning out at the end, where the last few rings run longer and
+   fade away slowly. A seventeenth ripple is never drawn at all — only
+   its band on the headline shows, lighting the water hidden under the
+   letters as it passes, then closing.
 
    Kept deliberately cheap: the rings animate transform and opacity
    only, so the whole layer stays on the compositor. Nothing here
@@ -2049,6 +2051,20 @@ textarea.blank:focus {
 
 @keyframes hero-grow { from { transform: scale(0.02); } to { transform: scale(1); } }
 @keyframes hero-fade { from { opacity: var(--a, 0.32); } to { opacity: 0; } }
+
+/* The last few rings run a second longer and hold their strength before
+   easing away, so the rain thins out rather than stopping. */
+.rain-on .hero-ring.slow {
+  animation:
+    hero-grow var(--t) cubic-bezier(0.16, 0.6, 0.22, 1) var(--delay) forwards,
+    hero-fade-slow var(--t) cubic-bezier(0.33, 0, 0.67, 1) var(--delay) forwards;
+}
+
+@keyframes hero-fade-slow {
+  0% { opacity: var(--a, 0.32); }
+  45% { opacity: var(--a, 0.32); }
+  100% { opacity: 0; }
+}
 
 /* The closing ripple: the last drop of the rain is also the reveal. Its band
    carries the water hidden under the letters across the title as the ring

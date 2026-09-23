@@ -47,11 +47,12 @@ function charDelay() {
 // which only renders there.
 //
 // The closing ripple, centred off to the right so its band crosses the title
-// from that side. Its timing lives here once, as CSS: the headline's mask is
+// from that side. The circle itself is never drawn — only what it does to the
+// letters as it passes. Its timing lives here once, as CSS: the headline's mask is
 // armed and disarmed by this very ring's own animation events, so the two can
 // never drift — including in a background tab, where timers are throttled and
 // CSS animations are not.
-const CLOSER = { x: 0.72, y: 0.5, d: 160, t: '4.8s', delay: '7s' }
+const CLOSER = { x: 0.72, y: 0.5, d: 160, t: '4.8s', delay: '5s' }
 
 type Ring = { c: string; s: Record<string, string> }
 const DROPS: { x: string; y: string; rings: Ring[] }[] = [
@@ -72,52 +73,52 @@ const DROPS: { x: string; y: string; rings: Ring[] }[] = [
     { c: 'hr-a', s: { '--d': '80%', '--t': '3.39s', '--delay': '1.65s', '--a': '.42', '--w': '1.5px', '--from': '130deg' } },
   ] },
   { x: '72%', y: '86%', rings: [
-    { c: 'hr-a', s: { '--d': '22%', '--t': '2.38s', '--delay': '1.79s', '--a': '.36', '--w': '1px', '--from': '330deg' } },
-    { c: 'hr-a', s: { '--d': '22%', '--t': '2.38s', '--delay': '2.09s', '--a': '.36', '--w': '1px', '--from': '10deg' } },
+    { c: 'hr-a', s: { '--d': '22%', '--t': '2.38s', '--delay': '1.58s', '--a': '.36', '--w': '1px', '--from': '330deg' } },
+    { c: 'hr-a', s: { '--d': '22%', '--t': '2.38s', '--delay': '1.88s', '--a': '.36', '--w': '1px', '--from': '10deg' } },
   ] },
   { x: '8%', y: '62%', rings: [
-    { c: 'hr-b', s: { '--d': '44%', '--t': '2.76s', '--delay': '2.21s', '--a': '.46', '--w': '1.5px', '--from': '270deg' } },
-    { c: 'hr-b', s: { '--d': '44%', '--t': '2.76s', '--delay': '2.51s', '--a': '.46', '--w': '1.5px', '--from': '310deg' } },
+    { c: 'hr-b', s: { '--d': '44%', '--t': '2.76s', '--delay': '1.79s', '--a': '.46', '--w': '1.5px', '--from': '270deg' } },
+    { c: 'hr-b', s: { '--d': '44%', '--t': '2.76s', '--delay': '2.09s', '--a': '.46', '--w': '1.5px', '--from': '310deg' } },
   ] },
   { x: '52%', y: '42%', rings: [
-    { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '2.67s', '--a': '.2', '--w': '3px', '--from': '300deg' } },
-    { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '2.97s', '--a': '.2', '--w': '3px', '--from': '340deg' } },
+    { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '2.03s', '--a': '.2', '--w': '3px', '--from': '300deg' } },
+    { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '2.33s', '--a': '.2', '--w': '3px', '--from': '340deg' } },
   ] },
   { x: '92%', y: '18%', rings: [
-    { c: 'hr-c', s: { '--d': '150%', '--t': '4.6s', '--delay': '2.99s', '--a': '.17', '--w': '3px', '--from': '240deg' } },
-    { c: 'hr-c', s: { '--d': '150%', '--t': '4.6s', '--delay': '3.29s', '--a': '.17', '--w': '3px', '--from': '280deg' } },
+    { c: 'hr-c', s: { '--d': '150%', '--t': '4.60s', '--delay': '2.20s', '--a': '.17', '--w': '3px', '--from': '240deg' } },
+    { c: 'hr-c', s: { '--d': '150%', '--t': '4.60s', '--delay': '2.50s', '--a': '.17', '--w': '3px', '--from': '280deg' } },
   ] },
   { x: '26%', y: '90%', rings: [
-    { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '3.47s', '--a': '.32', '--w': '1px', '--from': '270deg' } },
-    { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '3.77s', '--a': '.32', '--w': '1px', '--from': '310deg' } },
+    { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '2.45s', '--a': '.32', '--w': '1px', '--from': '270deg' } },
+    { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '2.75s', '--a': '.32', '--w': '1px', '--from': '310deg' } },
   ] },
   { x: '58%', y: '64%', rings: [
-    { c: 'hr-b', s: { '--d': '60%', '--t': '3.04s', '--delay': '3.95s', '--a': '.38', '--w': '1.5px', '--from': '120deg' } },
-    { c: 'hr-b', s: { '--d': '60%', '--t': '3.04s', '--delay': '4.25s', '--a': '.38', '--w': '1.5px', '--from': '160deg' } },
+    { c: 'hr-b', s: { '--d': '60%', '--t': '3.04s', '--delay': '2.69s', '--a': '.38', '--w': '1.5px', '--from': '120deg' } },
+    { c: 'hr-b', s: { '--d': '60%', '--t': '3.04s', '--delay': '2.99s', '--a': '.38', '--w': '1.5px', '--from': '160deg' } },
   ] },
   { x: '44%', y: '8%', rings: [
-    { c: 'hr-b', s: { '--d': '150%', '--t': '4.6s', '--delay': '4.36s', '--a': '.14', '--w': '3px', '--from': '60deg' } },
-    { c: 'hr-b', s: { '--d': '150%', '--t': '4.6s', '--delay': '4.66s', '--a': '.14', '--w': '3px', '--from': '100deg' } },
+    { c: 'hr-b', s: { '--d': '150%', '--t': '4.60s', '--delay': '2.91s', '--a': '.14', '--w': '3px', '--from': '60deg' } },
+    { c: 'hr-b', s: { '--d': '150%', '--t': '4.60s', '--delay': '3.21s', '--a': '.14', '--w': '3px', '--from': '100deg' } },
   ] },
   { x: '80%', y: '34%', rings: [
-    { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '4.74s', '--a': '.14', '--w': '3px', '--from': '240deg' } },
-    { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '5.04s', '--a': '.14', '--w': '3px', '--from': '280deg' } },
+    { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '3.10s', '--a': '.14', '--w': '3px', '--from': '240deg' } },
+    { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '3.40s', '--a': '.14', '--w': '3px', '--from': '280deg' } },
   ] },
   { x: '14%', y: '40%', rings: [
-    { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '5.21s', '--a': '.32', '--w': '1px', '--from': '210deg' } },
-    { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '5.51s', '--a': '.32', '--w': '1px', '--from': '250deg' } },
+    { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '3.35s', '--a': '.32', '--w': '1px', '--from': '210deg' } },
+    { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '3.65s', '--a': '.32', '--w': '1px', '--from': '250deg' } },
   ] },
   { x: '68%', y: '50%', rings: [
-    { c: 'hr-a', s: { '--d': '80%', '--t': '3.39s', '--delay': '5.49s', '--a': '.38', '--w': '1.5px', '--from': '90deg' } },
-    { c: 'hr-a', s: { '--d': '80%', '--t': '3.39s', '--delay': '5.79s', '--a': '.38', '--w': '1.5px', '--from': '130deg' } },
+    { c: 'hr-a slow', s: { '--d': '80%', '--t': '4.39s', '--delay': '3.49s', '--a': '.38', '--w': '1.5px', '--from': '90deg' } },
+    { c: 'hr-a slow', s: { '--d': '80%', '--t': '4.39s', '--delay': '3.79s', '--a': '.38', '--w': '1.5px', '--from': '130deg' } },
   ] },
   { x: '34%', y: '50%', rings: [
-    { c: 'hr-b', s: { '--d': '9%', '--t': '2.16s', '--delay': '6.06s', '--a': '.36', '--w': '1px', '--from': '330deg' } },
-    { c: 'hr-b', s: { '--d': '9%', '--t': '2.16s', '--delay': '6.36s', '--a': '.36', '--w': '1px', '--from': '10deg' } },
+    { c: 'hr-b slow', s: { '--d': '9%', '--t': '3.16s', '--delay': '4.06s', '--a': '.36', '--w': '1px', '--from': '330deg' } },
+    { c: 'hr-b slow', s: { '--d': '9%', '--t': '3.16s', '--delay': '4.36s', '--a': '.36', '--w': '1px', '--from': '10deg' } },
   ] },
   { x: '90%', y: '80%', rings: [
-    { c: 'hr-a', s: { '--d': '110%', '--t': '3.91s', '--delay': '6.38s', '--a': '.14', '--w': '3px', '--from': '30deg' } },
-    { c: 'hr-a', s: { '--d': '110%', '--t': '3.91s', '--delay': '6.68s', '--a': '.14', '--w': '3px', '--from': '70deg' } },
+    { c: 'hr-a slow', s: { '--d': '110%', '--t': '4.91s', '--delay': '4.38s', '--a': '.14', '--w': '3px', '--from': '30deg' } },
+    { c: 'hr-a slow', s: { '--d': '110%', '--t': '4.91s', '--delay': '4.68s', '--a': '.14', '--w': '3px', '--from': '70deg' } },
   ] },
 ]
 
@@ -305,8 +306,9 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
           compositor. Depth reads through line weight and opacity. */}
       {isDesktop && (
         <div className="hero-fx" aria-hidden="true">
-          {/* the closing ripple, drawn with the rest so the band on the
-              headline always sits exactly on a ring the visitor can see */}
+          {/* The closing ripple. It is not painted (--a: 0) — only its
+              effect on the headline shows — but it is a real ring on the
+              rain's own clock, and its animation events arm the reveal. */}
           <div
             className="hero-drop"
             style={{ '--x': `${CLOSER.x * 100}%`, '--y': `${CLOSER.y * 100}%` } as React.CSSProperties}
@@ -318,7 +320,10 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
                 '--d': `${CLOSER.d}%`,
                 '--t': CLOSER.t,
                 '--delay': CLOSER.delay,
-                '--a': '.16',
+                // invisible on purpose: the ring is only a clock and a
+                // shape for the headline's band to ride. Its animations
+                // still start and end, which is what arms the reveal.
+                '--a': '0',
                 '--w': '3px',
                 '--from': '210deg',
               } as React.CSSProperties}
