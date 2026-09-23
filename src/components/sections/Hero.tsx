@@ -22,11 +22,16 @@ function charDelay() {
 
 // ---- Hero rain (ported from the Studio_Landing study, 2026-09-23) ----
 // Sixteen drops fall once the typewriter has finished, purely as background:
-// the rings sit behind the copy and never touch it. When the water is still
-// the hover window wipes itself across the title, right to left. Desktop
-// only: that wipe needs .hero-rainbow, which only renders there.
-const RAIN_OUT = 11000 // ms from the first drop to the last ring fading
-const WIPE = 1900 // ms for the window to cross the title
+// the rings sit behind the copy and never touch it. The last drop is the
+// exception — it is wider than the rest and its band carries the water
+// hidden under the headline across the letters as it grows past them, then
+// closes. Desktop only: that reveal needs .hero-rainbow, which only renders
+// there.
+// The closing ripple — the last drop of the rain, wider than the rest, and
+// the one the headline mask follows as it rises through the letters. Centred
+// off to the right so its band crosses the title from that side.
+const CLOSER = { x: 0.72, y: 0.5, d: 160, t: '4.8s', delay: '7s' }
+const CLOSER_END = 11900 // ms: its delay plus its life, plus a beat
 
 type Ring = { c: string; s: Record<string, string> }
 const DROPS: { x: string; y: string; rings: Ring[] }[] = [
@@ -212,35 +217,26 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
 
       setRevealReady(true)
 
-      // ---- the rain, then the closing wipe ----
+      // ---- the rain, and the ripple that lights the headline on its way out ----
       const title = titleRef.current
       const hero = heroRef.current
       if (!desktopRef.current || !title || !hero) return
 
+      const hb = hero.getBoundingClientRect()
       const box = title.getBoundingClientRect()
+      title.style.setProperty('--wcx', `${hb.left + hb.width * CLOSER.x - box.left}px`)
+      title.style.setProperty('--wcy', `${hb.top + hb.height * CLOSER.y - box.top}px`)
+      title.style.setProperty('--wre', `${(hb.width * CLOSER.d) / 200}px`)
+      title.style.setProperty('--wt', CLOSER.t)
+      title.style.setProperty('--wd', CLOSER.delay)
 
-      // The closing wipe travels across the letters, not the full-width box:
-      // it drops from the first line's centre to the second's as it goes.
-      const rows = title.querySelectorAll<HTMLElement>('.hero-ink > div')
-      const spans = title.querySelectorAll<HTMLElement>('.hero-ink .typewriter-text')
-      if (rows.length === 2 && spans.length === 2) {
-        const r1 = rows[0].getBoundingClientRect()
-        const r2 = rows[1].getBoundingClientRect()
-        const s1 = spans[0].getBoundingClientRect()
-        const s2 = spans[1].getBoundingClientRect()
-        title.style.setProperty('--y1', `${r1.top + r1.height / 2 - box.top}px`)
-        title.style.setProperty('--y2', `${r2.top + r2.height / 2 - box.top}px`)
-        title.style.setProperty('--x0', `${Math.max(s1.right, s2.right) - box.left + 100}px`)
-        title.style.setProperty('--x1', '-100px')
-      }
-
+      // The mask waits out its own animation-delay, so it can be armed with
+      // the rain and simply ride the closing ripple when that arrives.
       setRaining(true)
-      await sleep(RAIN_OUT) // the last ring has faded
-      if (cancelled.current) return
       setWiping(true)
-      await sleep(WIPE + 60)
+      await sleep(CLOSER_END)
       if (cancelled.current) return
-      setWiping(false) // hand the window back to the pointer
+      setWiping(false) // hand the headline back to the pointer
     }
 
     run()
@@ -261,6 +257,24 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
           compositor. Depth reads through line weight and opacity. */}
       {isDesktop && (
         <div className="hero-fx" aria-hidden="true">
+          {/* the closing ripple, drawn with the rest so the band on the
+              headline always sits exactly on a ring the visitor can see */}
+          <div
+            className="hero-drop"
+            style={{ '--x': `${CLOSER.x * 100}%`, '--y': `${CLOSER.y * 100}%` } as React.CSSProperties}
+          >
+            <i
+              className="hero-ring hr-b"
+              style={{
+                '--d': `${CLOSER.d}%`,
+                '--t': CLOSER.t,
+                '--delay': CLOSER.delay,
+                '--a': '.16',
+                '--w': '3px',
+                '--from': '210deg',
+              } as React.CSSProperties}
+            />
+          </div>
           {DROPS.map((d, i) => (
             <div
               key={i}

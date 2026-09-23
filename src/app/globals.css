@@ -1961,8 +1961,9 @@ textarea.blank:focus {
 /* ================================================================
    Hero rain (Hero.tsx, 2026-09-23)
    Desktop only. The typewriter finishes, then sixteen drops fall
-   across the hero over about seven seconds; when the water is still
-   the hover window wipes itself across the title, right to left.
+   across the hero over about seven seconds. The last of them is wider
+   than the rest and rises through the headline: its band lights the
+   water hidden under the letters as it passes, then closes.
 
    Kept deliberately cheap: the rings animate transform and opacity
    only, so the whole layer stays on the compositor. Nothing here
@@ -2022,32 +2023,86 @@ textarea.blank:focus {
 @keyframes hero-grow { from { transform: scale(0.02); } to { transform: scale(1); } }
 @keyframes hero-fade { from { opacity: var(--a, 0.32); } to { opacity: 0; } }
 
-/* The closing wipe: the window the pointer opens travels across the title on
-   its own, right to left, dropping from the first line to the second.
-   Registering --mx/--my is what lets them animate; they inherit down to the
-   ink and rainbow layers. */
-@property --mx { syntax: '<length-percentage>'; inherits: true; initial-value: 50%; }
-@property --my { syntax: '<length-percentage>'; inherits: true; initial-value: 50%; }
+/* The closing ripple: the last drop of the rain is also the reveal. Its band
+   carries the water hidden under the letters across the title as the ring
+   grows past it, then closes and takes the colour with it. One annulus on
+   each title layer — the rainbow keeps what the band covers, the ink loses
+   it — both driven by the same two registered lengths on the ring's own
+   clock, so the colour is always exactly where the circle is.
 
-.hero-title.wipe { animation: hero-wipe 1.9s cubic-bezier(0.5, 0.02, 0.3, 1) forwards; }
-.hero-title.wipe .hero-rainbow { opacity: 1; }
-.hero-title.wipe .hero-ink {
-  -webkit-mask-image: radial-gradient(circle 80px at var(--mx) var(--my),
-    transparent 99%, #000 100%);
-  mask-image: radial-gradient(circle 80px at var(--mx) var(--my),
-    transparent 99%, #000 100%);
+   :not(:hover) because the class is armed for the whole rain while its
+   animation waits out its delay — without it the pointer's own reveal would
+   be masked away for those first several seconds. */
+@property --wr { syntax: '<length>'; inherits: true; initial-value: 0px; }
+@property --wb { syntax: '<length>'; inherits: true; initial-value: 0px; }
+
+.hero-title.wipe {
+  animation:
+    hero-wipe-r var(--wt) cubic-bezier(0.16, 0.6, 0.22, 1) var(--wd) forwards,
+    hero-wipe-b var(--wt) cubic-bezier(0.4, 0, 0.35, 1) var(--wd) forwards;
 }
 
-@keyframes hero-wipe {
-  from { --mx: var(--x0, 100%); --my: var(--y1, 30%); }
-  to { --mx: var(--x1, 0px); --my: var(--y2, 70%); }
+@keyframes hero-wipe-r { from { --wr: 0px; } to { --wr: var(--wre, 0px); } }
+@keyframes hero-wipe-b {
+  0% { --wb: 0px; }
+  18% { --wb: 26px; }
+  70% { --wb: 26px; }
+  100% { --wb: 0px; }
+}
+
+.hero-title.wipe:not(:hover) .hero-rainbow {
+  opacity: 1;
+  transform: none;
+  -webkit-mask-image: radial-gradient(circle at var(--wcx) var(--wcy),
+    transparent calc(var(--wr) - var(--wb) * 3.0),
+    rgba(0, 0, 0, .12) calc(var(--wr) - var(--wb) * 2.2),
+    rgba(0, 0, 0, .42) calc(var(--wr) - var(--wb) * 1.4),
+    rgba(0, 0, 0, .8) calc(var(--wr) - var(--wb) * 0.6),
+    #000 var(--wr),
+    rgba(0, 0, 0, .8) calc(var(--wr) + var(--wb) * 0.6),
+    rgba(0, 0, 0, .42) calc(var(--wr) + var(--wb) * 1.4),
+    rgba(0, 0, 0, .12) calc(var(--wr) + var(--wb) * 2.2),
+    transparent calc(var(--wr) + var(--wb) * 3.0));
+  mask-image: radial-gradient(circle at var(--wcx) var(--wcy),
+    transparent calc(var(--wr) - var(--wb) * 3.0),
+    rgba(0, 0, 0, .12) calc(var(--wr) - var(--wb) * 2.2),
+    rgba(0, 0, 0, .42) calc(var(--wr) - var(--wb) * 1.4),
+    rgba(0, 0, 0, .8) calc(var(--wr) - var(--wb) * 0.6),
+    #000 var(--wr),
+    rgba(0, 0, 0, .8) calc(var(--wr) + var(--wb) * 0.6),
+    rgba(0, 0, 0, .42) calc(var(--wr) + var(--wb) * 1.4),
+    rgba(0, 0, 0, .12) calc(var(--wr) + var(--wb) * 2.2),
+    transparent calc(var(--wr) + var(--wb) * 3.0));
+}
+
+.hero-title.wipe:not(:hover) .hero-ink {
+  -webkit-mask-image: radial-gradient(circle at var(--wcx) var(--wcy),
+    #000 calc(var(--wr) - var(--wb) * 3.45),
+    rgba(0, 0, 0, .88) calc(var(--wr) - var(--wb) * 2.53),
+    rgba(0, 0, 0, .58) calc(var(--wr) - var(--wb) * 1.61),
+    rgba(0, 0, 0, .2) calc(var(--wr) - var(--wb) * 0.69),
+    transparent var(--wr),
+    rgba(0, 0, 0, .2) calc(var(--wr) + var(--wb) * 0.69),
+    rgba(0, 0, 0, .58) calc(var(--wr) + var(--wb) * 1.61),
+    rgba(0, 0, 0, .88) calc(var(--wr) + var(--wb) * 2.53),
+    #000 calc(var(--wr) + var(--wb) * 3.45));
+  mask-image: radial-gradient(circle at var(--wcx) var(--wcy),
+    #000 calc(var(--wr) - var(--wb) * 3.45),
+    rgba(0, 0, 0, .88) calc(var(--wr) - var(--wb) * 2.53),
+    rgba(0, 0, 0, .58) calc(var(--wr) - var(--wb) * 1.61),
+    rgba(0, 0, 0, .2) calc(var(--wr) - var(--wb) * 0.69),
+    transparent var(--wr),
+    rgba(0, 0, 0, .2) calc(var(--wr) + var(--wb) * 0.69),
+    rgba(0, 0, 0, .58) calc(var(--wr) + var(--wb) * 1.61),
+    rgba(0, 0, 0, .88) calc(var(--wr) + var(--wb) * 2.53),
+    #000 calc(var(--wr) + var(--wb) * 3.45));
 }
 
 @media (prefers-reduced-motion: reduce) {
   .hero-fx { display: none; }
   .hero-title.wipe { animation: none; }
-  .hero-title.wipe .hero-rainbow { opacity: 0; }
-  .hero-title.wipe .hero-ink { -webkit-mask-image: none; mask-image: none; }
+  .hero-title.wipe:not(:hover) .hero-rainbow { opacity: 0; }
+  .hero-title.wipe:not(:hover) .hero-ink { -webkit-mask-image: none; mask-image: none; }
 }
 
 
