@@ -39,9 +39,10 @@ function charDelay() {
 }
 
 // ---- Hero rain ----
-// Nine drops fall once the typewriter has finished, purely as background:
-// each sends out two rings, one echoing the other, and they sit under every
-// piece of copy and never touch it.
+// Seven drops fall once the typewriter has finished, purely as background.
+// A drop is not one circle: each sends out one to three rings, the echoes
+// following 0.3s apart and each carrying less light than the one before, the
+// way real water does. They sit under every piece of copy and never touch it.
 // The last drop is the exception — it is wider than the rest and its band
 // carries the water hidden under the headline across the letters as it grows
 // past them, then closes. Desktop only: that reveal needs .hero-rainbow,
@@ -59,35 +60,27 @@ type Ring = { c: string; s: Record<string, string> }
 const DROPS: { x: string; y: string; rings: Ring[] }[] = [
   { x: '18%', y: '22%', rings: [
     { c: 'hr-c', s: { '--d': '14%', '--t': '2.24s', '--delay': '0.17s', '--a': '.28', '--w': '1px', '--from': '120deg' } },
-    { c: 'hr-c', s: { '--d': '14%', '--t': '2.24s', '--delay': '0.47s', '--a': '.28', '--w': '1px', '--from': '160deg' } },
   ] },
   { x: '84%', y: '58%', rings: [
     { c: 'hr-a', s: { '--d': '110%', '--t': '3.91s', '--delay': '0.86s', '--a': '.14', '--w': '3px', '--from': '30deg' } },
-    { c: 'hr-a', s: { '--d': '110%', '--t': '3.91s', '--delay': '1.16s', '--a': '.14', '--w': '3px', '--from': '70deg' } },
-  ] },
-  { x: '38%', y: '70%', rings: [
-    { c: 'hr-a', s: { '--d': '80%', '--t': '3.39s', '--delay': '1.35s', '--a': '.42', '--w': '1.5px', '--from': '90deg' } },
-    { c: 'hr-a', s: { '--d': '80%', '--t': '3.39s', '--delay': '1.65s', '--a': '.42', '--w': '1.5px', '--from': '130deg' } },
+    { c: 'hr-a', s: { '--d': '110%', '--t': '3.91s', '--delay': '1.16s', '--a': '.101', '--w': '3px', '--from': '70deg' } },
+    { c: 'hr-a', s: { '--d': '110%', '--t': '3.91s', '--delay': '1.46s', '--a': '.07', '--w': '3px', '--from': '110deg' } },
   ] },
   { x: '8%', y: '62%', rings: [
     { c: 'hr-b', s: { '--d': '44%', '--t': '2.76s', '--delay': '1.79s', '--a': '.46', '--w': '1.5px', '--from': '270deg' } },
-    { c: 'hr-b', s: { '--d': '44%', '--t': '2.76s', '--delay': '2.09s', '--a': '.46', '--w': '1.5px', '--from': '310deg' } },
+    { c: 'hr-b', s: { '--d': '44%', '--t': '2.76s', '--delay': '2.09s', '--a': '.331', '--w': '1.5px', '--from': '310deg' } },
   ] },
   { x: '26%', y: '90%', rings: [
     { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '2.45s', '--a': '.32', '--w': '1px', '--from': '270deg' } },
-    { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '2.75s', '--a': '.32', '--w': '1px', '--from': '310deg' } },
-  ] },
-  { x: '80%', y: '34%', rings: [
-    { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '3.10s', '--a': '.14', '--w': '3px', '--from': '240deg' } },
-    { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '3.40s', '--a': '.14', '--w': '3px', '--from': '280deg' } },
   ] },
   { x: '68%', y: '50%', rings: [
     { c: 'hr-a slow', s: { '--d': '80%', '--t': '4.39s', '--delay': '3.49s', '--a': '.38', '--w': '1.5px', '--from': '90deg' } },
-    { c: 'hr-a slow', s: { '--d': '80%', '--t': '4.39s', '--delay': '3.79s', '--a': '.38', '--w': '1.5px', '--from': '130deg' } },
+    { c: 'hr-a slow', s: { '--d': '80%', '--t': '4.39s', '--delay': '3.79s', '--a': '.274', '--w': '1.5px', '--from': '130deg' } },
+    { c: 'hr-a slow', s: { '--d': '80%', '--t': '4.39s', '--delay': '4.09s', '--a': '.19', '--w': '1.5px', '--from': '170deg' } },
   ] },
   { x: '90%', y: '80%', rings: [
     { c: 'hr-a slow', s: { '--d': '110%', '--t': '4.91s', '--delay': '4.38s', '--a': '.14', '--w': '3px', '--from': '30deg' } },
-    { c: 'hr-a slow', s: { '--d': '110%', '--t': '4.91s', '--delay': '4.68s', '--a': '.14', '--w': '3px', '--from': '70deg' } },
+    { c: 'hr-a slow', s: { '--d': '110%', '--t': '4.91s', '--delay': '4.68s', '--a': '.101', '--w': '3px', '--from': '70deg' } },
   ] },
 ]
 
