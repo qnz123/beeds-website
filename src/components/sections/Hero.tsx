@@ -47,8 +47,8 @@ function charDelay() {
 // which only renders there.
 //
 // The closing ripple, centred off to the right so its band crosses the title
-// from that side. The circle itself is never drawn — only what it does to the
-// letters as it passes. Its timing lives here once, as CSS: the headline's mask is
+// from that side, so the band on the headline always sits exactly on a circle
+// the visitor can see. Its timing lives here once, as CSS: the headline's mask is
 // armed and disarmed by this very ring's own animation events, so the two can
 // never drift — including in a background tab, where timers are throttled and
 // CSS animations are not.
@@ -306,9 +306,9 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
           compositor. Depth reads through line weight and opacity. */}
       {isDesktop && (
         <div className="hero-fx" aria-hidden="true">
-          {/* The closing ripple. It is not painted (--a: 0) — only its
-              effect on the headline shows — but it is a real ring on the
-              rain's own clock, and its animation events arm the reveal. */}
+          {/* The closing ripple, drawn with the rest so the band on the
+              headline always sits exactly on a ring the visitor can see.
+              Its animation events are what arm and disarm the reveal. */}
           <div
             className="hero-drop"
             style={{ '--x': `${CLOSER.x * 100}%`, '--y': `${CLOSER.y * 100}%` } as React.CSSProperties}
@@ -320,10 +320,7 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
                 '--d': `${CLOSER.d}%`,
                 '--t': CLOSER.t,
                 '--delay': CLOSER.delay,
-                // invisible on purpose: the ring is only a clock and a
-                // shape for the headline's band to ride. Its animations
-                // still start and end, which is what arms the reveal.
-                '--a': '0',
+                '--a': '.16',
                 '--w': '3px',
                 '--from': '210deg',
               } as React.CSSProperties}

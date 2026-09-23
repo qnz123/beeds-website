@@ -1987,9 +1987,9 @@ textarea.blank:focus {
    Desktop only. The typewriter finishes, then the rain falls: sixteen
    drops over about four and a half seconds, quick through the middle
    and thinning out at the end, where the last few rings run longer and
-   fade away slowly. A seventeenth ripple is never drawn at all — only
-   its band on the headline shows, lighting the water hidden under the
-   letters as it passes, then closing.
+   fade away slowly. A seventeenth, wider ripple follows and rises
+   through the headline: its band lights the water hidden under the
+   letters as it passes, then closes.
 
    Kept deliberately cheap: the rings animate transform and opacity
    only, so the whole layer stays on the compositor. Nothing here
