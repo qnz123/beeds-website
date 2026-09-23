@@ -1985,9 +1985,9 @@ textarea.blank:focus {
 /* ================================================================
    Hero rain (Hero.tsx, 2026-09-23)
    Desktop only. The typewriter finishes, then the rain falls: sixteen
-   drops over about four and a half seconds, quick through the middle
-   and thinning out at the end, where the last few rings run longer and
-   fade away slowly. A seventeenth, wider ripple follows and rises
+   drops over about four and a half seconds, one ring each, quick
+   through the middle and thinning out at the end, where the last few
+   run longer and fade away slowly. A seventeenth, wider ripple follows and rises
    through the headline: its band lights the water hidden under the
    letters as it passes, then closes.
 

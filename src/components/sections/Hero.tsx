@@ -40,7 +40,8 @@ function charDelay() {
 
 // ---- Hero rain ----
 // Seventeen drops fall once the typewriter has finished, purely as
-// background: the rings sit under every piece of copy and never touch it.
+// background: one ring each, sitting under every piece of copy and never
+// touching it.
 // The last drop is the exception — it is wider than the rest and its band
 // carries the water hidden under the headline across the letters as it grows
 // past them, then closes. Desktop only: that reveal needs .hero-rainbow,
@@ -58,67 +59,51 @@ type Ring = { c: string; s: Record<string, string> }
 const DROPS: { x: string; y: string; rings: Ring[] }[] = [
   { x: '18%', y: '22%', rings: [
     { c: 'hr-c', s: { '--d': '14%', '--t': '2.24s', '--delay': '0.17s', '--a': '.28', '--w': '1px', '--from': '120deg' } },
-    { c: 'hr-c', s: { '--d': '14%', '--t': '2.24s', '--delay': '0.47s', '--a': '.28', '--w': '1px', '--from': '160deg' } },
   ] },
   { x: '64%', y: '14%', rings: [
     { c: 'hr-a', s: { '--d': '22%', '--t': '2.38s', '--delay': '0.50s', '--a': '.36', '--w': '1px', '--from': '120deg' } },
-    { c: 'hr-a', s: { '--d': '22%', '--t': '2.38s', '--delay': '0.80s', '--a': '.36', '--w': '1px', '--from': '160deg' } },
   ] },
   { x: '84%', y: '58%', rings: [
     { c: 'hr-a', s: { '--d': '110%', '--t': '3.91s', '--delay': '0.86s', '--a': '.14', '--w': '3px', '--from': '30deg' } },
-    { c: 'hr-a', s: { '--d': '110%', '--t': '3.91s', '--delay': '1.16s', '--a': '.14', '--w': '3px', '--from': '70deg' } },
   ] },
   { x: '38%', y: '70%', rings: [
     { c: 'hr-a', s: { '--d': '80%', '--t': '3.39s', '--delay': '1.35s', '--a': '.42', '--w': '1.5px', '--from': '90deg' } },
-    { c: 'hr-a', s: { '--d': '80%', '--t': '3.39s', '--delay': '1.65s', '--a': '.42', '--w': '1.5px', '--from': '130deg' } },
   ] },
   { x: '72%', y: '86%', rings: [
     { c: 'hr-a', s: { '--d': '22%', '--t': '2.38s', '--delay': '1.58s', '--a': '.36', '--w': '1px', '--from': '330deg' } },
-    { c: 'hr-a', s: { '--d': '22%', '--t': '2.38s', '--delay': '1.88s', '--a': '.36', '--w': '1px', '--from': '10deg' } },
   ] },
   { x: '8%', y: '62%', rings: [
     { c: 'hr-b', s: { '--d': '44%', '--t': '2.76s', '--delay': '1.79s', '--a': '.46', '--w': '1.5px', '--from': '270deg' } },
-    { c: 'hr-b', s: { '--d': '44%', '--t': '2.76s', '--delay': '2.09s', '--a': '.46', '--w': '1.5px', '--from': '310deg' } },
   ] },
   { x: '52%', y: '42%', rings: [
     { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '2.03s', '--a': '.2', '--w': '3px', '--from': '300deg' } },
-    { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '2.33s', '--a': '.2', '--w': '3px', '--from': '340deg' } },
   ] },
   { x: '92%', y: '18%', rings: [
     { c: 'hr-c', s: { '--d': '150%', '--t': '4.60s', '--delay': '2.20s', '--a': '.17', '--w': '3px', '--from': '240deg' } },
-    { c: 'hr-c', s: { '--d': '150%', '--t': '4.60s', '--delay': '2.50s', '--a': '.17', '--w': '3px', '--from': '280deg' } },
   ] },
   { x: '26%', y: '90%', rings: [
     { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '2.45s', '--a': '.32', '--w': '1px', '--from': '270deg' } },
-    { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '2.75s', '--a': '.32', '--w': '1px', '--from': '310deg' } },
   ] },
   { x: '58%', y: '64%', rings: [
     { c: 'hr-b', s: { '--d': '60%', '--t': '3.04s', '--delay': '2.69s', '--a': '.38', '--w': '1.5px', '--from': '120deg' } },
-    { c: 'hr-b', s: { '--d': '60%', '--t': '3.04s', '--delay': '2.99s', '--a': '.38', '--w': '1.5px', '--from': '160deg' } },
   ] },
   { x: '44%', y: '8%', rings: [
     { c: 'hr-b', s: { '--d': '150%', '--t': '4.60s', '--delay': '2.91s', '--a': '.14', '--w': '3px', '--from': '60deg' } },
-    { c: 'hr-b', s: { '--d': '150%', '--t': '4.60s', '--delay': '3.21s', '--a': '.14', '--w': '3px', '--from': '100deg' } },
   ] },
   { x: '80%', y: '34%', rings: [
     { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '3.10s', '--a': '.14', '--w': '3px', '--from': '240deg' } },
-    { c: 'hr-b', s: { '--d': '110%', '--t': '3.91s', '--delay': '3.40s', '--a': '.14', '--w': '3px', '--from': '280deg' } },
   ] },
   { x: '14%', y: '40%', rings: [
     { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '3.35s', '--a': '.32', '--w': '1px', '--from': '210deg' } },
-    { c: 'hr-a', s: { '--d': '14%', '--t': '2.24s', '--delay': '3.65s', '--a': '.32', '--w': '1px', '--from': '250deg' } },
   ] },
   { x: '68%', y: '50%', rings: [
     { c: 'hr-a slow', s: { '--d': '80%', '--t': '4.39s', '--delay': '3.49s', '--a': '.38', '--w': '1.5px', '--from': '90deg' } },
-    { c: 'hr-a slow', s: { '--d': '80%', '--t': '4.39s', '--delay': '3.79s', '--a': '.38', '--w': '1.5px', '--from': '130deg' } },
   ] },
   { x: '34%', y: '50%', rings: [
     { c: 'hr-b slow', s: { '--d': '9%', '--t': '3.16s', '--delay': '4.06s', '--a': '.36', '--w': '1px', '--from': '330deg' } },
-    { c: 'hr-b slow', s: { '--d': '9%', '--t': '3.16s', '--delay': '4.36s', '--a': '.36', '--w': '1px', '--from': '10deg' } },
   ] },
   { x: '90%', y: '80%', rings: [
     { c: 'hr-a slow', s: { '--d': '110%', '--t': '4.91s', '--delay': '4.38s', '--a': '.14', '--w': '3px', '--from': '30deg' } },
-    { c: 'hr-a slow', s: { '--d': '110%', '--t': '4.91s', '--delay': '4.68s', '--a': '.14', '--w': '3px', '--from': '70deg' } },
   ] },
 ]
 
