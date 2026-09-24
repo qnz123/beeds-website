@@ -2209,13 +2209,80 @@ textarea.blank:focus {
     #000 calc(var(--wr) + var(--wb) * 3.45));
 }
 
+/* Both reveals at once. The pointer's lens is switched off while the ripple
+   runs (the hover rules carry :not(.wipe)), and on its own that made the
+   headline blink: letters lit under the pointer snapped back to black the
+   instant the ripple armed, and snapped alight again when it finished.
+   So when the pointer is genuinely on the title — .lens means a real pointer
+   event has placed it — the ripple's band and the pointer's circle are shown
+   together: the rainbow takes the union of the two masks (mask layers add by
+   default), and the ink is cut by both (intersect: opaque only where NEITHER
+   hole is). Nothing snaps at either edge of the ripple. */
+.hero-title.wipe.lens:hover .hero-rainbow {
+  -webkit-mask-image:
+    radial-gradient(circle at var(--wcx) var(--wcy),
+      transparent calc(var(--wr) - var(--wb) * 3.0),
+      rgba(0, 0, 0, .12) calc(var(--wr) - var(--wb) * 2.2),
+      rgba(0, 0, 0, .42) calc(var(--wr) - var(--wb) * 1.4),
+      rgba(0, 0, 0, .8) calc(var(--wr) - var(--wb) * 0.6),
+      #000 var(--wr),
+      rgba(0, 0, 0, .8) calc(var(--wr) + var(--wb) * 0.6),
+      rgba(0, 0, 0, .42) calc(var(--wr) + var(--wb) * 1.4),
+      rgba(0, 0, 0, .12) calc(var(--wr) + var(--wb) * 2.2),
+      transparent calc(var(--wr) + var(--wb) * 3.0)),
+    radial-gradient(circle 80px at var(--mx, 50%) var(--my, 50%), #000 99%, transparent 100%);
+  mask-image:
+    radial-gradient(circle at var(--wcx) var(--wcy),
+      transparent calc(var(--wr) - var(--wb) * 3.0),
+      rgba(0, 0, 0, .12) calc(var(--wr) - var(--wb) * 2.2),
+      rgba(0, 0, 0, .42) calc(var(--wr) - var(--wb) * 1.4),
+      rgba(0, 0, 0, .8) calc(var(--wr) - var(--wb) * 0.6),
+      #000 var(--wr),
+      rgba(0, 0, 0, .8) calc(var(--wr) + var(--wb) * 0.6),
+      rgba(0, 0, 0, .42) calc(var(--wr) + var(--wb) * 1.4),
+      rgba(0, 0, 0, .12) calc(var(--wr) + var(--wb) * 2.2),
+      transparent calc(var(--wr) + var(--wb) * 3.0)),
+    radial-gradient(circle 80px at var(--mx, 50%) var(--my, 50%), #000 99%, transparent 100%);
+}
+
+.hero-title.wipe.lens:hover .hero-ink {
+  -webkit-mask-image:
+    radial-gradient(circle at var(--wcx) var(--wcy),
+      #000 calc(var(--wr) - var(--wb) * 3.45),
+      rgba(0, 0, 0, .88) calc(var(--wr) - var(--wb) * 2.53),
+      rgba(0, 0, 0, .58) calc(var(--wr) - var(--wb) * 1.61),
+      rgba(0, 0, 0, .2) calc(var(--wr) - var(--wb) * 0.69),
+      transparent var(--wr),
+      rgba(0, 0, 0, .2) calc(var(--wr) + var(--wb) * 0.69),
+      rgba(0, 0, 0, .58) calc(var(--wr) + var(--wb) * 1.61),
+      rgba(0, 0, 0, .88) calc(var(--wr) + var(--wb) * 2.53),
+      #000 calc(var(--wr) + var(--wb) * 3.45)),
+    radial-gradient(circle 80px at var(--mx, 50%) var(--my, 50%), transparent 99%, #000 100%);
+  mask-image:
+    radial-gradient(circle at var(--wcx) var(--wcy),
+      #000 calc(var(--wr) - var(--wb) * 3.45),
+      rgba(0, 0, 0, .88) calc(var(--wr) - var(--wb) * 2.53),
+      rgba(0, 0, 0, .58) calc(var(--wr) - var(--wb) * 1.61),
+      rgba(0, 0, 0, .2) calc(var(--wr) - var(--wb) * 0.69),
+      transparent var(--wr),
+      rgba(0, 0, 0, .2) calc(var(--wr) + var(--wb) * 0.69),
+      rgba(0, 0, 0, .58) calc(var(--wr) + var(--wb) * 1.61),
+      rgba(0, 0, 0, .88) calc(var(--wr) + var(--wb) * 2.53),
+      #000 calc(var(--wr) + var(--wb) * 3.45)),
+    radial-gradient(circle 80px at var(--mx, 50%) var(--my, 50%), transparent 99%, #000 100%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-fx { display: none; }
   .typewriter-cursor { animation: none; }
   .typewriter-cursor.blinking-out { opacity: 0; }
   .hero-title.wipe { animation: none; }
-  .hero-title.wipe .hero-rainbow { opacity: 0; }
-  .hero-title.wipe .hero-ink { -webkit-mask-image: none; mask-image: none; }
+  .hero-title.wipe .hero-rainbow,
+  .hero-title.wipe.lens:hover .hero-rainbow { opacity: 0; }
+  .hero-title.wipe .hero-ink,
+  .hero-title.wipe.lens:hover .hero-ink { -webkit-mask-image: none; mask-image: none; }
 }
 
 
