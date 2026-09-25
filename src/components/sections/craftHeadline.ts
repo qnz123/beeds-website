@@ -30,6 +30,8 @@ const TL = {
   shades: { drop: [3600, 3880], swing: [3880, 4280] },
 } as const
 export const CRAFT_END = 4320
+/** the sunglasses catch on the A's tip */
+export const CRAFT_LAND = TL.shades.drop[1]
 export const CRAFT_SETTLE = 4300
 
 type Span = readonly [number, number]

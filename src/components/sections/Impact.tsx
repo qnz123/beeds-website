@@ -8,7 +8,7 @@ import { JetBrains_Mono } from 'next/font/google'
 import React, { memo, useEffect, useRef, useState } from 'react'
 import type { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
-import { balanceShades, CRAFT_END, CRAFT_SVG, playCraft, restCraft } from './craftHeadline'
+import { balanceShades, CRAFT_END, CRAFT_LAND, CRAFT_SVG, playCraft, restCraft } from './craftHeadline'
 
 const mono = JetBrains_Mono({ subsets: ['latin'], weight: ['400', '500'], variable: '--ic-mono', display: 'swap' })
 
@@ -54,6 +54,26 @@ const CRAFT_HTML = { __html: CRAFT_SVG }
 const CraftWord = memo(function CraftWord() {
   return <svg className="ic-word" viewBox="-10 -84 374 98" aria-hidden="true" focusable="false" dangerouslySetInnerHTML={CRAFT_HTML} />
 })
+
+/** Scrolls the page down by `by` px over `dur` ms with a cubic ease-out (fast start, soft landing).
+ *  The reader's own wheel, touch or key input takes over at once. Returns a cancel. */
+function easeScrollBy(by: number, dur: number): () => void {
+  const from = window.scrollY, t0 = performance.now()
+  let raf = 0
+  const cancel = () => {
+    cancelAnimationFrame(raf)
+    for (const ev of ['wheel', 'touchstart', 'keydown'] as const) window.removeEventListener(ev, cancel)
+  }
+  const step = (now: number) => {
+    const t = Math.min(1, (now - t0) / dur)
+    window.scrollTo({ top: from + by * (1 - Math.pow(1 - t, 3)), behavior: 'instant' as ScrollBehavior })
+    if (t < 1) raf = requestAnimationFrame(step)
+    else cancel()
+  }
+  for (const ev of ['wheel', 'touchstart', 'keydown'] as const) window.addEventListener(ev, cancel, { passive: true })
+  raf = requestAnimationFrame(step)
+  return cancel
+}
 
 /** Blocks scrolling further down (wheel, touch, keys, scrollbar) until the returned release is called. */
 function holdScrollDown(): () => void {
@@ -154,7 +174,7 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
     if (reducedMotion()) return
     wrap.classList.add('wait')
     let stop: (() => void) | undefined, unlock: (() => void) | undefined, unbalance: (() => void) | undefined
-    let done = 0
+    let done = 0, balanced = 0, glide: (() => void) | undefined
     const io = new IntersectionObserver(([e]) => {
       if (!e.isIntersecting) return
       io.disconnect()
@@ -164,19 +184,19 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
       const heldAt = e.boundingClientRect.top > 0 ? window.scrollY : -1
       if (heldAt >= 0) unlock = holdScrollDown()
       stop = playCraft(wrap, svg, () => wrap.classList.add('settled'))
+      balanced = window.setTimeout(() => { unbalance = balanceShades(wrap) }, CRAFT_END)
+      // the moment the glasses catch on the A, the page lets go and glides on until the word sits just
+      // under the nav, still in view above the photos, unless the reader scrolled back up meanwhile
       done = window.setTimeout(() => {
         unlock?.(); unlock = undefined
-        unbalance = balanceShades(wrap)
-        // then glide on until the word sits just under the nav, still in view above the photos,
-        // unless the reader scrolled back up meanwhile
         const nav = document.querySelector<HTMLElement>('.nav')?.offsetHeight ?? 64
         const by = svg.getBoundingClientRect().top - nav - 20
         if (heldAt >= 0 && by > 0 && Math.abs(window.scrollY - heldAt) < 4)
-          window.scrollTo({ top: window.scrollY + by, behavior: 'smooth' })
-      }, CRAFT_END)
+          glide = easeScrollBy(by, 1100)
+      }, CRAFT_LAND)
     }, { rootMargin: '0px 0px -50% 0px' })
     io.observe(wrap)
-    return () => { io.disconnect(); window.clearTimeout(done); unlock?.(); unbalance?.(); stop?.(); wrap.classList.remove('play', 'settled', 'wait') }
+    return () => { io.disconnect(); window.clearTimeout(done); window.clearTimeout(balanced); glide?.(); unlock?.(); unbalance?.(); stop?.(); wrap.classList.remove('play', 'settled', 'wait') }
   }, [])
 
   const phasesRef = useOnceInView<HTMLDivElement>(0.35, () => setCounting(true))
