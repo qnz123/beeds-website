@@ -296,7 +296,7 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
             aria-label={`${t.liftHeading}: ${channelLift.map((c, i) => `${t.channels[i]} 100 → ${c.after}`).join(', ')}.`}
           >
             <div className="ic-ruler" aria-hidden="true">
-              {[0, 100, 150, 200].map((v) => (
+              {[100].map((v) => (
                 <span key={v} className="ic-tick" style={{ left: pct(v) }}><b>{v}</b></span>
               ))}
             </div>
