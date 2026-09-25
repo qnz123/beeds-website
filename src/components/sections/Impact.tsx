@@ -200,6 +200,47 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
   }, [])
 
   const phasesRef = useOnceInView<HTMLDivElement>(0.35, () => setCounting(true))
+
+  // The photos start at full width and shrink as they scroll up toward the nav, landing at the width
+  // where photos, figures and bars fit one screen (~420px of text and bars below 4:5 photos).
+  useEffect(() => {
+    const el = phasesRef.current
+    if (!el) return
+    let raf = 0, cur = -1, last = 0
+    const target = () => {
+      const box = el.parentElement ?? el, cs = getComputedStyle(box)
+      const full = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)
+      const vh = window.innerHeight
+      const fit = Math.min(full, Math.max(600, 2.4 * vh - 1230))
+      if (fit >= full || reducedMotion()) return -1
+      const nav = document.querySelector<HTMLElement>('.nav')?.offsetHeight ?? 64
+      const top = el.getBoundingClientRect().top
+      // full size until the photos' top passes 40% of the screen, then shrink over the last stretch,
+      // easing out so the last of it slows into place
+      const from = vh * 0.4, to = nav + 24
+      const p = Math.min(1, Math.max(0, (from - top) / (from - to)))
+      return full - (full - fit) * (1 - Math.pow(1 - p, 3))
+    }
+    // the width follows the scroll through a short ease-out, so wheel steps glide instead of jumping
+    const step = (now: number) => {
+      raf = 0
+      const want = target()
+      if (want < 0) { cur = -1; el.style.removeProperty('--ic-phw'); return }
+      const dt = last ? Math.min(64, now - last) : 16
+      last = now
+      cur = cur < 0 ? want : cur + (want - cur) * (1 - Math.exp(-dt / 160))
+      if (Math.abs(want - cur) < 0.3) cur = want
+      el.style.setProperty('--ic-phw', `${cur.toFixed(1)}px`)
+      if (cur !== want) raf = requestAnimationFrame(step)
+      else last = 0
+    }
+    const queue = () => { if (!raf) raf = requestAnimationFrame(step) }
+    step(performance.now())
+    window.addEventListener('scroll', queue, { passive: true })
+    window.addEventListener('resize', queue)
+    return () => { cancelAnimationFrame(raf); window.removeEventListener('scroll', queue); window.removeEventListener('resize', queue) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const [growing, setGrowing] = useState(false)
   const liftRef = useOnceInView<HTMLDivElement>(0.4, () => setGrowing(true))
 

@@ -1367,9 +1367,9 @@ h6 {
 .ic .star-burst path { fill: none; stroke-linecap: square; stroke-dasharray: 1 2; visibility: hidden; }
 
 /* the three phases: the photograph is the mark */
-/* the photos keep their full 4:5 frame; the whole block (photos, figures, bars) narrows with the
-   window's height so photos and bars always share one screen: ~420px of text and bars + 4:5 photos */
-.ic-phases, .ic-lift, .ic-note { max-width: clamp(600px, 240vh - 1230px, 100%); margin-inline: auto; }
+/* the photos arrive full width; as they scroll up to the nav, Impact.tsx narrows them (--ic-phw) until
+   photos and bars share one screen. They keep their full 4:5 frame throughout. */
+.ic-phases { max-width: var(--ic-phw, 100%); margin-inline: auto; }
 .ic-phases { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
 .ic-phase { display: flex; flex-direction: column; }
 .ic-shot { margin: 0 0 16px; aspect-ratio: 4 / 5; max-width: 100%; background: #ebe4d8; overflow: hidden; }
