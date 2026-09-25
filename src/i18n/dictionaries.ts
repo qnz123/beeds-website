@@ -69,12 +69,14 @@ type Dict = {
     lblTime: string
   }
   impact: {
-    lede: string // '\n' marks intentional line breaks
+    lede: string // first sentence, set in full black
+    ledeRest: string // second sentence, set muted
     disclaimer: string
-    stats: string[] // the three stat-callout labels, in order
-    channels: string[] // bar-chart channel names, in order
-    before: string
-    after: string
+    stats: string[] // the three figure labels: engagement, output, time-to-launch
+    phases: string[] // the three phase names, in order
+    alts: string[] // alt text for the three lollipop photographs, in order
+    channels: string[] // channel-lift row names, in order
+    liftHeading: string
   }
   svc: { heading: string; clients: string }
   explore: {
@@ -156,16 +158,22 @@ const en: Dict = {
     lblTime: 'Time',
   },
   impact: {
-    lede: 'Creative consulting doesn’t end with recommendations. It continues through production. This is what happens when strategy is transformed into stories, experiences, and results.',
+    lede: 'Creative recommendation does not end.',
+    ledeRest: 'We continue with execution.',
     disclaimer: 'Figures are demonstration purposes.',
     stats: [
       'Average engagement lift across client channels',
       'Increase in monthly content output',
       'Faster time-to-launch on new campaigns',
     ],
+    phases: ['Strategy', 'Production', 'Results'],
+    alts: [
+      'A plain white paper lollipop stick lying on cream paper, with nothing on it yet.',
+      'The same stick, now with a glossy round hard candy on top, red at the crown fading to yellow.',
+      'The finished lollipop wrapped in crinkled gold plastic, twisted at the neck, with a cream oval label reading Human Identity.',
+    ],
     channels: ['Organic Search', 'Paid Social', 'Search Ads', 'Email'],
-    before: 'Before',
-    after: 'After',
+    liftHeading: 'CHANNEL LIFT',
   },
   svc: { heading: 'Our Services', clients: 'Selected Clients' },
   explore: {
@@ -266,16 +274,22 @@ const ja: Dict = {
     lblTime: '時間',
   },
   impact: {
-    lede: 'クリエイティブコンサルティングは、提案で終わりません。\nその先の制作まで伴走します。\n戦略を、心を動かすストーリーや体験、そして成果へと形にしていく。',
+    lede: 'クリエイティブの提案で、終わりにはしません。',
+    ledeRest: '私たちは、実行まで続けます。',
     disclaimer: '数値はデモンストレーション用のサンプルです。',
     stats: [
       'クライアントチャネル全体での平均エンゲージメント向上',
       '月間コンテンツ制作量の増加',
       '新規キャンペーンの立ち上げ時間の短縮',
     ],
+    phases: ['戦略', '制作', '成果'],
+    alts: [
+      'クリーム色の紙の上に置かれた、まだ何も付いていない白い紙のロリポップの棒。',
+      '同じ棒の先に、赤から黄色へと色が移る、つややかな丸いキャンディ。',
+      '金色のフィルムで包まれ、首元をひねった完成したロリポップ。「Human Identity」のクリーム色の楕円ラベル付き。',
+    ],
     channels: ['オーガニック検索', '有料ソーシャル', '検索広告', 'メール'],
-    before: '導入前',
-    after: '導入後',
+    liftHeading: 'チャネル別リフト',
   },
   svc: { heading: 'サービス', clients: '主なクライアント' },
   explore: {

@@ -1332,115 +1332,82 @@ h6 {
   }
 }
 
-/* ---- Impact: scroll-triggered reveals + chart animations ---- */
-/* The hidden state below is only ever entered via the `data-animate="hidden"`
-   attribute, which JS applies after mount right before arming an
-   IntersectionObserver (see `useInView` in Impact.tsx). With no attribute at
-   all (SSR / no-JS / IO never fires) every rule here is inert and content
-   renders fully visible, matching `data-animate="visible"` exactly. */
+/* ---- Impact: the CRAFT headline, three lollipop phases, channel lift ----
+   Everything is scoped under .ic. The headline's parts are moved by
+   craftHeadline.ts; at rest (no JS, reduced motion, or after it plays) only the
+   letters and the hanging sunglasses show. Assets never scale or fade: they are
+   hidden by a letter mask, by the edge of .ic-hl, or gone in a burst. */
 
-.impact-reveal {
-  transition: opacity 0.8s ease, transform 0.8s ease;
-}
-.impact-reveal[data-animate='hidden'] {
-  opacity: 0;
-  transform: translateY(24px);
-}
-.impact-reveal[data-animate='visible'] {
-  opacity: 1;
-  transform: translateY(0);
-}
+.ic { container-type: inline-size; --ic-ink: #111111; --ic-muted: #666666; --ic-gold: #ccb718; --ic-gold-text: #8a7607; }
 
-.impact-stat {
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
-.impact-stat[data-animate='hidden'] {
-  opacity: 0;
-  transform: translateY(16px);
-}
-.impact-stat[data-animate='visible'] {
-  opacity: 1;
-  transform: translateY(0);
-}
+.ic-top { text-align: center; margin-bottom: 56px; }
+.ic-hl { position: relative; overflow: hidden; padding-block: 120px 96px; margin-bottom: 36px; background: transparent; }
+.ic-title { margin: 0; line-height: 0; }
+.ic-word { position: relative; z-index: 1; display: block; width: min(100%, 374px); height: auto; margin: 0 auto; overflow: visible; }
+.ic-lede { font-size: 30px; line-height: 1.32; max-width: 30ch; margin: 0 auto; text-wrap: balance; }
+.ic-lede span { color: var(--ic-muted); }
 
-/* Chart internals are scoped to a `figure[data-animate]` ancestor (never a
-   bare `[data-animate]`) so a surrounding .impact-reveal block flipping to
-   "visible" can never leak into — and prematurely fire — a nested chart's
-   own, separately-observed draw-in. */
-.impact-chart-line {
-  transition: stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
+.ic .ink { fill: none; stroke: var(--ic-ink); stroke-width: 12; stroke-linecap: square; stroke-linejoin: miter; stroke-miterlimit: 2; }
+/* grain is the settled finish: off while things move (a live turbulence filter re-renders every frame) */
+.ic-hl:not(.play) .ink, .ic-hl.settled .ink,
+.ic-hl:not(.play) .shades, .ic-hl.settled .shades { filter: url(#ic-grain); }
+.ic .lt path { transform-box: view-box; }
+.ic .lt .draw { stroke-dasharray: 1; }
+.ic-hl.play .lt.join  { animation: ic-join 420ms cubic-bezier(.65, 0, .35, 1) var(--dj) backwards; }
+.ic-hl.play .lt .draw { animation: ic-draw var(--dur) cubic-bezier(.65, 0, .35, 1) var(--d) backwards; }
+.ic-hl.play .lt .rise { animation: ic-rise var(--dur) cubic-bezier(.65, 0, .35, 1) var(--d) backwards; }
+@keyframes ic-join { from { transform: translateX(var(--jx)); } to { transform: translateX(0); } }
+@keyframes ic-draw { 0% { opacity: 0; stroke-dashoffset: 1; } 6% { opacity: 1; } 100% { opacity: 1; stroke-dashoffset: 0; } }
+@keyframes ic-rise { from { transform: scaleY(0); } to { transform: scaleY(1); } }
 
-.impact-chart-dot {
-  transform-box: fill-box;
-  transform-origin: center;
-}
-figure[data-animate='hidden'] .impact-chart-dot {
-  opacity: 0;
-  transform: scale(0.3);
-}
-figure[data-animate='visible'] .impact-chart-dot {
-  opacity: 1;
-  transform: scale(1);
-  transition: opacity 0.5s ease, transform 0.5s ease;
-}
+.ic .asset, .ic .c-ring, .ic .c-glint, .ic .ph-ink { visibility: hidden; }
+.ic .c-ring { fill: none; stroke: var(--ic-ink); stroke-linecap: square; }
+.ic .c-glint { fill: #ffffff; }
+.ic .star-burst path { fill: none; stroke-linecap: square; stroke-dasharray: 1 2; visibility: hidden; }
+.ic .ph-shade, .ic .ph-ink { fill: var(--ic-ink); }
 
-figure[data-animate='hidden'] .impact-chart-label {
-  opacity: 0;
-}
-figure[data-animate='visible'] .impact-chart-label {
-  opacity: 1;
-  transition: opacity 0.5s ease;
-}
+/* the three phases: the photograph is the mark */
+.ic-phases { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+.ic-phase { display: flex; flex-direction: column; }
+.ic-shot { margin: 0 0 20px; aspect-ratio: 4 / 5; max-width: 100%; background: #ebe4d8; overflow: hidden; }
+.ic-shot img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ic-name { margin: 0; font-weight: 400; font-size: 27px; line-height: 1.1; }
+.ic-fig { font-size: 52px; line-height: 1; margin-top: 14px; color: var(--ic-gold-text); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.ic-cap { font-size: 14px; line-height: 1.45; color: var(--ic-muted); margin: 8px 0 0; max-width: 28ch; }
 
-/* Bar chart: bars grow up from the baseline, then the lift label fades in. */
-.impact-bar {
-  transform-box: fill-box;
-  transform-origin: bottom;
-}
-figure[data-animate='hidden'] .impact-bar {
-  transform: scaleY(0);
-}
-figure[data-animate='visible'] .impact-bar {
-  transform: scaleY(1);
-  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-}
+/* channel lift: a quiet readout under the phases (index 0 at the track's left, 220 at its right) */
+.ic-lift { margin-top: 64px; }
+.ic-lift-head { font-family: var(--ic-mono), ui-monospace, Menlo, monospace; font-size: 10.5px; letter-spacing: 0.2em; margin-bottom: 14px; }
+.ic-lift-head b { color: var(--ic-ink); font-weight: 500; }
+.ic-lift-grid { display: grid; grid-template-columns: 190px minmax(0, 1fr) 62px 46px; column-gap: 16px; row-gap: 16px; align-items: center; }
+.ic-row { display: contents; }
+.ic-ruler { grid-column: 2; position: relative; height: 16px; margin-bottom: -6px; }
+.ic-tick { position: absolute; bottom: 0; width: 1px; height: 5px; background: #c9c3b5; }
+.ic-tick b { position: absolute; bottom: 8px; left: 0; transform: translateX(-50%); font-family: var(--ic-mono), ui-monospace, Menlo, monospace; font-weight: 400; font-size: 9.5px; color: var(--ic-muted); }
+.ic-tick.first b { transform: none; }
+.ic-ch { grid-column: 1; display: flex; align-items: center; gap: 11px; font-family: var(--ic-mono), ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ic-ink); }
+.ic-ch svg { width: 16px; height: 16px; color: #8d8a80; flex: none; display: block; }
+.ic-track { grid-column: 2; display: flex; height: 12px; background: #f1eee6; }
+.ic-base { background: #ddd8cc; }
+.ic-gain { background: var(--ic-gold); }
+.ic-up { grid-column: 3; font-family: var(--ic-mono), ui-monospace, Menlo, monospace; font-size: 12px; color: var(--ic-gold-text); text-align: right; }
+.ic-end { grid-column: 4; font-size: 19px; font-variant-numeric: tabular-nums; }
+.ic-note { font-size: 11px; color: #999; margin: 36px 0 0; }
 
-figure[data-animate='hidden'] .impact-lift-label {
-  opacity: 0;
-}
-figure[data-animate='visible'] .impact-lift-label {
-  opacity: 1;
-  transition: opacity 0.5s ease;
+/* the section on a phone: phases stack */
+@container (max-width: 760px) {
+  .ic-lede { font-size: 24px; }
+  .ic-phases { grid-template-columns: 1fr; gap: 40px; }
+  .ic-shot { aspect-ratio: 4 / 3; }
+  .ic-shot img { object-position: 50% 28%; }
+  .ic-lift-grid { grid-template-columns: minmax(0, 1fr) 52px 38px; row-gap: 8px; }
+  .ic-ruler { display: none; }
+  .ic-ch { grid-column: 1 / -1; margin-top: 10px; }
+  .ic-track { grid-column: 1; } .ic-up { grid-column: 2; } .ic-end { grid-column: 3; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .impact-reveal,
-  .impact-stat,
-  .impact-chart-line,
-  .impact-chart-dot,
-  .impact-chart-label,
-  .impact-bar,
-  .impact-lift-label {
-    transition: none !important;
-  }
-
-  .impact-reveal[data-animate],
-  .impact-stat[data-animate] {
-    opacity: 1;
-    transform: none;
-  }
-
-  figure[data-animate] .impact-chart-dot,
-  figure[data-animate] .impact-chart-label,
-  figure[data-animate] .impact-lift-label {
-    opacity: 1;
-    transform: none;
-  }
-
-  figure[data-animate] .impact-bar {
-    transform: none;
-  }
+  .ic-hl.play .lt, .ic-hl.play .lt path { animation: none; }
 }
 
 /* ---- Typewriter animations ---- */

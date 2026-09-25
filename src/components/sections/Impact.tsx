@@ -3,280 +3,177 @@
 // Illustrative placeholder data — replace with real research/consulting figures
 // before launch. Kept as top-of-file consts per the project's section convention.
 
-import { Fragment, useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
+import { JetBrains_Mono } from 'next/font/google'
+import { memo, useEffect, useRef, useState } from 'react'
 import type { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
+import { CRAFT_SVG, playCraft, restCraft } from './craftHeadline'
 
-const ACCENT = '#ccb718' // restrained accent for "growth" marks, used sparingly
-const BASE_GREY = '#ccc' // baseline / comparison marks
+const mono = JetBrains_Mono({ subsets: ['latin'], weight: ['400', '500'], variable: '--ic-mono', display: 'swap' })
 
-/** A KPI stat: `value` is the authored display string (also the sr-only source
- *  of truth); `target`/`prefix`/`suffix`/`decimals` describe how to count it
- *  up from 0 on scroll-reveal without losing the exact final formatting. */
-type StatDatum = {
-  value: string
-  label: string
-  target: number
-  prefix: string
-  suffix: string
-  decimals: number
+/** A KPI figure: `value` is the authored display string (also the sr-only source
+ *  of truth); `target`/`prefix`/`suffix`/`decimals` describe how to count it up
+ *  from 0 on scroll-reveal without losing the exact final formatting. */
+type StatDatum = { value: string; target: number; prefix: string; suffix: string; decimals: number }
+
+// One lollipop at three stages is the mark for each phase. `stat` indexes the
+// dictionary's `stats` labels (engagement, output, time-to-launch).
+const phases: { img: string; stat: number; datum: StatDatum }[] = [
+  { img: '/impact/phase-1.jpg', stat: 2, datum: { value: '58%', target: 58, prefix: '', suffix: '%', decimals: 0 } },
+  { img: '/impact/phase-2.jpg', stat: 1, datum: { value: '3.2×', target: 3.2, prefix: '', suffix: '×', decimals: 1 } },
+  { img: '/impact/phase-3.jpg', stat: 0, datum: { value: '+142%', target: 142, prefix: '+', suffix: '%', decimals: 0 } },
+]
+
+// Indexed to 100 before the engagement; the track runs 0–220.
+const channelLift = [
+  { after: 156, glyph: 'organic' },
+  { after: 212, glyph: 'social' },
+  { after: 134, glyph: 'ads' },
+  { after: 178, glyph: 'email' },
+] as const
+const SCALE = 220
+const pct = (v: number) => `${((v / SCALE) * 100).toFixed(2)}%`
+
+function Glyph({ name }: { name: (typeof channelLift)[number]['glyph'] }) {
+  return (
+    <svg viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth={1.4}>
+      {name === 'organic' && (<><circle cx="8.4" cy="8.4" r="5.4" /><path d="M12.4 12.4L17 17" /></>)}
+      {name === 'social' && <path d="M3 3h14v10H9l-4 4v-4H3z" />}
+      {name === 'ads' && <path d="M4.5 2.5v14l3.6-3.4 2.4 4.6 2.1-1.1-2.3-4.4h4.6z" />}
+      {name === 'email' && (<><rect x="2.5" y="4.5" width="15" height="11" /><path d="M2.5 5.2L10 11l7.5-5.8" /></>)}
+    </svg>
+  )
 }
 
-const resultStats: StatDatum[] = [
-  { value: '+142%', label: 'Average engagement lift across client channels', target: 142, prefix: '+', suffix: '%', decimals: 0 },
-  { value: '3.2×', label: 'Increase in monthly content output', target: 3.2, prefix: '', suffix: '×', decimals: 1 },
-  { value: '58%', label: 'Faster time-to-launch on new campaigns', target: 58, prefix: '', suffix: '%', decimals: 0 },
-]
+const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-const channelLift = [
-  { name: 'Organic Search', before: 100, after: 156 },
-  { name: 'Paid Social', before: 100, after: 212 },
-  { name: 'Search Ads', before: 100, after: 134 },
-  { name: 'Email', before: 100, after: 178 },
-]
+// The headline's markup is set once and then driven directly by craftHeadline.ts. It must never
+// re-render: React would rewrite the markup and wipe the drawn letters mid-animation.
+const CRAFT_HTML = { __html: CRAFT_SVG }
+const CraftWord = memo(function CraftWord() {
+  return <svg className="ic-word" viewBox="-10 -84 374 98" aria-hidden="true" focusable="false" dangerouslySetInnerHTML={CRAFT_HTML} />
+})
 
-// ---------------------------------------------------------------------------
-// Scroll-reveal + count-up primitives
-//
-// `useInView` mirrors the `useRevealOnScroll` hook in VideoPortfolio.tsx: an
-// IntersectionObserver fires once (threshold ~0.3, 10% bottom rootMargin) and
-// disconnects. The hidden state is a *client-only* transition ('idle' ->
-// 'hidden' -> 'visible') so SSR/no-JS output always renders in the 'idle'
-// state, which is visually identical to 'visible' — nothing is ever
-// permanently invisible if JS fails or the observer never fires.
-// `prefers-reduced-motion` skips straight from 'idle' to 'visible'.
-// ---------------------------------------------------------------------------
-
-type AnimState = 'idle' | 'hidden' | 'visible'
-
-function useInView<T extends Element>(threshold = 0.3) {
+/** Fires once when `ref` is well into view. */
+function useOnceInView<T extends Element>(threshold: number, onEnter: () => void) {
   const ref = useRef<T>(null)
-  const [state, setState] = useState<AnimState>('idle')
-
   useEffect(() => {
     const node = ref.current
     if (!node || typeof IntersectionObserver === 'undefined') return
-
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setState('visible')
-      return
-    }
-
-    setState('hidden')
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setState('visible')
-          observer.disconnect()
-        }
-      },
-      { threshold, rootMargin: '0px 0px -10% 0px' }
-    )
-    observer.observe(node)
-    return () => observer.disconnect()
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); onEnter() } }, { threshold })
+    io.observe(node)
+    return () => io.disconnect()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [threshold])
-
-  return { ref, state, dataAnimate: state === 'idle' ? undefined : state }
+  return ref
 }
 
-/** Elegant ease-out count-up from 0 to `stat.target`, ~1.1s, staggered by
- *  `delayMs`. Screen readers get the exact authored string regardless of
- *  animation timing: the animating number is aria-hidden, paired with a
- *  static sr-only span. */
-function StatValue({ stat, state, delayMs }: { stat: StatDatum; state: AnimState; delayMs: number }) {
+/** Ease-out count-up from 0, ~1.1s. Screen readers get the exact authored string. */
+function Figure({ stat, run }: { stat: StatDatum; run: boolean }) {
   const [display, setDisplay] = useState(stat.target)
-  const startedRef = useRef(false)
-
   useEffect(() => {
-    if (state === 'hidden') {
-      setDisplay(0)
-      return
-    }
-    if (state !== 'visible' || startedRef.current) return
-    startedRef.current = true
-
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setDisplay(stat.target)
-      return
-    }
-
+    if (!run || reducedMotion()) return
     let raf = 0
-    const duration = 1100
-    const timer = setTimeout(() => {
-      const start = performance.now()
-      const tick = (now: number) => {
-        const t = Math.min(1, (now - start) / duration)
-        const eased = 1 - Math.pow(1 - t, 3)
-        setDisplay(stat.target * eased)
-        if (t < 1) raf = requestAnimationFrame(tick)
-        else setDisplay(stat.target)
-      }
-      raf = requestAnimationFrame(tick)
-    }, delayMs)
-
-    return () => {
-      clearTimeout(timer)
-      cancelAnimationFrame(raf)
+    const start = performance.now()
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / 1100)
+      setDisplay(stat.target * (1 - Math.pow(1 - t, 3)))
+      if (t < 1) raf = requestAnimationFrame(tick)
     }
-  }, [state, stat.target, delayMs])
-
-  const formatted = `${stat.prefix}${display.toFixed(stat.decimals)}${stat.suffix}`
-
+    setDisplay(0)
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [run, stat.target])
   return (
-    <div
-      className="impact-stat border-t border-black pt-5"
-      data-animate={state === 'idle' ? undefined : state}
-      style={{ transitionDelay: `${delayMs}ms` }}
-    >
-      <div className="text-4xl md:text-5xl mb-2 tabular-nums" aria-hidden="true">
-        {formatted}
-      </div>
+    <>
+      <div className="ic-fig" aria-hidden="true">{`${stat.prefix}${display.toFixed(stat.decimals)}${stat.suffix}`}</div>
       <span className="sr-only">{stat.value}</span>
-      <div className="text-xs text-[#666] leading-snug">{stat.label}</div>
-    </div>
-  )
-}
-
-/** Stat callout grid, revealed + counted-up together once ~40% in view,
- *  staggered ~90ms per item. */
-function StatsGrid({ stats, columnsClass }: { stats: StatDatum[]; columnsClass: string }) {
-  const { ref, state } = useInView<HTMLDivElement>(0.4)
-  return (
-    <div ref={ref} className={`grid ${columnsClass} gap-x-8 gap-y-10 mb-16`}>
-      {stats.map((s, i) => (
-        <StatValue key={s.label} stat={s} state={state} delayMs={i * 90} />
-      ))}
-    </div>
-  )
-}
-
-/** Grouped bar chart (before / after) used for the per-channel lift illustration. */
-function ChannelLiftChart({ lang = 'en' as Locale }: { lang?: Locale }) {
-  const t = getDictionary(lang).impact
-  const width = 600
-  const height = 240
-  const padTop = 34
-  const padBottom = 48
-  const padX = 12
-  const max = Math.max(...channelLift.map((d) => d.after)) * 1.08
-  const plotH = height - padTop - padBottom
-  const baselineY = padTop + plotH
-  const groupWidth = (width - padX * 2) / channelLift.length
-  const barWidth = 34
-  const barGap = 8
-
-  const barY = (value: number) => padTop + plotH * (1 - value / max)
-  const barH = (value: number) => plotH * (value / max)
-
-  const { ref, state } = useInView<HTMLElement>(0.3)
-
-  return (
-    <figure ref={ref} data-animate={state === 'idle' ? undefined : state}>
-      <div className="flex items-center gap-5 mb-3 text-xs text-[#666]">
-        <span className="flex items-center gap-2">
-          <span style={{ width: 10, height: 10, background: BASE_GREY, display: 'inline-block' }} />
-          {t.before}
-        </span>
-        <span className="flex items-center gap-2">
-          <span style={{ width: 10, height: 10, background: ACCENT, display: 'inline-block' }} />
-          {t.after}
-        </span>
-      </div>
-      <svg
-        viewBox={`0 0 ${width} ${height}`}
-        style={{ width: '100%', height: 'auto' }}
-        role="img"
-        aria-label={`Grouped bar chart comparing an illustrative before-and-after index per channel: ${channelLift
-          .map((c) => `${c.name} up ${c.after - c.before}%`)
-          .join(', ')}.`}
-      >
-        <title>Illustrative before/after lift by channel</title>
-        <line x1={padX} y1={baselineY} x2={width - padX} y2={baselineY} stroke="#000" strokeWidth={1} />
-        {channelLift.map((c, i) => {
-          const groupCenter = padX + groupWidth * i + groupWidth / 2
-          const beforeX = groupCenter - barGap / 2 - barWidth
-          const afterX = groupCenter + barGap / 2
-          const beforeH = barH(c.before)
-          const afterH = barH(c.after)
-          const pairDelay = i * 110
-          return (
-            <g key={c.name}>
-              <rect
-                className="impact-bar"
-                x={beforeX}
-                y={barY(c.before)}
-                width={barWidth}
-                height={beforeH}
-                fill={BASE_GREY}
-                style={{ transitionDelay: `${pairDelay}ms` }}
-              />
-              <rect
-                className="impact-bar"
-                x={afterX}
-                y={barY(c.after)}
-                width={barWidth}
-                height={afterH}
-                fill={ACCENT}
-                style={{ transitionDelay: `${pairDelay + 90}ms` }}
-              />
-              <text
-                className="impact-lift-label"
-                x={afterX + barWidth / 2}
-                y={barY(c.after) - 8}
-                textAnchor="middle"
-                fontSize={12}
-                fill={ACCENT}
-                fontFamily="'Times New Roman', Times, serif"
-                style={{ transitionDelay: `${pairDelay + 840}ms` }}
-              >
-                +{c.after - c.before}%
-              </text>
-              <text
-                x={groupCenter}
-                y={baselineY + 20}
-                textAnchor="middle"
-                fontSize={11}
-                letterSpacing={0.4}
-                fill="#666"
-                fontFamily="'Times New Roman', Times, serif"
-              >
-                {t.channels[i] ?? c.name}
-              </text>
-            </g>
-          )
-        })}
-      </svg>
-    </figure>
+    </>
   )
 }
 
 export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
-  const block2 = useInView<HTMLDivElement>(0.25)
   const t = getDictionary(lang).impact
+  const wrapRef = useRef<HTMLDivElement>(null)
+  const [counting, setCounting] = useState(false)
+
+  // The headline plays once, when it is well into view; with reduced motion it simply sits there.
+  useEffect(() => {
+    const wrap = wrapRef.current
+    const svg = wrap?.querySelector('svg')
+    if (!wrap || !svg || typeof IntersectionObserver === 'undefined') return
+    restCraft(wrap)
+    if (reducedMotion()) return
+    let stop: (() => void) | undefined
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return
+      io.disconnect()
+      wrap.classList.remove('settled')
+      wrap.classList.add('play')
+      stop = playCraft(wrap, svg, () => wrap.classList.add('settled'))
+    }, { threshold: 0.5 })
+    io.observe(wrap)
+    return () => { io.disconnect(); stop?.(); wrap.classList.remove('play', 'settled') }
+  }, [])
+
+  const phasesRef = useOnceInView<HTMLDivElement>(0.35, () => setCounting(true))
 
   return (
-    <section id="impact" className="bg-white py-20 px-10 border-t border-black">
+    <section id="impact" className={`ic bg-white py-20 px-10 ${mono.variable}`} aria-labelledby="ic-lede">
       <div className="container-x">
-        {/* Results of Creative Consulting */}
-        <div ref={block2.ref} className="impact-reveal" data-animate={block2.dataAnimate}>
-          <p className="text-2xl leading-[1.55] max-w-[780px] mb-12">
-            {t.lede.split('\n').map((line, i) => (
-              <Fragment key={i}>
-                {i > 0 && <br />}
-                {line}
-              </Fragment>
-            ))}
+        <div className="ic-top">
+          <div className="ic-hl" ref={wrapRef}>
+            <h2 className="ic-title">
+              <span className="sr-only">Craft</span>
+              <CraftWord />
+            </h2>
+          </div>
+          <p className="ic-lede" id="ic-lede">
+            {t.lede} <span>{t.ledeRest}</span>
           </p>
-          <StatsGrid
-            stats={resultStats.map((s, i) => ({ ...s, label: t.stats[i] ?? s.label }))}
-            columnsClass="grid-cols-1 md:grid-cols-3"
-          />
-          <div className="max-w-[720px]">
-            <ChannelLiftChart lang={lang} />
+        </div>
+
+        <div className="ic-phases" ref={phasesRef}>
+          {phases.map((p, i) => (
+            <article className="ic-phase" key={p.img}>
+              <figure className="ic-shot">
+                <Image src={p.img} alt={t.alts[i]} width={1000} height={1250} sizes="(max-width: 760px) 100vw, 33vw" />
+              </figure>
+              <h3 className="ic-name">{t.phases[i]}</h3>
+              <Figure stat={p.datum} run={counting} />
+              <p className="ic-cap">{t.stats[p.stat]}</p>
+            </article>
+          ))}
+        </div>
+
+        <div className="ic-lift">
+          <div className="ic-lift-head"><b>{t.liftHeading}</b></div>
+          <div
+            className="ic-lift-grid"
+            role="img"
+            aria-label={`${t.liftHeading}: ${channelLift.map((c, i) => `${t.channels[i]} 100 → ${c.after}`).join(', ')}.`}
+          >
+            <div className="ic-ruler" aria-hidden="true">
+              {[0, 100, 150, 200].map((v) => (
+                <span key={v} className={`ic-tick${v === 0 ? ' first' : ''}`} style={{ left: pct(v) }}><b>{v}</b></span>
+              ))}
+            </div>
+            {channelLift.map((c, i) => (
+              <div className="ic-row" key={c.glyph}>
+                <div className="ic-ch"><Glyph name={c.glyph} />{t.channels[i]}</div>
+                <div className="ic-track">
+                  <div className="ic-base" style={{ width: pct(100) }} />
+                  <div className="ic-gain" style={{ width: pct(c.after - 100) }} />
+                </div>
+                <div className="ic-up">+{c.after - 100}%</div>
+                <div className="ic-end">{c.after}</div>
+              </div>
+            ))}
           </div>
         </div>
 
-        <p className="text-xs text-[#999] mt-16">{t.disclaimer}</p>
+        <p className="ic-note">{t.disclaimer}</p>
       </div>
     </section>
   )
