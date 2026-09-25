@@ -5,10 +5,10 @@
 
 import Image from 'next/image'
 import { JetBrains_Mono } from 'next/font/google'
-import { memo, useEffect, useRef, useState } from 'react'
+import React, { memo, useEffect, useRef, useState } from 'react'
 import type { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
-import { CRAFT_SVG, playCraft, restCraft } from './craftHeadline'
+import { balanceShades, CRAFT_END, CRAFT_SVG, playCraft, restCraft } from './craftHeadline'
 
 const mono = JetBrains_Mono({ subsets: ['latin'], weight: ['400', '500'], variable: '--ic-mono', display: 'swap' })
 
@@ -55,6 +55,33 @@ const CraftWord = memo(function CraftWord() {
   return <svg className="ic-word" viewBox="-10 -84 374 98" aria-hidden="true" focusable="false" dangerouslySetInnerHTML={CRAFT_HTML} />
 })
 
+/** Blocks scrolling further down (wheel, touch, keys, scrollbar) until the returned release is called. */
+function holdScrollDown(): () => void {
+  const floor = window.scrollY
+  let touchY = 0
+  const wheel = (e: WheelEvent) => { if (e.deltaY > 0) e.preventDefault() }
+  const touchStart = (e: TouchEvent) => { touchY = e.touches[0]?.clientY ?? 0 }
+  const touchMove = (e: TouchEvent) => { if ((e.touches[0]?.clientY ?? 0) < touchY) e.preventDefault() }
+  const keys = new Set(['ArrowDown', 'PageDown', 'End', ' ', 'Spacebar'])
+  const key = (e: KeyboardEvent) => {
+    const el = e.target as HTMLElement | null
+    if (keys.has(e.key) && !e.shiftKey && !el?.closest('input, textarea, select, [contenteditable]')) e.preventDefault()
+  }
+  const scroll = () => { if (window.scrollY > floor) window.scrollTo({ top: floor, behavior: 'instant' as ScrollBehavior }) }
+  window.addEventListener('wheel', wheel, { passive: false })
+  window.addEventListener('touchstart', touchStart, { passive: true })
+  window.addEventListener('touchmove', touchMove, { passive: false })
+  window.addEventListener('keydown', key)
+  window.addEventListener('scroll', scroll)
+  return () => {
+    window.removeEventListener('wheel', wheel)
+    window.removeEventListener('touchstart', touchStart)
+    window.removeEventListener('touchmove', touchMove)
+    window.removeEventListener('keydown', key)
+    window.removeEventListener('scroll', scroll)
+  }
+}
+
 /** Fires once when `ref` is well into view. */
 function useOnceInView<T extends Element>(threshold: number, onEnter: () => void) {
   const ref = useRef<T>(null)
@@ -93,34 +120,86 @@ function Figure({ stat, run }: { stat: StatDatum; run: boolean }) {
   )
 }
 
+/** Counts from `from` to `to` once `run` flips on, after `delay` ms, easing out. */
+function Count({ from, to, run, delay, dur = 700, fmt = (v: number) => String(Math.round(v)) }: { from: number; to: number; run: boolean; delay: number; dur?: number; fmt?: (v: number) => string }) {
+  const [v, setV] = useState(to)
+  useEffect(() => {
+    if (!run || reducedMotion()) return
+    let raf = 0
+    setV(from)
+    const start = performance.now() + delay
+    const tick = (now: number) => {
+      const t = Math.min(1, Math.max(0, (now - start) / dur))
+      setV(from + (to - from) * (1 - Math.pow(1 - t, 3)))
+      if (t < 1) raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [run, from, to, delay, dur])
+  return <>{fmt(v)}</>
+}
+
 export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
   const t = getDictionary(lang).impact
   const wrapRef = useRef<HTMLDivElement>(null)
   const [counting, setCounting] = useState(false)
 
-  // The headline plays once, when it is well into view; with reduced motion it simply sits there.
+  // The headline stays hidden until its top reaches the middle of the screen, then plays once from
+  // nothing while the page holds; the glasses then balance with the scroll; with reduced motion (or no JS) the finished word simply sits there.
   useEffect(() => {
     const wrap = wrapRef.current
     const svg = wrap?.querySelector('svg')
     if (!wrap || !svg || typeof IntersectionObserver === 'undefined') return
     restCraft(wrap)
     if (reducedMotion()) return
-    let stop: (() => void) | undefined
+    wrap.classList.add('wait')
+    let stop: (() => void) | undefined, unlock: (() => void) | undefined, unbalance: (() => void) | undefined
+    let done = 0
     const io = new IntersectionObserver(([e]) => {
       if (!e.isIntersecting) return
       io.disconnect()
-      wrap.classList.remove('settled')
+      wrap.classList.remove('settled', 'wait')
       wrap.classList.add('play')
+      // arriving from above, the page holds here until the word has finished drawing (scrolling back up still works)
+      const heldAt = e.boundingClientRect.top > 0 ? window.scrollY : -1
+      if (heldAt >= 0) unlock = holdScrollDown()
       stop = playCraft(wrap, svg, () => wrap.classList.add('settled'))
-    }, { threshold: 0.5 })
+      done = window.setTimeout(() => {
+        unlock?.(); unlock = undefined
+        unbalance = balanceShades(wrap)
+        // then glide on until the word sits just under the nav, still in view above the photos,
+        // unless the reader scrolled back up meanwhile
+        const nav = document.querySelector<HTMLElement>('.nav')?.offsetHeight ?? 64
+        const by = svg.getBoundingClientRect().top - nav - 20
+        if (heldAt >= 0 && by > 0 && Math.abs(window.scrollY - heldAt) < 4)
+          window.scrollTo({ top: window.scrollY + by, behavior: 'smooth' })
+      }, CRAFT_END)
+    }, { rootMargin: '0px 0px -50% 0px' })
     io.observe(wrap)
-    return () => { io.disconnect(); stop?.(); wrap.classList.remove('play', 'settled') }
+    return () => { io.disconnect(); window.clearTimeout(done); unlock?.(); unbalance?.(); stop?.(); wrap.classList.remove('play', 'settled', 'wait') }
   }, [])
 
   const phasesRef = useOnceInView<HTMLDivElement>(0.35, () => setCounting(true))
+  const [growing, setGrowing] = useState(false)
+  const liftRef = useOnceInView<HTMLDivElement>(0.4, () => setGrowing(true))
+
+  // Soft scroll-through: blocks fade up as they arrive. Armed only once JS runs (and not
+  // with reduced motion), so without it everything simply shows.
+  const sectionRef = useRef<HTMLElement>(null)
+  useEffect(() => {
+    const root = sectionRef.current
+    if (!root || typeof IntersectionObserver === 'undefined' || reducedMotion()) return
+    const items = root.querySelectorAll<HTMLElement>('[data-rv]')
+    root.classList.add('ic-armed')
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) if (e.isIntersecting) { e.target.classList.add('ic-in'); io.unobserve(e.target) }
+    }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' })
+    items.forEach((el) => io.observe(el))
+    return () => io.disconnect()
+  }, [])
 
   return (
-    <section id="impact" className={`ic bg-white py-20 px-10 ${mono.variable}`} aria-labelledby="ic-lede">
+    <section id="impact" ref={sectionRef} className={`ic py-20 px-10 ${mono.variable}`} aria-labelledby="ic-lede">
       <div className="container-x">
         <div className="ic-top">
           <div className="ic-hl" ref={wrapRef}>
@@ -129,14 +208,14 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
               <CraftWord />
             </h2>
           </div>
-          <p className="ic-lede" id="ic-lede">
+          <p className="ic-lede" id="ic-lede" data-rv>
             {t.lede} <span>{t.ledeRest}</span>
           </p>
         </div>
 
         <div className="ic-phases" ref={phasesRef}>
           {phases.map((p, i) => (
-            <article className="ic-phase" key={p.img}>
+            <article className="ic-phase" key={p.img} data-rv style={{ '--i': i } as React.CSSProperties}>
               <figure className="ic-shot">
                 <Image src={p.img} alt={t.alts[i]} width={1000} height={1250} sizes="(max-width: 760px) 100vw, 33vw" />
               </figure>
@@ -147,7 +226,8 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
           ))}
         </div>
 
-        <div className="ic-lift">
+        {/* growth is a data attribute, not a class: React rewriting className would drop the fade-up's ic-in */}
+        <div className="ic-lift" ref={liftRef} data-rv data-grow={growing ? '' : undefined}>
           <div className="ic-lift-head"><b>{t.liftHeading}</b></div>
           <div
             className="ic-lift-grid"
@@ -156,24 +236,24 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
           >
             <div className="ic-ruler" aria-hidden="true">
               {[0, 100, 150, 200].map((v) => (
-                <span key={v} className={`ic-tick${v === 0 ? ' first' : ''}`} style={{ left: pct(v) }}><b>{v}</b></span>
+                <span key={v} className="ic-tick" style={{ left: pct(v) }}><b>{v}</b></span>
               ))}
             </div>
             {channelLift.map((c, i) => (
-              <div className="ic-row" key={c.glyph}>
+              <div className="ic-row" key={c.glyph} style={{ '--i': i } as React.CSSProperties}>
                 <div className="ic-ch"><Glyph name={c.glyph} />{t.channels[i]}</div>
                 <div className="ic-track">
                   <div className="ic-base" style={{ width: pct(100) }} />
                   <div className="ic-gain" style={{ width: pct(c.after - 100) }} />
                 </div>
-                <div className="ic-up">+{c.after - 100}%</div>
-                <div className="ic-end">{c.after}</div>
+                <div className="ic-up">+<Count from={0} to={c.after - 100} run={growing} delay={120 + i * 110} dur={800} />%</div>
+                <div className="ic-end"><Count from={100} to={c.after} run={growing} delay={120 + i * 110} dur={800} /></div>
               </div>
             ))}
           </div>
         </div>
 
-        <p className="ic-note">{t.disclaimer}</p>
+        <p className="ic-note" data-rv>{t.disclaimer}</p>
       </div>
     </section>
   )

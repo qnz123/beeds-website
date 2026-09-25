@@ -638,6 +638,7 @@ h6 {
   display: grid;
   grid-template-columns: 1fr;
   border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
 }
 
 .client-cell {
@@ -1338,21 +1339,21 @@ h6 {
    letters and the hanging sunglasses show. Assets never scale or fade: they are
    hidden by a letter mask, by the edge of .ic-hl, or gone in a burst. */
 
-.ic { container-type: inline-size; --ic-ink: #111111; --ic-muted: #666666; --ic-gold: #ccb718; --ic-gold-text: #8a7607; }
+.ic { overflow-x: clip; container-type: inline-size; --ic-ink: #111111; --ic-muted: #666666; --ic-gold: #ccb718; --ic-gold-text: #8a7607; }
 
 .ic-top { text-align: center; margin-bottom: 56px; }
-.ic-hl { position: relative; overflow: hidden; padding-block: 120px 96px; margin-bottom: 36px; background: transparent; }
+/* no padding: the headline area is exactly the word's height. Nothing is clipped here — the
+   animation draws over its surroundings; assets enter and leave across the screen's edges. */
+.ic-hl { position: relative; overflow: visible; padding-block: 0; margin-bottom: 36px; background: transparent; }
 .ic-title { margin: 0; line-height: 0; }
-.ic-word { position: relative; z-index: 1; display: block; width: min(100%, 374px); height: auto; margin: 0 auto; overflow: visible; }
+.ic-word { position: relative; z-index: 1; display: block; width: min(100%, 1122px); height: auto; margin: 0 auto; overflow: visible; }
 .ic-lede { font-size: 30px; line-height: 1.32; max-width: 30ch; margin: 0 auto; text-wrap: balance; }
 .ic-lede span { color: var(--ic-muted); }
 
 .ic .ink { fill: none; stroke: var(--ic-ink); stroke-width: 12; stroke-linecap: square; stroke-linejoin: miter; stroke-miterlimit: 2; }
-/* grain is the settled finish: off while things move (a live turbulence filter re-renders every frame) */
-.ic-hl:not(.play) .ink, .ic-hl.settled .ink,
-.ic-hl:not(.play) .shades, .ic-hl.settled .shades { filter: url(#ic-grain); }
 .ic .lt path { transform-box: view-box; }
 .ic .lt .draw { stroke-dasharray: 1; }
+.ic-hl.wait .ic-word { visibility: hidden; } /* nothing shows until the play starts at mid-screen */
 .ic-hl.play .lt.join  { animation: ic-join 420ms cubic-bezier(.65, 0, .35, 1) var(--dj) backwards; }
 .ic-hl.play .lt .draw { animation: ic-draw var(--dur) cubic-bezier(.65, 0, .35, 1) var(--d) backwards; }
 .ic-hl.play .lt .rise { animation: ic-rise var(--dur) cubic-bezier(.65, 0, .35, 1) var(--d) backwards; }
@@ -1360,31 +1361,32 @@ h6 {
 @keyframes ic-draw { 0% { opacity: 0; stroke-dashoffset: 1; } 6% { opacity: 1; } 100% { opacity: 1; stroke-dashoffset: 0; } }
 @keyframes ic-rise { from { transform: scaleY(0); } to { transform: scaleY(1); } }
 
-.ic .asset, .ic .c-ring, .ic .c-glint, .ic .ph-ink { visibility: hidden; }
+.ic .asset, .ic .c-ring, .ic .c-glint { visibility: hidden; }
 .ic .c-ring { fill: none; stroke: var(--ic-ink); stroke-linecap: square; }
 .ic .c-glint { fill: #ffffff; }
 .ic .star-burst path { fill: none; stroke-linecap: square; stroke-dasharray: 1 2; visibility: hidden; }
-.ic .ph-shade, .ic .ph-ink { fill: var(--ic-ink); }
 
 /* the three phases: the photograph is the mark */
-.ic-phases { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+/* the photos keep their full 4:5 frame; the whole block (photos, figures, bars) narrows with the
+   window's height so photos and bars always share one screen: ~420px of text and bars + 4:5 photos */
+.ic-phases, .ic-lift, .ic-note { max-width: clamp(600px, 240vh - 1230px, 100%); margin-inline: auto; }
+.ic-phases { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
 .ic-phase { display: flex; flex-direction: column; }
-.ic-shot { margin: 0 0 20px; aspect-ratio: 4 / 5; max-width: 100%; background: #ebe4d8; overflow: hidden; }
+.ic-shot { margin: 0 0 16px; aspect-ratio: 4 / 5; max-width: 100%; background: #ebe4d8; overflow: hidden; }
 .ic-shot img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.ic-name { margin: 0; font-weight: 400; font-size: 27px; line-height: 1.1; }
-.ic-fig { font-size: 52px; line-height: 1; margin-top: 14px; color: var(--ic-gold-text); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
-.ic-cap { font-size: 14px; line-height: 1.45; color: var(--ic-muted); margin: 8px 0 0; max-width: 28ch; }
+.ic-name { margin: 0; font-weight: 400; font-size: 22px; line-height: 1.1; }
+.ic-fig { font-size: 42px; line-height: 1; margin-top: 10px; color: var(--ic-gold-text); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.ic-cap { font-size: 13px; line-height: 1.45; color: var(--ic-muted); margin: 6px 0 0; max-width: 28ch; }
 
 /* channel lift: a quiet readout under the phases (index 0 at the track's left, 220 at its right) */
-.ic-lift { margin-top: 64px; }
+.ic-lift { margin-top: 44px; }
 .ic-lift-head { font-family: var(--ic-mono), ui-monospace, Menlo, monospace; font-size: 10.5px; letter-spacing: 0.2em; margin-bottom: 14px; }
 .ic-lift-head b { color: var(--ic-ink); font-weight: 500; }
-.ic-lift-grid { display: grid; grid-template-columns: 190px minmax(0, 1fr) 62px 46px; column-gap: 16px; row-gap: 16px; align-items: center; }
+.ic-lift-grid { display: grid; grid-template-columns: 190px minmax(0, 1fr) 62px 46px; column-gap: 16px; row-gap: 12px; align-items: center; }
 .ic-row { display: contents; }
 .ic-ruler { grid-column: 2; position: relative; height: 16px; margin-bottom: -6px; }
 .ic-tick { position: absolute; bottom: 0; width: 1px; height: 5px; background: #c9c3b5; }
 .ic-tick b { position: absolute; bottom: 8px; left: 0; transform: translateX(-50%); font-family: var(--ic-mono), ui-monospace, Menlo, monospace; font-weight: 400; font-size: 9.5px; color: var(--ic-muted); }
-.ic-tick.first b { transform: none; }
 .ic-ch { grid-column: 1; display: flex; align-items: center; gap: 11px; font-family: var(--ic-mono), ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ic-ink); }
 .ic-ch svg { width: 16px; height: 16px; color: #8d8a80; flex: none; display: block; }
 .ic-track { grid-column: 2; display: flex; height: 12px; background: #f1eee6; }
@@ -1392,7 +1394,7 @@ h6 {
 .ic-gain { background: var(--ic-gold); }
 .ic-up { grid-column: 3; font-family: var(--ic-mono), ui-monospace, Menlo, monospace; font-size: 12px; color: var(--ic-gold-text); text-align: right; }
 .ic-end { grid-column: 4; font-size: 19px; font-variant-numeric: tabular-nums; }
-.ic-note { font-size: 11px; color: #999; margin: 36px 0 0; }
+.ic-note { font-size: 11px; color: #999; margin-top: 24px; margin-bottom: 0; }
 
 /* the section on a phone: phases stack */
 @container (max-width: 760px) {
@@ -1405,6 +1407,17 @@ h6 {
   .ic-ch { grid-column: 1 / -1; margin-top: 10px; }
   .ic-track { grid-column: 1; } .ic-up { grid-column: 2; } .ic-end { grid-column: 3; }
 }
+
+/* soft edges: the white section grades into the #f5f5f5 sections on either side */
+.ic { background: linear-gradient(#f5f5f5, #ffffff 160px, #ffffff calc(100% - 160px), #f5f5f5); }
+
+/* scroll-through: blocks fade up as they arrive (armed by JS only, so no-JS shows everything) */
+.ic.ic-armed [data-rv] { opacity: 0; transform: translateY(28px); transition: opacity 0.9s cubic-bezier(.22, 1, .36, 1), transform 0.9s cubic-bezier(.22, 1, .36, 1); transition-delay: calc(var(--i, 0) * 120ms); }
+.ic.ic-armed [data-rv].ic-in { opacity: 1; transform: none; }
+
+/* the growth bars: the grey 0–100 baseline stays put; only the gold gain above 100 grows out of it */
+.ic.ic-armed .ic-gain { transform: scaleX(0); transform-origin: left center; }
+.ic.ic-armed [data-grow] .ic-gain { transform: scaleX(1); transition: transform 0.8s cubic-bezier(.22, 1, .36, 1) calc(120ms + var(--i, 0) * 110ms); }
 
 @media (prefers-reduced-motion: reduce) {
   .ic-hl.play .lt, .ic-hl.play .lt path { animation: none; }
