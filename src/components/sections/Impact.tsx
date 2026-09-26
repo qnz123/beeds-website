@@ -381,7 +381,7 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
               <CraftWord />
             </h2>
           </div>
-          <p className="ic-lede" id="ic-lede" data-rv>
+          <p className="ic-lede" id="ic-lede" lang={lang} data-rv>
             {t.lede} <span>{t.ledeRest}</span>
           </p>
         </div>
