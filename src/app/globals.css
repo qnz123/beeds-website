@@ -1427,8 +1427,11 @@ h6 {
 .ic-word { position: relative; z-index: 1; display: block; width: min(100%, 1122px); height: auto; margin: 0 auto; overflow: visible; }
 .ic-lede { font-size: 30px; line-height: 1.32; max-width: 30ch; margin: 0 auto; text-wrap: balance; }
 .ic-lede span { color: var(--ic-muted); }
-/* Japanese: two more characters a line than the balanced default (12 on desktop), broken at phrase boundaries */
-.ic-lede:lang(ja) { max-width: 12.4em; text-wrap: wrap; word-break: auto-phrase; }
+/* Japanese: one sentence a line at every width. The type eases down with the text column (the
+   section less 160px of padding) so the first sentence stays whole; only below 19px does it wrap, and
+   then only at the phrase breaks marked in the copy (keep-all: never mid-word) */
+.ic-lede:lang(ja) { max-width: none; font-size: clamp(19px, (100cqi - 160px) / 22.6, 30px); text-wrap: wrap; word-break: keep-all; line-break: strict; }
+.ic-lede:lang(ja) span { display: block; }
 
 .ic .ink { fill: none; stroke: var(--ic-ink); stroke-width: 12; stroke-linecap: square; stroke-linejoin: miter; stroke-miterlimit: 2; }
 .ic .lt path { transform-box: view-box; }
@@ -1482,7 +1485,6 @@ h6 {
 /* the section on a phone: phases stack */
 @container (max-width: 760px) {
   .ic-lede { font-size: 24px; }
-  .ic-lede:lang(ja) { max-width: 30ch; text-wrap: balance; word-break: normal; } /* too narrow for 10; keep the even 8s */
   .ic-phases { grid-template-columns: 1fr; gap: 40px; }
   .ic-shot { aspect-ratio: 4 / 3; }
   .ic-shot img { object-position: 50% 28%; }

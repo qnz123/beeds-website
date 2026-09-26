@@ -274,8 +274,9 @@ const ja: Dict = {
     lblTime: '時間',
   },
   impact: {
-    lede: 'クリエイティブの提案で、終わりにはしません。',
-    ledeRest: '実行まで続けます。',
+    // \u200b marks where a line may break (phrase ends); the lede sets word-break: keep-all in Japanese
+    lede: 'クリエイティブの\u200b提案で、\u200b終わりには\u200bしません。',
+    ledeRest: '実行まで\u200b続けます。',
     disclaimer: '数値はデモンストレーション用のサンプルです。',
     stats: [
       'クライアントチャネル全体での平均エンゲージメント向上',
