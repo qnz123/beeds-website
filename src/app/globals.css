@@ -206,10 +206,10 @@ h6 {
     top 0.2s cubic-bezier(0.65, 0, 0.35, 1) 0.16s,
     transform 0.2s cubic-bezier(0.65, 0, 0.35, 1) 0s;
 }
-.nav-burger > span:first-child { top: 8px; }
+.nav-burger > span:first-child { top: 8.5px; } /* 6px above the bottom line, a whole pixel apart, so both land on the same sub-pixel and draw alike */
 .nav-burger > span:last-child { top: 14.5px; }
 .nav-burger.is-open > span {
-  top: 11.25px;
+  top: 11.5px;
   transition:
     top 0.2s cubic-bezier(0.65, 0, 0.35, 1) 0s,
     transform 0.24s cubic-bezier(0.65, 0, 0.35, 1) 0.16s;

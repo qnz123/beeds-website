@@ -91,7 +91,9 @@ function holdScrollDown(): () => void {
   const endHere = () => {
     if (!main) return
     const top = main.getBoundingClientRect().top + window.scrollY
-    main.style.maxHeight = `${Math.max(0, floor + root.clientHeight - top)}px`
+    // the taller of the two viewport heights: on a phone, innerHeight grows as the browser bar slides
+    // away while clientHeight does not, and ending the page at the shorter one pulled it back up
+    main.style.maxHeight = `${Math.max(0, floor + Math.max(root.clientHeight, window.innerHeight) - top)}px`
   }
   if (main) { main.style.overflowY = 'clip'; main.style.contain = 'layout'; if (footer) footer.style.display = 'none'; endHere() }
   // and no rubber-band bounce against that end, so the page stops dead. (With this on, a non-passive
@@ -108,6 +110,32 @@ function holdScrollDown(): () => void {
     if (main) { main.style.removeProperty('max-height'); main.style.removeProperty('overflow-y'); main.style.removeProperty('contain') }
     if (footer) footer.style.removeProperty('display')
     root.style.overscrollBehaviorY = prevOverscroll
+  }
+}
+
+/** Calls `onUp` when the reader moves the page back up (wheel, finger or key); returns a stop. */
+function watchScrollUp(onUp: () => void): () => void {
+  // a swipe may already be under way when this starts (it is what brought the headline in), so its
+  // first move seen, not 0, is where it is measured from
+  let y0: number | undefined
+  const wheel = (e: WheelEvent) => { if (e.deltaY < -2) onUp() }
+  const start = (e: TouchEvent) => { y0 = e.touches[0]?.clientY }
+  const move = (e: TouchEvent) => {
+    const y = e.touches[0]?.clientY
+    if (y === undefined) return
+    if (y0 === undefined) y0 = y
+    else if (y - y0 > 24) onUp()
+  }
+  const key = (e: KeyboardEvent) => { if (['ArrowUp', 'PageUp', 'Home'].includes(e.key) || (e.key === ' ' && e.shiftKey)) onUp() }
+  window.addEventListener('wheel', wheel, { passive: true })
+  window.addEventListener('touchstart', start, { passive: true })
+  window.addEventListener('touchmove', move, { passive: true })
+  window.addEventListener('keydown', key)
+  return () => {
+    window.removeEventListener('wheel', wheel)
+    window.removeEventListener('touchstart', start)
+    window.removeEventListener('touchmove', move)
+    window.removeEventListener('keydown', key)
   }
 }
 
@@ -213,6 +241,7 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
     let stop: (() => void) | undefined, unlock: (() => void) | undefined, unbalance: (() => void) | undefined
     let done = 0, balanced = 0, glide: (() => void) | undefined
     let heldAt = -1, played = false, passing = false, endTrip: (() => void) | undefined
+    let wentUp = false, watchUp: (() => void) | undefined
 
     const io = new IntersectionObserver(([e]) => {
       if (!e.isIntersecting || passing) return
@@ -222,16 +251,18 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
       wrap.classList.add('play')
       // arriving from above, the page holds here until the word has finished drawing (scrolling back up still works)
       heldAt = e.boundingClientRect.top > 0 ? window.scrollY : -1
-      if (heldAt >= 0) unlock = holdScrollDown()
+      if (heldAt >= 0) { unlock = holdScrollDown(); watchUp = watchScrollUp(() => { wentUp = true }) }
       stop = playCraft(wrap, svg, () => wrap.classList.add('settled'))
       balanced = window.setTimeout(() => { unbalance = balanceShades(wrap) }, CRAFT_END)
       // the moment the glasses catch on the A, the page lets go and glides on until the word sits just
       // under the nav, still in view above the photos, unless the reader scrolled back up meanwhile
       done = window.setTimeout(() => {
-        unlock?.(); unlock = undefined
+        unlock?.(); unlock = undefined; watchUp?.(); watchUp = undefined
         const nav = document.querySelector<HTMLElement>('.nav')?.offsetHeight ?? 64
         const by = svg.getBoundingClientRect().top - nav - 20
-        if (heldAt >= 0 && by > 0 && Math.abs(window.scrollY - heldAt) < 4)
+        // (only the reader's own move back up cancels it: a phone's browser bar sliding in or out
+        // shifts the page by its height while held, so the scroll position alone can't tell)
+        if (heldAt >= 0 && by > 0 && !wentUp)
           glide = easeScrollBy(by, 1100)
       }, CRAFT_LAND)
     }, { rootMargin: '0px 0px -50% 0px' })
@@ -242,14 +273,14 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
     // still stops here.
     const onPass = () => {
       passing = true
-      unlock?.(); unlock = undefined; heldAt = -1; glide?.(); glide = undefined
+      unlock?.(); unlock = undefined; watchUp?.(); watchUp = undefined; heldAt = -1; glide?.(); glide = undefined
       endTrip?.()
       endTrip = whenTripEnds(() => { passing = false; endTrip = undefined; if (!played) { io.unobserve(wrap); io.observe(wrap) } })
     }
     window.addEventListener(PASS_EVENT, onPass)
     return () => {
       window.removeEventListener(PASS_EVENT, onPass); endTrip?.()
-      io.disconnect(); window.clearTimeout(done); window.clearTimeout(balanced); glide?.(); unlock?.(); unbalance?.(); stop?.(); wrap.classList.remove('play', 'settled', 'wait')
+      io.disconnect(); window.clearTimeout(done); window.clearTimeout(balanced); glide?.(); unlock?.(); watchUp?.(); unbalance?.(); stop?.(); wrap.classList.remove('play', 'settled', 'wait')
     }
   }, [])
 
