@@ -295,6 +295,25 @@ function Reveal({ i, as: Tag = 'div', className = '', children }: {
   )
 }
 
+// iPhone Safari zooms the page in on any focused control under 16px and leaves it zoomed after the
+// picker closes. The selects are deliberately smaller than the prose (0.62em, about 13.6px on phones),
+// so rather than enlarging them the page scale is capped only while a select is being picked. Pinch-zoom
+// is untouched the rest of the time, and a reader who has already pinched in is left alone (browsers
+// that honour maximum-scale would zoom them back out). iPad never zooms on focus.
+const VIEWPORT_CAP = ', maximum-scale=1'
+function releaseZoomCap() {
+  if (document.activeElement instanceof HTMLSelectElement) return
+  const m = document.querySelector<HTMLMetaElement>('meta[name="viewport"]')
+  if (m) m.content = m.content.replace(VIEWPORT_CAP, '')
+}
+function capZoomForSelect() {
+  if (!/iPhone|iPod/.test(navigator.platform) || (window.visualViewport?.scale ?? 1) > 1.01) return
+  const m = document.querySelector<HTMLMetaElement>('meta[name="viewport"]')
+  if (m && !m.content.includes(VIEWPORT_CAP)) m.content += VIEWPORT_CAP
+  window.setTimeout(releaseZoomCap, 1000) // a touch that scrolls instead of focusing
+}
+const releaseZoomCapSoon = () => { window.setTimeout(releaseZoomCap, 300) }
+
 const EMPTY_FORM = { service: '', date: '', time: '', name: '', email: '', message: '', company: '' }
 
 export default function BookingCalendar({ lang = 'en' as Locale }: { lang?: Locale }) {
@@ -544,6 +563,8 @@ export default function BookingCalendar({ lang = 'en' as Locale }: { lang?: Loca
                     {t.s1pre}
                     <select
                       className="blank"
+                      onTouchStart={capZoomForSelect}
+                      onBlur={releaseZoomCapSoon}
                       aria-label="Service"
                       value={form.service}
                       onChange={set('service')}
@@ -557,6 +578,8 @@ export default function BookingCalendar({ lang = 'en' as Locale }: { lang?: Loca
                     {t.s1afterService}
                     <select
                       className="blank"
+                      onTouchStart={capZoomForSelect}
+                      onBlur={releaseZoomCapSoon}
                       aria-label="Date (optional)"
                       value={form.date}
                       onChange={setDate}
@@ -575,6 +598,8 @@ export default function BookingCalendar({ lang = 'en' as Locale }: { lang?: Loca
                     {t.s1betweenDateTime}
                     <select
                       className="blank"
+                      onTouchStart={capZoomForSelect}
+                      onBlur={releaseZoomCapSoon}
                       aria-label="Time, shown in your local timezone (optional)"
                       value={form.time}
                       onChange={set('time')}

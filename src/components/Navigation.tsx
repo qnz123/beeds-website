@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import React, { useEffect, useRef, useState } from 'react'
 import type { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 
@@ -18,12 +19,34 @@ export default function Navigation({
   switchHref?: string
 }) {
   const [isOpen, setIsOpen] = useState(false)
+  // The sheet stays mounted for its short fade-out after closing (see .mm-sheet.is-out).
+  const [sheetUp, setSheetUp] = useState(false)
+  useEffect(() => {
+    if (isOpen) { setSheetUp(true); return }
+    const t = window.setTimeout(() => setSheetUp(false), 200)
+    return () => window.clearTimeout(t)
+  }, [isOpen])
   // The bar's bottom edge is absent at the top of the page and fades in once
   // the page has moved, so the nav reads as part of the hero until it starts
   // to overlap content.
   const [scrolled, setScrolled] = useState(false)
   const navRef = useRef<HTMLElement>(null)
   const t = getDictionary(lang).nav
+  const router = useRouter()
+  // /explore/'s prefetch carries preload hints for the Showcase's nine webfonts
+  // (~265 KB), so a viewport prefetch from the desktop bar made every page
+  // download them. That one link prefetches on intent (hover, focus, touch)
+  // instead.
+  // The mobile sheet keeps its normal prefetch: opening it is already intent.
+  const prefetchOnIntent = (href: string) =>
+    href.endsWith('/explore')
+      ? {
+          prefetch: false as const,
+          onMouseEnter: () => router.prefetch(href),
+          onFocus: () => router.prefetch(href),
+          onTouchStart: () => router.prefetch(href), // tablets ≥768px get this bar
+        }
+      : {}
   const isJa = lang === 'ja'
   const home = isJa ? '/ja' : '/'
 
@@ -35,6 +58,28 @@ export default function Navigation({
     { label: 'Explore', href: isJa ? '/ja/explore' : '/explore' },
     { label: t.contact, href: isJa ? '/ja/#contact' : '/#contact' },
   ]
+
+  // ...and once this page has finished loading and the browser is idle, fetch /explore/ (and its
+  // fonts) quietly anyway, so a quick click on Explore finds them cached instead of showing a
+  // fallback face. Off the first load, so it costs the page nothing; skipped on Save-Data / 2G.
+  const exploreHref = isJa ? '/ja/explore' : '/explore'
+  useEffect(() => {
+    const c = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection
+    if (c?.saveData || /2g/.test(c?.effectiveType ?? '')) return
+    let timer = 0, idle = 0
+    const fetchIt = () => {
+      if ('requestIdleCallback' in window) idle = window.requestIdleCallback(() => router.prefetch(exploreHref), { timeout: 4000 })
+      else router.prefetch(exploreHref) // Safari has no requestIdleCallback
+    }
+    const afterLoad = () => { timer = window.setTimeout(fetchIt, 2500) }
+    if (document.readyState === 'complete') afterLoad()
+    else window.addEventListener('load', afterLoad, { once: true })
+    return () => {
+      window.removeEventListener('load', afterLoad)
+      window.clearTimeout(timer)
+      if (idle && 'cancelIdleCallback' in window) window.cancelIdleCallback(idle)
+    }
+  }, [router, exploreHref])
 
   // Toggle shows the OTHER language's name and links to its URL.
   const toggleLabel = isJa ? 'English' : '日本語'
@@ -100,16 +145,16 @@ export default function Navigation({
 
   return (
     <>
-    <nav ref={navRef} className={`nav sticky top-0 z-50${scrolled ? ' is-scrolled' : ''}`}>
+    <nav ref={navRef} className={`nav sticky top-0 z-50${scrolled ? ' is-scrolled' : ''}${isOpen ? ' menu-open' : sheetUp ? ' menu-closing' : ''}`}>
       {/* The wordmark stays in the house serif; only the link row goes sans. */}
       <div className="nav-wordmark">
-        <Link href={home}>BEEDS</Link>
+        <Link href={home} onClick={() => setIsOpen(false)}>BEEDS</Link>
       </div>
 
       {/* Desktop Navigation */}
       <div className="nav-links hidden md:flex gap-10 items-center">
         {navLinks.map((link) => (
-          <Link key={link.href} href={link.href}>
+          <Link key={link.href} href={link.href} {...prefetchOnIntent(link.href)}>
             {link.label}
           </Link>
         ))}
@@ -127,45 +172,41 @@ export default function Navigation({
         </a>
       </div>
 
-      {/* Mobile Menu Button */}
+      {/* Mobile menu toggle: two long lines that fold into an X. It stays in the bar, which
+          sits above the open sheet, so the wordmark and the toggle never move. */}
       <button
-        onClick={() => setIsOpen(true)}
-        className="md:hidden text-base"
-        aria-label="Open menu"
+        type="button"
+        onClick={() => setIsOpen((open) => !open)}
+        className={`nav-burger nav-tap md:hidden${isOpen ? ' is-open' : ''}`}
+        aria-label={isOpen ? 'Close menu' : 'Open menu'}
         aria-expanded={isOpen}
         aria-controls="mobile-menu"
       >
-        ☰
+        <span aria-hidden="true" />
+        <span aria-hidden="true" />
       </button>
 
     </nav>
 
-    {/* Mobile menu: a full-screen sheet, not a dropdown. It sits above the nav so the
-        nav's own bottom rule is covered, and it draws no horizontal rules itself. */}
-    {isOpen && (
+    {/* Mobile menu: a full-screen sheet, not a dropdown. The bar itself stays on top of it
+        (.nav.menu-open), with its edge and frosted ground switched off, so the one wordmark and
+        the toggle keep their exact place; the sheet draws no header or rules of its own. */}
+    {(isOpen || sheetUp) && (
       <div
         id="mobile-menu"
-        role="dialog"
-        aria-modal="true"
         aria-label="Menu"
-        className="fixed inset-0 z-[60] bg-light md:hidden flex flex-col"
+        className={`mm-sheet fixed inset-0 z-[60] md:hidden flex flex-col${isOpen ? '' : ' is-out'}`}
       >
-        <div className="flex items-center justify-between px-10 py-5">
-          <Link href={home} onClick={() => setIsOpen(false)} className="text-xs uppercase tracking-[1px]">
-            BEEDS
-          </Link>
-          <button onClick={() => setIsOpen(false)} className="text-base" aria-label="Close menu">
-            ✕
-          </button>
-        </div>
+        <div aria-hidden="true" style={{ height: 'var(--nav-h, 64px)', flex: 'none' }} />
 
         <div className="flex-1 flex flex-col justify-center gap-7 px-10 pb-10">
-          {navLinks.map((link) => (
+          {navLinks.map((link, i) => (
             <Link
               key={link.href}
               href={link.href}
               onClick={() => setIsOpen(false)}
-              className="text-[34px] leading-none"
+              className="mm-item text-[34px] leading-none"
+              style={{ '--i': i } as React.CSSProperties}
             >
               {link.label}
             </Link>

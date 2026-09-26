@@ -71,6 +71,13 @@ export default function StudyLightbox({
         // Backdrop click (not a click inside the panel) closes.
         if (e.target === e.currentTarget) onClose()
       }}
+      // iOS Safari only turns a tap into mouse events on an element it sees as
+      // clickable, and React's delegated onMouseDown doesn't count. Any onClick
+      // prop makes React attach a native no-op onclick, so a tap on the
+      // backdrop now fires the mousedown above. It does nothing itself, so
+      // desktop still closes on press, exactly as before. (No tap flash: the
+      // page already sets -webkit-tap-highlight-color: transparent on html.)
+      onClick={() => {}}
     >
       <div
         ref={panelRef}

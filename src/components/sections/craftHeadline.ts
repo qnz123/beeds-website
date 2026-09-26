@@ -40,7 +40,12 @@ const sg = (t: number, s: Span) => seg(t, s[0], s[1])
 /** Puts every part in its finished place (also the reduced-motion / no-JS picture). */
 export function restCraft(wrap: HTMLElement) {
   const q = (id: string) => wrap.querySelector<SVGGraphicsElement>('#ic-' + id)
-  for (const id of ['pola', 'c-glint', 'c-ring', 'wave', 'phone', 'star-a', 'star-b', 'star-c']) q(id)?.style.setProperty('visibility', 'hidden')
+  for (const id of ['pola', 'c-glint', 'c-ring', 'wave', 'phone', 'star-a', 'star-b', 'star-c']) {
+    const el = q(id)
+    el?.style.setProperty('visibility', 'hidden')
+    // hidden stickers also leave rendering (see show() in playCraft)
+    if (el?.classList.contains('asset')) el.style.setProperty('display', 'none')
+  }
   wrap.querySelectorAll<SVGPathElement>('#ic-star-burst path').forEach((p) => (p.style.visibility = 'hidden'))
   q('c-pocket-disc')?.setAttribute('r', '35')
   const arc = q('c-arc')
@@ -81,7 +86,11 @@ export function balanceShades(wrap: HTMLElement): () => void {
 /** Plays the headline once. Returns a cleanup that stops it and leaves the finished word. */
 export function playCraft(wrap: HTMLElement, svg: SVGSVGElement, onSettled: () => void): () => void {
   const q = (id: string) => wrap.querySelector('#ic-' + id) as SVGGraphicsElement
-  const show = (el: SVGElement, on: boolean) => { el.style.visibility = on ? 'visible' : 'hidden' }
+  // hidden stickers also leave rendering: Firefox and Safari otherwise run the die-cut filter on them every repaint
+  const show = (el: SVGElement, on: boolean, render = on) => {
+    el.style.visibility = on ? 'visible' : 'hidden'
+    if (el.classList.contains('asset')) el.style.display = render ? '' : 'none'
+  }
   const place = (el: Element, x: number, y: number, r: number, s: number, ox: number, oy: number) =>
     el.setAttribute('transform', `translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${r.toFixed(2)})${s === 1 ? '' : ` scale(${s})`} translate(${-ox} ${-oy})`)
 
@@ -205,10 +214,13 @@ export function playCraft(wrap: HTMLElement, svg: SVGSVGElement, onSettled: () =
     return { ...S, lines, burstAt: TL.stars.burst + i * TL.stars.burstGap }
   })
   function starsAt(t: number) {
+    // the three stars leave rendering only together: Safari clips a showing star's die-cut edge
+    // while a sibling star is out of rendering
+    const anyStar = STARS.some((S, i) => t >= TL.stars.pop[0] + i * TL.stars.gap && t < S.burstAt)
     STARS.forEach((S, i) => {
       const t0s = TL.stars.pop[0] + i * TL.stars.gap
       const u = out(seg(t, t0s, TL.stars.pop[1] + i * TL.stars.gap))
-      show(S.el, t >= t0s && t < S.burstAt)
+      show(S.el, t >= t0s && t < S.burstAt, anyStar)
       place(S.el, bez(S.from[0], S.via[0], S.to[0], u), bez(S.from[1], S.via[1], S.to[1], u), S.r - 200 * (1 - u), S.s, 48, 43)
       const a1 = seg(t, S.burstAt, S.burstAt + 110), z = seg(t, S.burstAt + 110, S.burstAt + 250)
       S.lines.forEach((ln) => {

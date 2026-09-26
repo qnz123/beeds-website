@@ -6,6 +6,19 @@ import { getDictionary } from '@/i18n/dictionaries'
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
+// Start or stop the water (the SMIL clock of #hero-bubble). The filter only
+// shows through .hero-rainbow, which sits at opacity 0 unless the pointer's
+// lens or the closing ripple's band is on, so between those the water is
+// paused: left running, it restyled and repainted that invisible layer every
+// frame for as long as the page stayed open. SMIL resumes from the phase it
+// paused at, so nothing on screen jumps.
+const setWater = (svg: SVGSVGElement | null, on: boolean) => {
+  if (!svg) return
+  const paused = svg.animationsPaused()
+  if (on && paused) svg.unpauseAnimations()
+  else if (!on && !paused) svg.pauseAnimations()
+}
+
 // Resolve on the caret's next blink boundary, where its opacity is 1, so the
 // fade-out can take over without a jump. Falls back on a timer for anyone
 // whose caret does not blink at all (reduced motion) or if the span is gone.
@@ -120,6 +133,11 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
   const cursorRef = useRef<HTMLSpanElement>(null)
   // The typewriter effect closes over isDesktop, so read it through a ref
   const desktopRef = useRef(false)
+  // The water filter's <svg>, and the two things that can show it: the
+  // pointer on the headline (the lens) and the closing ripple (the band)
+  const waterRef = useRef<SVGSVGElement>(null)
+  const overTitleRef = useRef(false)
+  const wipingRef = useRef(false)
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 768px) and (pointer: fine)')
@@ -131,6 +149,12 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
     mq.addEventListener('change', sync)
     return () => mq.removeEventListener('change', sync)
   }, [])
+
+  // The water's <svg> mounts with the desktop layers; it starts still and
+  // only runs while the lens or the band can show it.
+  useEffect(() => {
+    setWater(waterRef.current, overTitleRef.current || wipingRef.current)
+  }, [isDesktop])
 
   // Stripe palette (client-supplied 2026-08-07): random-width vertical strips
   // of these colors run across the full headline (background-clip: text).
@@ -157,12 +181,23 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
   // Until this runs the headline carries no .lens class, so the reveal stays
   // shut: :hover can be true with no pointer event at all.
   const handleTitleMove = (e: React.MouseEvent) => {
+    // Set here, on every move as well as on enter: a pointer resting on the
+    // headline at load sends no enter event, and the lens arms from a move.
+    if (!overTitleRef.current) {
+      overTitleRef.current = true
+      setWater(waterRef.current, true)
+    }
     const el = titleRef.current
     if (!el) return
     const r = el.getBoundingClientRect()
     el.style.setProperty('--mx', `${e.clientX - r.left}px`)
     el.style.setProperty('--my', `${e.clientY - r.top}px`)
     if (!lens) setLens(true)
+  }
+
+  const handleTitleLeave = () => {
+    overTitleRef.current = false
+    setWater(waterRef.current, wipingRef.current)
   }
 
   useEffect(() => {
@@ -249,18 +284,29 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
   // the circle it rides, whatever the browser does to timers in the meantime.
   useEffect(() => {
     const ring = closerRef.current
+    const water = waterRef.current
     if (!raining || !ring) return
+    // The water starts in the same task that arms the band, so the band never
+    // shows it still, and stops with it unless the lens is still open.
     const on = (e: AnimationEvent) => {
-      if (e.animationName === 'hero-grow') setWiping(true)
+      if (e.animationName !== 'hero-grow') return
+      wipingRef.current = true
+      setWater(waterRef.current, true)
+      setWiping(true)
     }
     const off = (e: AnimationEvent) => {
-      if (e.animationName === 'hero-grow') setWiping(false)
+      if (e.animationName !== 'hero-grow') return
+      wipingRef.current = false
+      setWater(waterRef.current, overTitleRef.current)
+      setWiping(false)
     }
     ring.addEventListener('animationstart', on)
     ring.addEventListener('animationend', off)
     return () => {
       ring.removeEventListener('animationstart', on)
       ring.removeEventListener('animationend', off)
+      wipingRef.current = false
+      setWater(water, overTitleRef.current)
       setWiping(false)
     }
   }, [raining])
@@ -324,28 +370,60 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
           className={`hero-title text-5xl leading-[1.2]${revealReady && isDesktop ? ' reveal-ready' : ''}${lens ? ' lens' : ''}${wiping && isDesktop ? ' wipe' : ''}`}
           onMouseMove={isDesktop ? handleTitleMove : undefined}
           onMouseEnter={isDesktop ? handleTitleMove : undefined}
+          onMouseLeave={isDesktop ? handleTitleLeave : undefined}
         >
+          {/* The whole title for screen readers and no-JS crawlers, in the
+              server HTML: the typewriter starts empty, so without this the
+              page's only h1 had no text until the typing finished. */}
+          <span className="sr-only">{`${t.line1} ${t.line2}`}</span>
+
           {/* Black ink layer — while the reveal is hovered, a hole matching
               the reveal circle is masked out of it so the rippling neon
               underneath is the only text inside the circle */}
-          <div className="hero-ink">
+          {/* Each line holds the typed text (.tw-live) and an invisible copy of
+              the line as it ends up (.tw-ghost). On phones each line wraps to
+              two or three rows, so the ghost sets the line's height from the
+              first paint and the live text sits over it out of the flow: the
+              centred hero no longer climbs (or bounces) as words wrap. On
+              desktop the ghost is not rendered and .tw-live adds no box, so
+              the layout there is unchanged (see globals.css). Line 2's ghost
+              ends like the finished line: a space and the faded caret, which
+              still takes room, except on a revisit, where no caret renders. */}
+          <div className="hero-ink" aria-hidden="true">
             <div className="mb-10">
-              <span className="typewriter-text">{typed[0]}</span>
-              {activeLine === 0 && (
-                <span
-                  ref={cursorRef}
-                  className={`typewriter-cursor ${cursorBlinkOut ? 'blinking-out' : ''}`}
-                />
-              )}
+              <span className="tw-live">
+                <span className="typewriter-text">{typed[0]}</span>
+                {activeLine === 0 && (
+                  <span
+                    ref={cursorRef}
+                    className={`typewriter-cursor ${cursorBlinkOut ? 'blinking-out' : ''}`}
+                  />
+                )}
+              </span>
+              <span className="tw-ghost">{LINES[0]}</span>
             </div>
             <div className="mb-16">
-              <span className="typewriter-text">{typed[1]}</span>
-              {activeLine === 1 && (
-                <span
-                  ref={cursorRef}
-                  className={`typewriter-cursor ${cursorBlinkOut ? 'blinking-out' : ''}`}
-                />
-              )}
+              <span className="tw-live">
+                <span className="typewriter-text">{typed[1]}</span>
+                {activeLine === 1 && (
+                  <span
+                    ref={cursorRef}
+                    className={`typewriter-cursor ${cursorBlinkOut ? 'blinking-out' : ''}`}
+                  />
+                )}
+              </span>
+              <span className="tw-ghost">
+                {LINES[1]}
+                {activeLine !== -1 && (
+                  <>
+                    {' '}
+                    <span
+                      className="typewriter-cursor"
+                      style={{ visibility: 'hidden', animation: 'none' }}
+                    />
+                  </>
+                )}
+              </span>
             </div>
           </div>
 
@@ -353,31 +431,36 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
               follows the cursor while hovering the headline. Each line mirrors
               the black layer exactly, including an invisible stand-in for the
               typewriter cursor (its inline-block grows the line box a few px;
-              without the stand-in the two layers drift apart vertically).
+              without the stand-in the two layers drift apart vertically). The
+              stand-in never blinks: it is hidden, and a blink that never
+              stopped kept restyling the page long after the typing ended.
+              The stripes are clipped to the letters on an inner box, apart
+              from the mask and opacity on .hero-rainbow (see globals.css).
               Desktop only — mobile gets the plain typewriter. */}
           {isDesktop && (
-          <div
-            className="hero-rainbow"
-            aria-hidden="true"
-            style={stripes ? { backgroundImage: stripes } : undefined}
-          >
-            <div className="mb-10">
-              {typed[0]}
-              {activeLine === 0 && (
-                <span
-                  className="typewriter-cursor"
-                  style={{ visibility: 'hidden' }}
-                />
-              )}
-            </div>
-            <div className="mb-16">
-              {typed[1]}
-              {activeLine === 1 && (
-                <span
-                  className="typewriter-cursor"
-                  style={{ visibility: 'hidden' }}
-                />
-              )}
+          <div className="hero-rainbow" aria-hidden="true">
+            <div
+              className="hero-rainbow-text"
+              style={stripes ? { backgroundImage: stripes } : undefined}
+            >
+              <div className="mb-10">
+                {typed[0]}
+                {activeLine === 0 && (
+                  <span
+                    className="typewriter-cursor"
+                    style={{ visibility: 'hidden', animation: 'none' }}
+                  />
+                )}
+              </div>
+              <div className="mb-16">
+                {typed[1]}
+                {activeLine === 1 && (
+                  <span
+                    className="typewriter-cursor"
+                    style={{ visibility: 'hidden', animation: 'none' }}
+                  />
+                )}
+              </div>
             </div>
           </div>
           )}
@@ -411,8 +494,11 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
       </div>
 
       {/* Constant gentle water for the neon hover reveal (.hero-rainbow) —
-          the revealed letters keep rippling under the circle. */}
-      <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
+          the revealed letters keep rippling under the circle. Rendered only
+          where that layer exists (desktop), and its clock runs only while the
+          lens or the closing ripple shows the colour (see setWater). */}
+      {isDesktop && (
+      <svg ref={waterRef} width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
         <filter id="hero-bubble" x="-10%" y="-10%" width="120%" height="120%">
           <feTurbulence
             type="fractalNoise"
@@ -437,6 +523,7 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
           />
         </filter>
       </svg>
+      )}
     </section>
   )
 }

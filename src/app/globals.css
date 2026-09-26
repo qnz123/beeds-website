@@ -159,6 +159,84 @@ h6 {
   opacity: 0.5;
 }
 
+/* Invisible tap-area extension (~38x48) for the glyph-only menu buttons
+   (open ☰ in the bar, close ✕ in the sheet): the glyph, the layout and the
+   focus ring stay exactly where they were. Not on .nav itself, which must
+   stay sticky. */
+.nav-tap { position: relative; }
+.nav-tap::after { content: ''; position: absolute; inset: -12px; }
+
+/* While the phone menu is open the bar sits above the full-screen sheet (z 60) so the wordmark and
+   the toggle keep their exact place; its ground, blur and lit edge step aside so bar and sheet read
+   as one surface. */
+.nav.menu-open {
+  z-index: 70;
+  background-color: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  transition: none;
+}
+.nav.menu-open::after { opacity: 0; transition: none; }
+/* Closing: the bar stays above the sheet while it fades away, with its own ground coming back, so the
+   page never shows through a bare bar. */
+.nav.menu-closing { z-index: 70; transition: none; }
+.nav.menu-closing::after { transition: none; }
+
+/* The phone menu toggle: two long hairlines that fold into an X. The box is 24px tall, the height
+   the old ☰ glyph gave the bar, so the bar (and --nav-h) keep their size. Opening, the lines meet in
+   the middle and then turn; closing, they untwist first and then part. No display here: md:hidden
+   must keep hiding it on desktop. */
+.nav-burger {
+  width: 28px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #000;
+  cursor: pointer;
+}
+.nav-burger.nav-tap::after { inset: -10px -12px; }
+.nav-burger > span {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 1.5px;
+  background: currentColor;
+  transition:
+    top 0.2s cubic-bezier(0.65, 0, 0.35, 1) 0.16s,
+    transform 0.2s cubic-bezier(0.65, 0, 0.35, 1) 0s;
+}
+.nav-burger > span:first-child { top: 8px; }
+.nav-burger > span:last-child { top: 14.5px; }
+.nav-burger.is-open > span {
+  top: 11.25px;
+  transition:
+    top 0.2s cubic-bezier(0.65, 0, 0.35, 1) 0s,
+    transform 0.24s cubic-bezier(0.65, 0, 0.35, 1) 0.16s;
+}
+.nav-burger.is-open > span:first-child { transform: rotate(45deg); }
+.nav-burger.is-open > span:last-child { transform: rotate(-45deg); }
+/* The phone menu page is there at once (opaque, so nothing behind it shows through the bar), and its
+   entries fade up one after another, quickly; closing, the whole sheet fades out in 0.18s
+   (Navigation.tsx keeps it mounted that long). The items are inline <a>s, so they need a box for the
+   transform. */
+/* A touch greyer than the page (#f5f5f5), so the menu reads as its own layer (his pick, 2026-09-26). */
+.mm-sheet { background-color: #ededed; }
+.mm-sheet.is-out { animation: mm-out 0.18s ease forwards; pointer-events: none; }
+.mm-item {
+  display: inline-block;
+  animation: mm-rise 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(70ms + var(--i, 0) * 45ms);
+}
+@keyframes mm-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes mm-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-burger > span, .nav-burger.is-open > span { transition: none; }
+  .mm-item { animation: none; }
+  .mm-sheet.is-out { animation: none; opacity: 0; }
+}
+
 /* ---- Featured Work — "The Folio", Edition B filmstrip ----
    Approved 2026-07-09 (replaces the "Signed Reel" projection bands).
    Four 3:4 specimen plates on the brand color fields in a horizontal
@@ -1657,6 +1735,7 @@ textarea.blank:focus {
 }
 
 .concierge-cta {
+  position: relative;
   margin-top: 34px;
   background: none;
   border: none;
@@ -1670,6 +1749,11 @@ textarea.blank:focus {
   cursor: pointer;
   transition: opacity 0.2s ease;
 }
+
+/* Taller tap area without moving the underlined text or the step-2
+   "← back / Submit" row: padding would, since that row is baseline-aligned
+   and zeroes this button's margin-top. */
+.concierge-cta::after { content: ''; position: absolute; inset: -12px -4px; }
 
 .concierge-cta:hover {
   opacity: 0.55;
@@ -1966,8 +2050,23 @@ textarea.blank:focus {
    begins to type. The cursor is pulled down onto the descender so its
    inline-block never grows the line either. */
 .hero-ink > div,
-.hero-rainbow > div {
+.hero-rainbow-text > div {
   min-height: 1.2em;
+}
+
+/* On phones (everything the desktop gate in Hero.tsx turns away) each line
+   wraps to two or three rows as it types, which one reserved row cannot
+   hold. There the invisible finished line (.tw-ghost) stays in the flow and
+   sets the line's height from the first paint, and the typed text
+   (.tw-live) sits over it out of the flow, so nothing below or above moves
+   while the words wrap. On desktop the ghost is not rendered and .tw-live
+   generates no box: the ink lines are laid out exactly as before. */
+.tw-live { display: contents; }
+.tw-ghost { display: none; }
+@media not all and (min-width: 768px) and (pointer: fine) {
+  .hero-ink > div { position: relative; }
+  .tw-live { display: block; position: absolute; top: 0; left: 0; right: 0; }
+  .tw-ghost { display: inline; visibility: hidden; }
 }
 
 .hero-rainbow {
@@ -1975,12 +2074,11 @@ textarea.blank:focus {
   inset: 0;
   pointer-events: none;
   /* Random vertical color strips (client palette) are generated per page
-     load in Hero.tsx and applied as an inline background-image; the gradient
-     is clipped to the letterforms here. */
-  -webkit-background-clip: text;
-  background-clip: text;
+     load in Hero.tsx and applied as an inline background-image on the inner
+     .hero-rainbow-text, which clips them to the letterforms (below). */
   color: transparent;
-  /* Water ripple inside the reveal circle (constant, never settles) */
+  /* Water ripple inside the reveal circle (never settles while the colour
+     shows; Hero.tsx pauses its clock only while this layer is invisible) */
   filter: url(#hero-bubble);
   opacity: 0;
   /* No transition on purpose. The hole in the ink (a mask) cannot fade, so
@@ -2000,6 +2098,17 @@ textarea.blank:focus {
      about the cursor point so the magnified area stays under the lens */
   transform: scale(1.15);
   transform-origin: var(--mx, 50%) var(--my, 50%);
+}
+
+/* The stripes are clipped to the letters on an inner box, not on .hero-rainbow
+   itself. Firefox applies an element's own mask and opacity twice when that
+   element also has background-clip:text (alpha squared), which thinned the
+   ripple band's feathered edges to grey there. Filter, mask, opacity and the
+   lens transform all stay on .hero-rainbow. */
+.hero-rainbow-text {
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 /* Hover arms only once the prism pass has finished (.reveal-ready) AND a real
@@ -2126,14 +2235,19 @@ textarea.blank:focus {
    the pointer's own reveal still wins. */
 @property --wr { syntax: '<length>'; inherits: true; initial-value: 0px; }
 @property --wb { syntax: '<length>'; inherits: true; initial-value: 0px; }
+/* the band's progress 0→1. Firefox will not interpolate a registered length whose keyframe end is a
+   var() (it jumps straight to the end, so the band skipped past the letters), so the animation runs
+   on this plain number and --wr is derived from it */
+@property --wp { syntax: '<number>'; inherits: true; initial-value: 0; }
 
 .hero-title.wipe {
+  --wr: calc(var(--wp) * var(--wre, 0px));
   animation:
     hero-wipe-r var(--wt) cubic-bezier(0.16, 0.6, 0.22, 1) forwards,
     hero-wipe-b var(--wt) cubic-bezier(0.4, 0, 0.35, 1) forwards;
 }
 
-@keyframes hero-wipe-r { from { --wr: 0px; } to { --wr: var(--wre, 0px); } }
+@keyframes hero-wipe-r { from { --wp: 0; } to { --wp: 1; } }
 @keyframes hero-wipe-b {
   0% { --wb: 0px; }
   18% { --wb: 26px; }

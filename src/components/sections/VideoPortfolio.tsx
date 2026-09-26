@@ -172,6 +172,7 @@ type VimeoPlayerLike = {
   off: (event: string) => void
   setCurrentTime: (s: number) => Promise<number>
   play: () => Promise<void>
+  pause: () => Promise<void>
 }
 
 declare global {
@@ -245,6 +246,14 @@ function FeaturedShowcase({
     if (!mountPlayer) return
     let player: VimeoPlayerLike | null = null
     let cancelled = false
+    // Off-screen hold: browsers keep decoding a playing film nobody can see
+    // (Firefox measured ~30 frames a second through the rest of the page).
+    // While the cover is more than 300px outside the viewport the film holds
+    // on its current frame, and it carries on from there before the cover
+    // scrolls back into view, so visitors still arrive at a moving film.
+    let offscreen = false
+    let held = false
+    let io: IntersectionObserver | undefined
 
     // Phones stall this loop where desktops do not: iOS suspends a muted
     // background film when the tab or the view moves away, and a seek there
@@ -265,6 +274,13 @@ function FeaturedShowcase({
       if (!cancelled) setPlaying(true)
     }
     const stalled = () => {
+      // A pause off screen (ours, or the browser's own) just waits for the
+      // cover to come back: no restart, and the poster never returns. This
+      // must come first, or our own pause() would restart the film.
+      if (offscreen) {
+        held = true
+        return
+      }
       restart()
       window.clearTimeout(recover)
       // a successful restart fires play/timeupdate and cancels this, so the
@@ -276,18 +292,43 @@ function FeaturedShowcase({
 
     loadVimeoApi().then((vimeo) => {
       if (cancelled || !vimeo || !frameRef.current) return
+      const cover = frameRef.current.parentElement
       player = new vimeo.Player(frameRef.current)
       player.on('play', alive)
       player.on('timeupdate', (data) => {
         alive()
         if (data.seconds >= SHOWCASE_LOOP_SECONDS) restart()
+        // Held from here, not only when the cover leaves view, so deep links
+        // (e.g. /#contact) that start the film off screen hold too. From 1s
+        // on, the held frame is a real frame and the poster has already faded
+        // exactly as before.
+        else if (offscreen && data.seconds >= 1) {
+          held = true
+          player?.pause().catch(() => {})
+        }
       })
       player.on('ended', stalled)
       player.on('pause', stalled)
+      if (cover && 'IntersectionObserver' in window) {
+        io = new IntersectionObserver(
+          (entries) => {
+            offscreen = !entries[entries.length - 1].isIntersecting
+            if (!offscreen && held) {
+              held = false
+              // a resume that fails takes the usual stall path (restart, and
+              // the still if that fails too), so it never ends on black
+              player?.play().catch(stalled)
+            }
+          },
+          { rootMargin: '300px 0px' }
+        )
+        io.observe(cover)
+      }
     })
 
     return () => {
       cancelled = true
+      io?.disconnect()
       window.clearTimeout(recover)
       player?.off('play')
       player?.off('timeupdate')
@@ -465,6 +506,13 @@ function VideoModal({
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}
+      // iOS Safari only turns a tap into mouse events on an element it sees as
+      // clickable, and React's delegated onMouseDown doesn't count. Any onClick
+      // prop makes React attach a native no-op onclick, so a tap on the
+      // backdrop now fires the mousedown above. It does nothing itself, so
+      // desktop still closes on press, exactly as before. (No tap flash: the
+      // page already sets -webkit-tap-highlight-color: transparent on html.)
+      onClick={() => {}}
     >
       <div
         ref={dialogRef}

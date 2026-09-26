@@ -10,7 +10,9 @@ import type { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 import { balanceShades, CRAFT_END, CRAFT_LAND, CRAFT_SVG, playCraft, restCraft } from './craftHeadline'
 
-const mono = JetBrains_Mono({ subsets: ['latin'], weight: ['400', '500'], variable: '--ic-mono', display: 'swap' })
+// preload: false — first used by the data block ~4,400px down; a preload made every page
+// (via the '/' prefetch) download it and competed with the hero on first paint.
+const mono = JetBrains_Mono({ subsets: ['latin'], weight: ['400', '500'], variable: '--ic-mono', display: 'swap', preload: false })
 
 /** A KPI figure: `value` is the authored display string (also the sr-only source
  *  of truth); `target`/`prefix`/`suffix`/`decimals` describe how to count it up
@@ -119,6 +121,8 @@ function useOnceInView<T extends Element>(threshold: number, onEnter: () => void
 /** Ease-out count-up from 0, ~1.1s. Screen readers get the exact authored string. */
 function Figure({ stat, run }: { stat: StatDatum; run: boolean }) {
   const [display, setDisplay] = useState(stat.target)
+  // with JS and motion the figure reads 0 until its count-up starts, so it never shows the final value and then snaps back
+  useEffect(() => { if (!reducedMotion() && typeof IntersectionObserver !== 'undefined') setDisplay(0) }, [])
   useEffect(() => {
     if (!run || reducedMotion()) return
     let raf = 0
@@ -175,20 +179,54 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
     wrap.classList.add('wait')
     let stop: (() => void) | undefined, unlock: (() => void) | undefined, unbalance: (() => void) | undefined
     let done = 0, balanced = 0, glide: (() => void) | undefined
+    let heldAt = -1
+
+    // A swipe or fling already under way when the hold starts can't be cancelled by the hold's touchmove:
+    // the browser keeps scrolling past the floor while the hold snaps back each frame, so the page shivers.
+    // For that one gesture the page is briefly frozen instead. The freeze is on body's overflow-y, not html:
+    // html{overflow:hidden} would stop body's overflow-x from reaching the viewport, body would become the
+    // sticky nav's scroller and the nav would jump off screen.
+    const body = document.body
+    let touchDown = false, lastTouchEnd = -1e9, frozen = false, thaw = 0
+    const unfreeze = () => {
+      window.clearTimeout(thaw)
+      if (!frozen) return
+      frozen = false
+      // only lift our own lock: the mobile menu sets the whole `overflow` itself and restores it itself
+      if (!body.style.overflowX) body.style.removeProperty('overflow-y')
+    }
+    const onTouchStart = () => { touchDown = true }
+    const onTouchEnd = () => {
+      touchDown = false; lastTouchEnd = performance.now()
+      if (frozen) { window.clearTimeout(thaw); thaw = window.setTimeout(unfreeze, 300) }
+    }
+    const topts = { passive: true, capture: true } as const
+    window.addEventListener('touchstart', onTouchStart, topts)
+    window.addEventListener('touchend', onTouchEnd, topts)
+    window.addEventListener('touchcancel', onTouchEnd, topts)
+
     const io = new IntersectionObserver(([e]) => {
       if (!e.isIntersecting) return
       io.disconnect()
       wrap.classList.remove('settled', 'wait')
       wrap.classList.add('play')
       // arriving from above, the page holds here until the word has finished drawing (scrolling back up still works)
-      const heldAt = e.boundingClientRect.top > 0 ? window.scrollY : -1
-      if (heldAt >= 0) unlock = holdScrollDown()
+      heldAt = e.boundingClientRect.top > 0 ? window.scrollY : -1
+      if (heldAt >= 0) {
+        unlock = holdScrollDown()
+        // a touch gesture in flight (finger down, or a fling from one that just lifted) is stopped at the floor;
+        // never with a classic scrollbar (a touchscreen laptop), whose disappearing would shift the layout
+        if ((touchDown || performance.now() - lastTouchEnd < 1500) && window.innerWidth === document.documentElement.clientWidth && !body.style.overflowY) {
+          frozen = true; body.style.overflowY = 'hidden'
+          if (!touchDown) thaw = window.setTimeout(unfreeze, 300)
+        }
+      }
       stop = playCraft(wrap, svg, () => wrap.classList.add('settled'))
       balanced = window.setTimeout(() => { unbalance = balanceShades(wrap) }, CRAFT_END)
       // the moment the glasses catch on the A, the page lets go and glides on until the word sits just
       // under the nav, still in view above the photos, unless the reader scrolled back up meanwhile
       done = window.setTimeout(() => {
-        unlock?.(); unlock = undefined
+        unlock?.(); unlock = undefined; unfreeze()
         const nav = document.querySelector<HTMLElement>('.nav')?.offsetHeight ?? 64
         const by = svg.getBoundingClientRect().top - nav - 20
         if (heldAt >= 0 && by > 0 && Math.abs(window.scrollY - heldAt) < 4)
@@ -196,10 +234,23 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
       }, CRAFT_LAND)
     }, { rootMargin: '0px 0px -50% 0px' })
     io.observe(wrap)
-    return () => { io.disconnect(); window.clearTimeout(done); window.clearTimeout(balanced); glide?.(); unlock?.(); unbalance?.(); stop?.(); wrap.classList.remove('play', 'settled', 'wait') }
+    return () => {
+      unfreeze(); window.removeEventListener('touchstart', onTouchStart, topts); window.removeEventListener('touchend', onTouchEnd, topts); window.removeEventListener('touchcancel', onTouchEnd, topts)
+      io.disconnect(); window.clearTimeout(done); window.clearTimeout(balanced); glide?.(); unlock?.(); unbalance?.(); stop?.(); wrap.classList.remove('play', 'settled', 'wait')
+    }
   }, [])
 
   const phasesRef = useOnceInView<HTMLDivElement>(0.35, () => setCounting(true))
+  // On a phone the stacked row is taller than the screen: the first figure can come into view before the
+  // row is 35% in (in landscape it never gets there), so the count also starts the moment that figure appears.
+  useEffect(() => {
+    const fig = phasesRef.current?.querySelector('.ic-fig')
+    if (!fig || typeof IntersectionObserver === 'undefined') return
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); setCounting(true) } })
+    io.observe(fig)
+    return () => io.disconnect()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // The photos start at full width and shrink as they scroll up toward the nav, landing at the width
   // where photos, figures and bars fit one screen (~420px of text and bars below 4:5 photos).
