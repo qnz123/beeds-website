@@ -72,7 +72,7 @@ const NOTES_JA = [
     "num": "02",
     "industry": "Booking",
     "title": "帰ってきて、休むために",
-    "note": "多くのホテルサイトが売っているのは、「昼」です。明るい客室、青い空、正午のロビー。\n\nけれど私たちは、ゲストが本当に大切にしているのは、一日の旅を終え、部屋に戻り、ようやくゆっくり休めるその瞬間だと考えています。だからこのスタディは、夜へと移り変わる時間に焦点を当てました。\n\n扉が開くと、そこには昼の光に満ちた部屋。スクロールするにつれて光はゆっくりと落ち、ランプが灯り、見出しは「到着」から「滞在」へと変わっていきます。\n\n料金はこれまでと同じく、1クリック先にあります。ただし、それが現れるのは、訪れた人が「ここに泊まりたい」と感じた、その後です。",
+    "note": "多くのホテルサイトが売っているのは、「昼」です。明るい客室、青い空、正午のロビー。\n\nけれど、ゲストが本当に大切にしているのは、一日の旅を終え、部屋に戻り、ようやくゆっくり休めるその瞬間だと考えています。だからこのスタディは、夜へと移り変わる時間に焦点を当てました。\n\n扉が開くと、そこには昼の光に満ちた部屋。スクロールするにつれて光はゆっくりと落ち、ランプが灯り、見出しは「到着」から「滞在」へと変わっていきます。\n\n料金はこれまでと同じく、1クリック先にあります。ただし、それが現れるのは、訪れた人が「ここに泊まりたい」と感じた、その後です。",
     "motion": "スクロールで扉が開く · 見出しが次の誘いへ · 昼から夕暮れへ",
     "baBefore": "/showcase/img/ba-hospitality-before.webp",
     "baBeforeAlt": "ビフォー：一般的なホテルサイト"
@@ -89,7 +89,7 @@ const NOTES_JA = [
 ]
 const COPY = {
   en: { notes: NOTES_EN, approach: 'Approach', beforeAfter: 'Before / After', caption: 'Left, what the category usually ships. Right, the direction.', wipe: 'Pull the before view across' },
-  ja: { notes: NOTES_JA, approach: 'アプローチ', beforeAfter: 'Before / After', caption: '左は、その業界でよく見られる作り。右は、私たちの方向性。', wipe: 'ビフォーの画面を引き出す' },
+  ja: { notes: NOTES_JA, approach: 'アプローチ', beforeAfter: 'Before / After', caption: '左は、その業界でよく見られる作り。右は、BEEDSが提案する方向性。', wipe: 'ビフォーの画面を引き出す' },
 }
 
 export default function Showcase({ lang = 'en' }: { lang?: Locale }) {

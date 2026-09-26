@@ -121,7 +121,7 @@ export default function AboutPageJa() {
               <div>
                 <h3 className="eyebrow text-[#666] mb-2">New York · Tokyo</h3>
                 <p className="text-sm leading-[1.7] text-[#666]">
-                  異なる文化は、新しい視点を生みます。ニューヨークと東京を拠点に、多様な市場とカルチャーを横断しながらブランドを支援しています。APAC、北米、中東。市場が変われば、伝わり方も変わる。だから私たちは、ローカルの文脈を理解し、
+                  異なる文化は、新しい視点を生みます。ニューヨークと東京を拠点に、多様な市場とカルチャーを横断しながらブランドを支援しています。APAC、北米、中東。市場が変われば、伝わり方も変わる。だから、ローカルの文脈を理解し、
                   <span className="brush-highlight">世界で機能するクリエイティブ</span>
                   を設計します。
                 </p>
