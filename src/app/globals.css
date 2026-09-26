@@ -2174,6 +2174,11 @@ textarea.blank:focus {
    the letters it vanished at exactly the moment it mattered. */
 .hero-fx-front { z-index: 2; }
 
+/* While the rain falls the rings are painted onto this canvas (heroRain.ts) and the CSS rings only
+   keep time, invisible: Firefox re-rasterised the big scaling rings every frame and fell to a few fps. */
+.hero-rain { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.hero-fx.painted .hero-ring { visibility: hidden; }
+
 /* A drop spans the hero so a ring's % size resolves against the hero, not a
    point; the drop's centre travels down to the rings as --x/--y. The
    aspect-ratio keeps them circular, and the % margins re-centre. */

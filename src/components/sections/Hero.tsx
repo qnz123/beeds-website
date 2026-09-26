@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { paintRain } from './heroRain'
 import type { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 
@@ -282,6 +283,14 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
   // The closing ripple arms and disarms the headline's band on its own clock.
   // Listening to the ring means the band is on screen for exactly as long as
   // the circle it rides, whatever the browser does to timers in the meantime.
+  // The rings are painted onto canvases while the rain falls (see heroRain.ts): the CSS rings keep
+  // the clock and the closing ripple's events, the canvas does the drawing.
+  useEffect(() => {
+    const hero = heroRef.current
+    if (!raining || !isDesktop || !hero) return
+    return paintRain(Array.from(hero.querySelectorAll<HTMLElement>('.hero-fx')))
+  }, [raining, isDesktop])
+
   useEffect(() => {
     const ring = closerRef.current
     const water = waterRef.current
@@ -322,6 +331,7 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
           compositor. Depth reads through line weight and opacity. */}
       {isDesktop && (
         <div className="hero-fx" aria-hidden="true">
+          <canvas className="hero-rain" />
           {DROPS.map((d, i) => (
             <div
               key={i}
@@ -342,6 +352,7 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
           moment it mattered. Its animation events arm and disarm the reveal. */}
       {isDesktop && (
         <div className="hero-fx hero-fx-front" aria-hidden="true">
+          <canvas className="hero-rain" />
           <div
             className="hero-drop"
             style={{ '--x': `${CLOSER.x * 100}%`, '--y': `${CLOSER.y * 100}%` } as React.CSSProperties}
