@@ -1445,9 +1445,12 @@ h6 {
 .ic .star-burst path { fill: none; stroke-linecap: square; stroke-dasharray: 1 2; visibility: hidden; }
 
 /* the three phases: the photograph is the mark */
-/* the photos arrive full width; as they scroll up to the nav, Impact.tsx narrows them (--ic-phw) until
-   photos and bars share one screen. They keep their full 4:5 frame throughout. */
+/* the photos arrive full width; as they scroll up to the nav, Impact.tsx narrows them (--ic-phw, set on
+   their container) until photos and bars share one screen. They keep their full 4:5 frame throughout.
+   The bar block (with the note inside it) stays put at the photos' final width (--ic-fitw), not following the
+   shrink, so they line up under the photos once those have landed. */
 .ic-phases { max-width: var(--ic-phw, 100%); margin-inline: auto; }
+.ic-lift { max-width: var(--ic-fitw, 100%); margin-inline: auto; }
 .ic-phases { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
 .ic-phase { display: flex; flex-direction: column; }
 .ic-shot { margin: 0 0 16px; aspect-ratio: 4 / 5; max-width: 100%; background: #ebe4d8; overflow: hidden; }

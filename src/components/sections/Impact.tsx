@@ -258,12 +258,23 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
     const el = phasesRef.current
     if (!el) return
     let raf = 0, cur = -1, last = 0
+    // Both widths live on the container: --ic-phw is the photos' moving width; --ic-fitw is the width
+    // they land at, which the bar block and the note below keep all the time (they do not shrink along)
+    const host = el.parentElement ?? el
+    let fitSet = -1
+    const setFit = (w: number) => {
+      if (w === fitSet) return
+      fitSet = w
+      if (w < 0) host.style.removeProperty('--ic-fitw')
+      else host.style.setProperty('--ic-fitw', `${w.toFixed(1)}px`)
+    }
     const target = () => {
       const box = el.parentElement ?? el, cs = getComputedStyle(box)
       const full = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)
       const vh = window.innerHeight
       const fit = Math.min(full, Math.max(600, 2.4 * vh - 1230))
-      if (fit >= full || reducedMotion()) return -1
+      if (fit >= full || reducedMotion()) { setFit(-1); return -1 }
+      setFit(fit)
       const nav = document.querySelector<HTMLElement>('.nav')?.offsetHeight ?? 64
       const top = el.getBoundingClientRect().top
       // full size until the photos' top passes 40% of the screen, then shrink over the last stretch,
@@ -276,12 +287,12 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
     const step = (now: number) => {
       raf = 0
       const want = target()
-      if (want < 0) { cur = -1; el.style.removeProperty('--ic-phw'); return }
+      if (want < 0) { cur = -1; host.style.removeProperty('--ic-phw'); return }
       const dt = last ? Math.min(64, now - last) : 16
       last = now
       cur = cur < 0 ? want : cur + (want - cur) * (1 - Math.exp(-dt / 160))
       if (Math.abs(want - cur) < 0.3) cur = want
-      el.style.setProperty('--ic-phw', `${cur.toFixed(1)}px`)
+      host.style.setProperty('--ic-phw', `${cur.toFixed(1)}px`)
       if (cur !== want) raf = requestAnimationFrame(step)
       else last = 0
     }
@@ -363,9 +374,9 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
               </div>
             ))}
           </div>
+          {/* inside the block, so it fades in with the bars rather than on its own */}
+          <p className="ic-note">{t.disclaimer}</p>
         </div>
-
-        <p className="ic-note" data-rv>{t.disclaimer}</p>
       </div>
     </section>
   )
