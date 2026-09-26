@@ -1495,7 +1495,8 @@ h6 {
 }
 
 /* soft edges: the white section grades into the #f5f5f5 sections on either side */
-.ic { background: linear-gradient(#f5f5f5, #ffffff 160px, #ffffff calc(100% - 160px), #f5f5f5); }
+/* plain white, no fades at the edges (he asked for the gradient to go) */
+.ic { background: #ffffff; }
 
 /* scroll-through: blocks fade up as they arrive (armed by JS only, so no-JS shows everything) */
 .ic.ic-armed [data-rv] { opacity: 0; transform: translateY(28px); transition: opacity 0.9s cubic-bezier(.22, 1, .36, 1), transform 0.9s cubic-bezier(.22, 1, .36, 1); transition-delay: calc(var(--i, 0) * 120ms); }
