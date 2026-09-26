@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { paintRain } from './heroRain'
+import { waterGuard, type WaterGuard } from './heroWater'
 import type { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 
@@ -122,6 +123,10 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
   // The rain, and the two ways it touches the headline
   const [raining, setRaining] = useState(false)
   const [wiping, setWiping] = useState(false)
+  // Set once this browser proves too slow for the water filter (see heroWater.ts); the colour
+  // reveal then shows without the ripple
+  const [dry, setDry] = useState(false)
+  const guardRef = useRef<WaterGuard | null>(null)
   // Set by the first real pointer event on the headline. Until then the lens
   // has no position, so the reveal stays shut even if :hover is already true.
   const [lens, setLens] = useState(false)
@@ -187,6 +192,7 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
     if (!overTitleRef.current) {
       overTitleRef.current = true
       setWater(waterRef.current, true)
+      guardRef.current?.waterOn()
     }
     const el = titleRef.current
     if (!el) return
@@ -199,6 +205,7 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
   const handleTitleLeave = () => {
     overTitleRef.current = false
     setWater(waterRef.current, wipingRef.current)
+    if (!wipingRef.current) guardRef.current?.waterOff()
   }
 
   useEffect(() => {
@@ -291,6 +298,15 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
     return paintRain(Array.from(hero.querySelectorAll<HTMLElement>('.hero-fx')))
   }, [raining, isDesktop])
 
+  // Frames are sampled from the start of the rain so the water's first showing can be measured
+  // against them (heroWater.ts)
+  useEffect(() => {
+    if (!raining || !isDesktop) return
+    const guard = waterGuard(() => setDry(true))
+    guardRef.current = guard
+    return () => { guard.stop(); guardRef.current = null }
+  }, [raining, isDesktop])
+
   useEffect(() => {
     const ring = closerRef.current
     const water = waterRef.current
@@ -301,12 +317,14 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
       if (e.animationName !== 'hero-grow') return
       wipingRef.current = true
       setWater(waterRef.current, true)
+      guardRef.current?.waterOn()
       setWiping(true)
     }
     const off = (e: AnimationEvent) => {
       if (e.animationName !== 'hero-grow') return
       wipingRef.current = false
       setWater(waterRef.current, overTitleRef.current)
+      if (!overTitleRef.current) guardRef.current?.waterOff()
       setWiping(false)
     }
     ring.addEventListener('animationstart', on)
@@ -449,7 +467,7 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
               from the mask and opacity on .hero-rainbow (see globals.css).
               Desktop only — mobile gets the plain typewriter. */}
           {isDesktop && (
-          <div className="hero-rainbow" aria-hidden="true">
+          <div className={`hero-rainbow${dry ? ' dry' : ''}`} aria-hidden="true">
             <div
               className="hero-rainbow-text"
               style={stripes ? { backgroundImage: stripes } : undefined}

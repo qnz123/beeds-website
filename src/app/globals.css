@@ -1425,6 +1425,10 @@ h6 {
 .ic-hl { position: relative; overflow: visible; padding-block: 0; margin-bottom: 36px; background: transparent; }
 .ic-title { margin: 0; line-height: 0; }
 .ic-word { position: relative; z-index: 1; display: block; width: min(100%, 1122px); height: auto; margin: 0 auto; overflow: visible; }
+/* The word is its own layout world: its size comes from its width and the viewBox's 374:98, so
+   nothing else on the page moving (the photos shrinking below) makes Safari lay the whole SVG out
+   again. Layout containment does not clip, so the assets still draw past its edges. */
+.ic-word { contain: size layout; aspect-ratio: 374 / 98; }
 .ic-lede { font-size: 30px; line-height: 1.32; max-width: 30ch; margin: 0 auto; text-wrap: balance; }
 .ic-lede span { color: var(--ic-muted); }
 /* Japanese: one sentence a line at every width. The type eases down with the text column (the
@@ -2114,6 +2118,9 @@ textarea.blank:focus {
    element also has background-clip:text (alpha squared), which thinned the
    ripple band's feathered edges to grey there. Filter, mask, opacity and the
    lens transform all stay on .hero-rainbow. */
+/* The water ripple is dropped where the browser can't keep up with it (heroWater.ts decides, by
+   frame rate: Safari renders this SVG filter on the CPU and fell to ~48fps). The colour stays. */
+.hero-rainbow.dry { filter: none; }
 .hero-rainbow-text {
   -webkit-background-clip: text;
   background-clip: text;
