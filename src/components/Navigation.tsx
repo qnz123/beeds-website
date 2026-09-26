@@ -81,6 +81,29 @@ export default function Navigation({
     }
   }, [router, exploreHref])
 
+  // Contact goes all the way down to the booking form (Book a session). On the home page it scrolls
+  // there itself: it first tells the Impact section (event 'beeds:pass') to let go of the CRAFT hold
+  // and set its photos at their final size, so nothing stops the trip or moves the target on the way.
+  // Only this link: the hero's "I want to build…" still stops at CRAFT. Returns true if it took over.
+  const toContact = (e: React.MouseEvent, href: string) => {
+    if (!href.endsWith('#contact') || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return false
+    const dest = document.getElementById('contact')
+    const here = window.location.pathname.replace(/\/$/, '') === href.split('#')[0].replace(/\/$/, '')
+    if (!dest || !here) return false
+    e.preventDefault()
+    const go = () => {
+      window.dispatchEvent(new Event('beeds:pass'))
+      const top = dest.getBoundingClientRect().top + window.scrollY
+      const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      window.scrollTo({ top, behavior: still ? ('instant' as ScrollBehavior) : 'smooth' })
+      window.history.replaceState(window.history.state, '', `${window.location.pathname}#contact`)
+    }
+    // from the phone menu, wait until it has closed and let the page scroll again
+    if (isOpen) { setIsOpen(false); requestAnimationFrame(() => requestAnimationFrame(go)) }
+    else go()
+    return true
+  }
+
   // Toggle shows the OTHER language's name and links to its URL.
   const toggleLabel = isJa ? 'English' : '日本語'
   const targetLocale = isJa ? 'en' : 'ja'
@@ -154,7 +177,7 @@ export default function Navigation({
       {/* Desktop Navigation */}
       <div className="nav-links hidden md:flex gap-10 items-center">
         {navLinks.map((link) => (
-          <Link key={link.href} href={link.href} {...prefetchOnIntent(link.href)}>
+          <Link key={link.href} href={link.href} {...prefetchOnIntent(link.href)} onClick={(e) => toContact(e, link.href)}>
             {link.label}
           </Link>
         ))}
@@ -204,7 +227,7 @@ export default function Navigation({
             <Link
               key={link.href}
               href={link.href}
-              onClick={() => setIsOpen(false)}
+              onClick={(e) => { if (!toContact(e, link.href)) setIsOpen(false) }}
               className="mm-item text-[34px] leading-none"
               style={{ '--i': i } as React.CSSProperties}
             >

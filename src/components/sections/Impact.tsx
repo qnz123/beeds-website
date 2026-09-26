@@ -77,31 +77,63 @@ function easeScrollBy(by: number, dur: number): () => void {
   return cancel
 }
 
-/** Blocks scrolling further down (wheel, touch, keys, scrollbar) until the returned release is called. */
+/** Holds the page where it is for downward scrolling until the returned release is called; scrolling up
+ *  still works. While held, the page simply ends at the bottom of the screen: <main> is clipped there
+ *  (with layout containment, which Firefox needs before it stops counting what lies below) and the
+ *  footer set aside, so the browser's own scrolling stops as it does at the end of any page.
+ *  Snapping back from a scroll listener could not do that in Chrome: a trackpad swipe or an animated
+ *  wheel scroll already under way is not cancelable, so the browser kept moving the page down while the
+ *  listener pulled it up every frame, and the screen shook. */
 function holdScrollDown(): () => void {
   const floor = window.scrollY
-  let touchY = 0
-  const wheel = (e: WheelEvent) => { if (e.deltaY > 0) e.preventDefault() }
-  const touchStart = (e: TouchEvent) => { touchY = e.touches[0]?.clientY ?? 0 }
-  const touchMove = (e: TouchEvent) => { if ((e.touches[0]?.clientY ?? 0) < touchY) e.preventDefault() }
-  const keys = new Set(['ArrowDown', 'PageDown', 'End', ' ', 'Spacebar'])
-  const key = (e: KeyboardEvent) => {
-    const el = e.target as HTMLElement | null
-    if (keys.has(e.key) && !e.shiftKey && !el?.closest('input, textarea, select, [contenteditable]')) e.preventDefault()
+  const root = document.documentElement
+  const main = document.querySelector('main'), footer = document.querySelector('footer')
+  const endHere = () => {
+    if (!main) return
+    const top = main.getBoundingClientRect().top + window.scrollY
+    main.style.maxHeight = `${Math.max(0, floor + root.clientHeight - top)}px`
   }
-  const scroll = () => { if (window.scrollY > floor) window.scrollTo({ top: floor, behavior: 'instant' as ScrollBehavior }) }
-  window.addEventListener('wheel', wheel, { passive: false })
-  window.addEventListener('touchstart', touchStart, { passive: true })
-  window.addEventListener('touchmove', touchMove, { passive: false })
-  window.addEventListener('keydown', key)
-  window.addEventListener('scroll', scroll)
+  if (main) { main.style.overflowY = 'clip'; main.style.contain = 'layout'; if (footer) footer.style.display = 'none'; endHere() }
+  // and no rubber-band bounce against that end, so the page stops dead. (With this on, a non-passive
+  // wheel listener made WebKit refuse to scroll back up, so the end itself is the only stop now.)
+  const prevOverscroll = root.style.overscrollBehaviorY
+  root.style.overscrollBehaviorY = 'none'
+  // a fallback only, for a browser without overflow: clip
+  const scroll = () => { if (window.scrollY > floor + 1) window.scrollTo({ top: floor, behavior: 'instant' as ScrollBehavior }) }
+  window.addEventListener('scroll', scroll, { passive: true })
+  window.addEventListener('resize', endHere)
   return () => {
-    window.removeEventListener('wheel', wheel)
-    window.removeEventListener('touchstart', touchStart)
-    window.removeEventListener('touchmove', touchMove)
-    window.removeEventListener('keydown', key)
     window.removeEventListener('scroll', scroll)
+    window.removeEventListener('resize', endHere)
+    if (main) { main.style.removeProperty('max-height'); main.style.removeProperty('overflow-y'); main.style.removeProperty('contain') }
+    if (footer) footer.style.removeProperty('display')
+    root.style.overscrollBehaviorY = prevOverscroll
   }
+}
+
+/** The nav's Contact link announces a trip past this section to the booking form with this event
+ *  (Navigation.tsx). Calls `done` once that trip's scroll is over: at scrollend (ignoring one straight
+ *  after the click, which belongs to a scroll it cut short), once the page has been still for 250ms
+ *  (Safari has no scrollend, and WebKit can start moving ~250ms after the click, hence the longer first
+ *  wait), at the reader's own wheel, touch or key, or after 4s at most. Returns a cancel. */
+const PASS_EVENT = 'beeds:pass'
+function whenTripEnds(done: () => void): () => void {
+  const t0 = performance.now()
+  let over = false
+  let idle = window.setTimeout(() => end(), 700)
+  const max = window.setTimeout(() => end(), 4000)
+  const onScroll = () => { window.clearTimeout(idle); idle = window.setTimeout(() => end(), 250) }
+  const onScrollEnd = () => { if (performance.now() - t0 > 150) end() }
+  const onInput = () => end()
+  const stop = () => {
+    window.clearTimeout(idle); window.clearTimeout(max)
+    window.removeEventListener('scroll', onScroll); window.removeEventListener('scrollend', onScrollEnd)
+    window.removeEventListener('wheel', onInput); window.removeEventListener('touchstart', onInput); window.removeEventListener('keydown', onInput)
+  }
+  function end() { if (over) return; over = true; stop(); done() }
+  window.addEventListener('scroll', onScroll, { passive: true }); window.addEventListener('scrollend', onScrollEnd)
+  window.addEventListener('wheel', onInput, { passive: true }); window.addEventListener('touchstart', onInput, { passive: true }); window.addEventListener('keydown', onInput)
+  return () => { if (!over) { over = true; stop() } }
 }
 
 /** Fires once when `ref` is well into view. */
@@ -166,6 +198,7 @@ function Count({ from, to, run, delay, dur = 700, fmt = (v: number) => String(Ma
 export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
   const t = getDictionary(lang).impact
   const wrapRef = useRef<HTMLDivElement>(null)
+  const playedRef = useRef(false)
   const [counting, setCounting] = useState(false)
 
   // The headline stays hidden until its top reaches the middle of the screen, then plays once from
@@ -179,54 +212,23 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
     wrap.classList.add('wait')
     let stop: (() => void) | undefined, unlock: (() => void) | undefined, unbalance: (() => void) | undefined
     let done = 0, balanced = 0, glide: (() => void) | undefined
-    let heldAt = -1
-
-    // A swipe or fling already under way when the hold starts can't be cancelled by the hold's touchmove:
-    // the browser keeps scrolling past the floor while the hold snaps back each frame, so the page shivers.
-    // For that one gesture the page is briefly frozen instead. The freeze is on body's overflow-y, not html:
-    // html{overflow:hidden} would stop body's overflow-x from reaching the viewport, body would become the
-    // sticky nav's scroller and the nav would jump off screen.
-    const body = document.body
-    let touchDown = false, lastTouchEnd = -1e9, frozen = false, thaw = 0
-    const unfreeze = () => {
-      window.clearTimeout(thaw)
-      if (!frozen) return
-      frozen = false
-      // only lift our own lock: the mobile menu sets the whole `overflow` itself and restores it itself
-      if (!body.style.overflowX) body.style.removeProperty('overflow-y')
-    }
-    const onTouchStart = () => { touchDown = true }
-    const onTouchEnd = () => {
-      touchDown = false; lastTouchEnd = performance.now()
-      if (frozen) { window.clearTimeout(thaw); thaw = window.setTimeout(unfreeze, 300) }
-    }
-    const topts = { passive: true, capture: true } as const
-    window.addEventListener('touchstart', onTouchStart, topts)
-    window.addEventListener('touchend', onTouchEnd, topts)
-    window.addEventListener('touchcancel', onTouchEnd, topts)
+    let heldAt = -1, played = false, passing = false, endTrip: (() => void) | undefined
 
     const io = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting) return
+      if (!e.isIntersecting || passing) return
+      played = true; playedRef.current = true
       io.disconnect()
       wrap.classList.remove('settled', 'wait')
       wrap.classList.add('play')
       // arriving from above, the page holds here until the word has finished drawing (scrolling back up still works)
       heldAt = e.boundingClientRect.top > 0 ? window.scrollY : -1
-      if (heldAt >= 0) {
-        unlock = holdScrollDown()
-        // a touch gesture in flight (finger down, or a fling from one that just lifted) is stopped at the floor;
-        // never with a classic scrollbar (a touchscreen laptop), whose disappearing would shift the layout
-        if ((touchDown || performance.now() - lastTouchEnd < 1500) && window.innerWidth === document.documentElement.clientWidth && !body.style.overflowY) {
-          frozen = true; body.style.overflowY = 'hidden'
-          if (!touchDown) thaw = window.setTimeout(unfreeze, 300)
-        }
-      }
+      if (heldAt >= 0) unlock = holdScrollDown()
       stop = playCraft(wrap, svg, () => wrap.classList.add('settled'))
       balanced = window.setTimeout(() => { unbalance = balanceShades(wrap) }, CRAFT_END)
       // the moment the glasses catch on the A, the page lets go and glides on until the word sits just
       // under the nav, still in view above the photos, unless the reader scrolled back up meanwhile
       done = window.setTimeout(() => {
-        unlock?.(); unlock = undefined; unfreeze()
+        unlock?.(); unlock = undefined
         const nav = document.querySelector<HTMLElement>('.nav')?.offsetHeight ?? 64
         const by = svg.getBoundingClientRect().top - nav - 20
         if (heldAt >= 0 && by > 0 && Math.abs(window.scrollY - heldAt) < 4)
@@ -234,10 +236,45 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
       }, CRAFT_LAND)
     }, { rootMargin: '0px 0px -50% 0px' })
     io.observe(wrap)
+    // The nav's Contact link goes past on its way to the booking form: let go of any hold or glide, and
+    // do not start the headline while the page goes by; look again once the trip is over (a reader who
+    // scrolls back up then gets it as usual). The hero's "I want to build…" is not part of this: it
+    // still stops here.
+    const onPass = () => {
+      passing = true
+      unlock?.(); unlock = undefined; heldAt = -1; glide?.(); glide = undefined
+      endTrip?.()
+      endTrip = whenTripEnds(() => { passing = false; endTrip = undefined; if (!played) { io.unobserve(wrap); io.observe(wrap) } })
+    }
+    window.addEventListener(PASS_EVENT, onPass)
     return () => {
-      unfreeze(); window.removeEventListener('touchstart', onTouchStart, topts); window.removeEventListener('touchend', onTouchEnd, topts); window.removeEventListener('touchcancel', onTouchEnd, topts)
+      window.removeEventListener(PASS_EVENT, onPass); endTrip?.()
       io.disconnect(); window.clearTimeout(done); window.clearTimeout(balanced); glide?.(); unlock?.(); unbalance?.(); stop?.(); wrap.classList.remove('play', 'settled', 'wait')
     }
+  }, [])
+
+  // The hero's "I want to build…" (a plain #contact link) is meant to stop at CRAFT, not run on to the
+  // booking form. Left to the browser, whether it stopped depended on the headline being caught
+  // mid-scroll, which Safari's fast smooth scroll skipped. So it now scrolls to CRAFT itself: to the point
+  // where the headline starts and holds, if it has not played yet (the usual hold, play and glide follow);
+  // otherwise, or with reduced motion, to the headline sitting under the nav. (The nav's Contact link is
+  // the one that goes on to the booking form.)
+  useEffect(() => {
+    const onClick = (ev: MouseEvent) => {
+      if (ev.button !== 0 || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return
+      if (!(ev.target instanceof Element) || !ev.target.closest('a.hero-btn-connect')) return
+      const wrap = wrapRef.current, word = wrap?.querySelector('svg')
+      if (!wrap || !word) return
+      ev.preventDefault()
+      const still = reducedMotion()
+      const nav = document.querySelector<HTMLElement>('.nav')?.offsetHeight ?? 64
+      const top = !still && !playedRef.current
+        ? window.scrollY + wrap.getBoundingClientRect().top - window.innerHeight * 0.45
+        : window.scrollY + word.getBoundingClientRect().top - nav - 20
+      window.scrollTo({ top, behavior: still ? ('instant' as ScrollBehavior) : 'smooth' })
+    }
+    document.addEventListener('click', onClick)
+    return () => document.removeEventListener('click', onClick)
   }, [])
 
   const phasesRef = useOnceInView<HTMLDivElement>(0.35, () => setCounting(true))
@@ -257,7 +294,7 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
   useEffect(() => {
     const el = phasesRef.current
     if (!el) return
-    let raf = 0, cur = -1, last = 0
+    let raf = 0, cur = -1, last = 0, passing = false, endTrip: (() => void) | undefined
     // Both widths live on the container: --ic-phw is the photos' moving width; --ic-fitw is the width
     // they land at, which the bar block and the note below keep all the time (they do not shrink along)
     const host = el.parentElement ?? el
@@ -281,7 +318,7 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
       // down to the nav (so the smaller version arrives twice as soon), easing out so the last of it
       // slows into place
       const from = vh * 0.4, to = from - (from - (nav + 24)) / 2
-      const p = Math.min(1, Math.max(0, (from - top) / (from - to)))
+      const p = passing ? 1 : Math.min(1, Math.max(0, (from - top) / (from - to)))
       return full - (full - fit) * (1 - Math.pow(1 - p, 3))
     }
     // the width follows the scroll through a short ease-out, so wheel steps glide instead of jumping
@@ -291,17 +328,29 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
       if (want < 0) { cur = -1; host.style.removeProperty('--ic-phw'); return }
       const dt = last ? Math.min(64, now - last) : 16
       last = now
-      cur = cur < 0 ? want : cur + (want - cur) * (1 - Math.exp(-dt / 160))
+      cur = cur < 0 || passing ? want : cur + (want - cur) * (1 - Math.exp(-dt / 160))
       if (Math.abs(want - cur) < 0.3) cur = want
       host.style.setProperty('--ic-phw', `${cur.toFixed(1)}px`)
       if (cur !== want) raf = requestAnimationFrame(step)
       else last = 0
     }
     const queue = () => { if (!raf) raf = requestAnimationFrame(step) }
+    // On the Contact link's trip past, the photos take their final size at once, before the page is
+    // measured, so it does not change height on the way down and the booking form lands where aimed
+    const onPass = () => {
+      passing = true
+      cancelAnimationFrame(raf); raf = 0; last = 0; step(performance.now())
+      endTrip?.()
+      endTrip = whenTripEnds(() => { passing = false; endTrip = undefined; queue() })
+    }
     step(performance.now())
     window.addEventListener('scroll', queue, { passive: true })
     window.addEventListener('resize', queue)
-    return () => { cancelAnimationFrame(raf); window.removeEventListener('scroll', queue); window.removeEventListener('resize', queue) }
+    window.addEventListener(PASS_EVENT, onPass)
+    return () => {
+      cancelAnimationFrame(raf); endTrip?.()
+      window.removeEventListener('scroll', queue); window.removeEventListener('resize', queue); window.removeEventListener(PASS_EVENT, onPass)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const [growing, setGrowing] = useState(false)
