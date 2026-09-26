@@ -277,9 +277,10 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
       setFit(fit)
       const nav = document.querySelector<HTMLElement>('.nav')?.offsetHeight ?? 64
       const top = el.getBoundingClientRect().top
-      // full size until the photos' top passes 40% of the screen, then shrink over the last stretch,
-      // easing out so the last of it slows into place
-      const from = vh * 0.4, to = nav + 24
+      // full size until the photos' top passes 40% of the screen, then shrink over half the stretch
+      // down to the nav (so the smaller version arrives twice as soon), easing out so the last of it
+      // slows into place
+      const from = vh * 0.4, to = from - (from - (nav + 24)) / 2
       const p = Math.min(1, Math.max(0, (from - top) / (from - to)))
       return full - (full - fit) * (1 - Math.pow(1 - p, 3))
     }
