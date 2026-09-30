@@ -343,6 +343,11 @@ html.leaving .nav::after { opacity: 0; }
   transform: translateY(24px);
 }
 
+/* gone past unseen (see Portfolio.tsx): simply there for a reader coming back up, no fade-up */
+.fw-folio[data-still] {
+  transition: none;
+}
+
 .fw-head {
   display: flex;
   justify-content: center;
@@ -1588,6 +1593,10 @@ html.leaving .nav::after { opacity: 0; }
 /* the growth bars: the grey 0–100 baseline stays put; only the gold gain above 100 grows out of it */
 .ic.ic-armed .ic-gain { transform: scaleX(0); transform-origin: left center; }
 .ic.ic-armed [data-grow] .ic-gain { transform: scaleX(1); transition: transform 0.8s cubic-bezier(.22, 1, .36, 1) calc(120ms + var(--i, 0) * 110ms); }
+
+/* gone past unseen (the Contact link's trip, or a jump from another page): already in place for a reader
+   coming back up, with no fade-up or growth (Impact.tsx, lib/passedUnseen.ts) */
+.ic.ic-armed [data-rv].ic-still, .ic.ic-armed [data-grow='still'] .ic-gain { transition: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .ic-hl.play .lt, .ic-hl.play .lt path { animation: none; }

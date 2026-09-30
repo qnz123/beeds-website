@@ -19,6 +19,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { getFrames, type FrameDatum } from './folioData'
 import type { Locale } from '@/i18n/config'
+import { whenPassedUnseen } from '@/lib/passedUnseen'
 
 // ---------------------------------------------------------------------------
 // Scroll-reveal hook — mirrors `useInView` in Impact.tsx / `useRevealOnScroll`
@@ -26,6 +27,9 @@ import type { Locale } from '@/i18n/config'
 // hidden state is only ever entered client-side after mount, so SSR/no-JS
 // output stays in 'idle' (styled identically to 'visible') and nothing is
 // ever permanently invisible. Reduced motion skips straight to 'visible'.
+// Gone past unseen (the nav's Contact link, straight to the booking form from
+// another page), it is 'visible' at once with `still` set (no fade), so a
+// reader coming back up finds it in place.
 // ---------------------------------------------------------------------------
 
 type AnimState = 'idle' | 'hidden' | 'visible'
@@ -33,6 +37,7 @@ type AnimState = 'idle' | 'hidden' | 'visible'
 function useInView<T extends Element>(threshold = 0.2) {
   const ref = useRef<T>(null)
   const [state, setState] = useState<AnimState>('idle')
+  const [still, setStill] = useState(false)
 
   useEffect(() => {
     const node = ref.current
@@ -49,15 +54,24 @@ function useInView<T extends Element>(threshold = 0.2) {
         if (entry.isIntersecting) {
           setState('visible')
           observer.disconnect()
+          unpass()
         }
       },
       { threshold, rootMargin: '0px 0px -8% 0px' }
     )
     observer.observe(node)
-    return () => observer.disconnect()
+    const unpass = whenPassedUnseen(node, () => {
+      observer.disconnect()
+      setStill(true)
+      setState('visible')
+    })
+    return () => {
+      observer.disconnect()
+      unpass()
+    }
   }, [threshold])
 
-  return { ref, dataAnimate: state === 'idle' ? undefined : state }
+  return { ref, dataAnimate: state === 'idle' ? undefined : state, still }
 }
 
 // ---------------------------------------------------------------------------
@@ -136,12 +150,25 @@ function ScrambleWord({ word }: { word: string }) {
         if (!entry.isIntersecting || startedRef.current) return
         startedRef.current = true
         observer.disconnect()
+        unpass()
         clearTimeout(fallback)
         runReveal()
       },
       { threshold: 0.6 }
     )
     observer.observe(node)
+
+    // Gone past before it played (the nav's Contact link, straight to the
+    // booking form from another page): the word stands in ink, unscrambled,
+    // for a reader coming back up — no reveal behind their back or in view.
+    const unpass = whenPassedUnseen(node, () => {
+      if (startedRef.current) return
+      startedRef.current = true
+      observer.disconnect()
+      clearTimeout(fallback)
+      setDisplay(word)
+      setColor(null)
+    })
 
     // Safety net: the "waiting" state above has no time limit of its own —
     // it sits as a random jumble of the word's own letters (often without a
@@ -156,11 +183,13 @@ function ScrambleWord({ word }: { word: string }) {
       if (startedRef.current) return
       startedRef.current = true
       observer.disconnect()
+      unpass()
       runReveal()
     }, 2500)
 
     return () => {
       observer.disconnect()
+      unpass()
       cancelAnimationFrame(raf)
       clearTimeout(fallback)
     }
@@ -203,7 +232,7 @@ function FolioFrame({ frame }: { frame: FrameDatum }) {
 export default function Portfolio({ lang = 'en' as Locale }: { lang?: Locale }) {
   const frames = getFrames(lang)
   const sectionRef = useRef<HTMLElement>(null)
-  const { ref: folioRef, dataAnimate } = useInView<HTMLDivElement>(0.15)
+  const { ref: folioRef, dataAnimate, still } = useInView<HTMLDivElement>(0.15)
 
   // The spin-down (client-directed, 2026-07-09): once the section enters the
   // viewport, its motion is DRIVEN BY THE PAGE SCROLL (client-directed
@@ -284,7 +313,7 @@ export default function Portfolio({ lang = 'en' as Locale }: { lang?: Locale }) 
 
   return (
     <section id="featured-work" ref={sectionRef} className="pb-14">
-      <div ref={folioRef} data-animate={dataAnimate} className="fw-folio">
+      <div ref={folioRef} data-animate={dataAnimate} data-still={still ? '' : undefined} className="fw-folio">
         <div className="fw-head">
           {/* Heading in the About-BEEDS lede voice (client-directed 2026-07-13):
               large serif statement, sentence case, centered. */}

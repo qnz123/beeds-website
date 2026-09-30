@@ -314,6 +314,18 @@ the slot in `CLIPS`, and add the caption in globals.css as `.video-services--vN:
 
 ## Impact ("Results of Creative Consulting")
 
+**Entrances play once, and never behind the reader (2026-09-30).** The CRAFT headline draws itself
+once per page load (a reload plays it again; coming back to the homepage from another page of the
+site finds it finished, with no hold), like the hero's rain (`craftPlayedThisPageLoad`, as Hero.tsx's
+`playedThisPageLoad`). When the reader jumps past the section without seeing it (the nav's Contact
+link from this page or another, a shared `/#contact` link, a dragged scrollbar), everything the jump
+skipped stands finished for a reader who then scrolls back up: CRAFT drawn and settled, figures and
+bar numbers final, bars grown, fade-up blocks shown, Featured Work's folio and scramble word in
+place, with no animation (`lib/passedUnseen.ts`). The photos still grow and shrink with the scroll,
+as designed. Opened at `#contact`, the photos take their final size in a layout effect, before
+Next scrolls to the form, so it lands where aimed without relying on scroll anchoring (Firefox's
+fell ~130px short).
+
 `components/sections/Impact.tsx` (client component — scroll-triggered reveal/count-up
 animations, see below) replaced the old homepage `About` section on 2026-07-07. It sits
 between Featured Work/Clients and BookingCalendar. **Originally three sub-blocks (Market

@@ -5,9 +5,10 @@
 
 import Image from 'next/image'
 import { JetBrains_Mono } from 'next/font/google'
-import React, { memo, useEffect, useRef, useState } from 'react'
+import React, { memo, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
+import { whenPassedUnseen } from '@/lib/passedUnseen'
 import { bakeStickers, balanceShades, CRAFT_END, CRAFT_LAND, CRAFT_SVG, playCraft, restCraft } from './craftHeadline'
 
 // preload: false — first used by the data block ~4,400px down; a preload made every page
@@ -49,6 +50,12 @@ function Glyph({ name }: { name: (typeof channelLift)[number]['glyph'] }) {
 }
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+// In-memory flag (resets on full page load), as the hero's rain has (Hero.tsx): the headline draws
+// itself once per visit or reload, and a reader who comes back to the homepage from another page of the
+// site (client-side navigation keeps this module alive) finds it standing finished instead of drawing
+// again, with no hold on the way down.
+let craftPlayedThisPageLoad = false
 
 // The headline's markup is set once and then driven directly by craftHeadline.ts. It must never
 // re-render: React would rewrite the markup and wipe the drawn letters mid-animation.
@@ -145,6 +152,10 @@ function watchScrollUp(onUp: () => void): () => void {
  *  (Safari has no scrollend, and WebKit can start moving ~250ms after the click, hence the longer first
  *  wait), at the reader's own wheel, touch or key, or after 4s at most. Returns a cancel. */
 const PASS_EVENT = 'beeds:pass'
+/** A page opened straight at the booking form (a shared /#contact link, which the underwater intro also
+ *  hands on to) makes the same trip: the browser scrolls there from the top, smoothly in Chrome, and the
+ *  headline's hold stopped it halfway. (From another page, the nav's link arrives already there.) */
+const openedAtContact = () => window.location.hash === '#contact'
 function whenTripEnds(done: () => void): () => void {
   const t0 = performance.now()
   let over = false
@@ -178,13 +189,19 @@ function useOnceInView<T extends Element>(threshold: number, onEnter: () => void
   return ref
 }
 
+/** Where a one-time entrance stands: waiting for the reader, playing (or played), or finished without
+ *  playing because the reader went past it unseen (see whenPassedUnseen). */
+type Entrance = 'wait' | 'play' | 'done'
+
 /** Ease-out count-up from 0, ~1.1s. Screen readers get the exact authored string. */
-function Figure({ stat, run }: { stat: StatDatum; run: boolean }) {
+function Figure({ stat, run }: { stat: StatDatum; run: Entrance }) {
   const [display, setDisplay] = useState(stat.target)
   // with JS and motion the figure reads 0 until its count-up starts, so it never shows the final value and then snaps back
   useEffect(() => { if (!reducedMotion() && typeof IntersectionObserver !== 'undefined') setDisplay(0) }, [])
   useEffect(() => {
-    if (!run || reducedMotion()) return
+    if (run === 'wait' || reducedMotion()) return
+    // gone past unseen: the final figure, no count
+    if (run === 'done') { setDisplay(stat.target); return }
     let raf = 0
     const start = performance.now()
     const tick = (now: number) => {
@@ -227,7 +244,7 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
   const t = getDictionary(lang).impact
   const wrapRef = useRef<HTMLDivElement>(null)
   const playedRef = useRef(false)
-  const [counting, setCounting] = useState(false)
+  const [counting, setCounting] = useState<Entrance>('wait')
 
   // The headline stays hidden until its top reaches the middle of the screen, then plays once from
   // nothing while the page holds; the glasses then balance with the scroll; with reduced motion (or no JS) the finished word simply sits there.
@@ -238,6 +255,13 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
     bakeStickers(svg)
     restCraft(wrap)
     if (reducedMotion()) return
+    if (craftPlayedThisPageLoad) {
+      // already drawn in this page load: the word stands as a play leaves it, the glasses balancing
+      playedRef.current = true
+      wrap.classList.add('settled')
+      const unbalance = balanceShades(wrap)
+      return () => { unbalance(); wrap.classList.remove('settled') }
+    }
     wrap.classList.add('wait')
     let stop: (() => void) | undefined, unlock: (() => void) | undefined, unbalance: (() => void) | undefined
     let done = 0, balanced = 0, glide: (() => void) | undefined
@@ -246,8 +270,8 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
 
     const io = new IntersectionObserver(([e]) => {
       if (!e.isIntersecting || passing) return
-      played = true; playedRef.current = true
-      io.disconnect()
+      played = true; playedRef.current = true; craftPlayedThisPageLoad = true
+      io.disconnect(); unpass()
       wrap.classList.remove('settled', 'wait')
       wrap.classList.add('play')
       // arriving from above, the page holds here until the word has finished drawing (scrolling back up still works)
@@ -268,10 +292,19 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
       }, CRAFT_LAND)
     }, { rootMargin: '0px 0px -50% 0px' })
     io.observe(wrap)
+    // Gone past without playing (the Contact link's trip carried the reader by, or the page jumped past it,
+    // as it does from another page): the word stands as a play leaves it, the glasses balancing, and a
+    // reader coming back up finds it finished instead of watching it draw
+    const unpass = whenPassedUnseen(wrap, () => {
+      played = true; playedRef.current = true
+      io.disconnect()
+      wrap.classList.remove('wait'); wrap.classList.add('settled')
+      unbalance = balanceShades(wrap)
+    })
     // The nav's Contact link goes past on its way to the booking form: let go of any hold or glide, and
-    // do not start the headline while the page goes by; look again once the trip is over (a reader who
-    // scrolls back up then gets it as usual). The hero's "I want to build…" is not part of this: it
-    // still stops here.
+    // do not start the headline while the page goes by (carried past, it is finished instead, above); if
+    // the trip is cut short before it gets here, look again once it is over, so a reader who scrolls on
+    // down gets it as usual. The hero's "I want to build…" is not part of this: it still stops here.
     const onPass = () => {
       passing = true
       unlock?.(); unlock = undefined; watchUp?.(); watchUp = undefined; heldAt = -1; glide?.(); glide = undefined
@@ -279,8 +312,9 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
       endTrip = whenTripEnds(() => { passing = false; endTrip = undefined; if (!played) { io.unobserve(wrap); io.observe(wrap) } })
     }
     window.addEventListener(PASS_EVENT, onPass)
+    if (openedAtContact()) onPass()
     return () => {
-      window.removeEventListener(PASS_EVENT, onPass); endTrip?.()
+      window.removeEventListener(PASS_EVENT, onPass); endTrip?.(); unpass()
       io.disconnect(); window.clearTimeout(done); window.clearTimeout(balanced); glide?.(); unlock?.(); watchUp?.(); unbalance?.(); stop?.(); wrap.classList.remove('play', 'settled', 'wait')
     }
   }, [])
@@ -309,21 +343,32 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
     return () => document.removeEventListener('click', onClick)
   }, [])
 
-  const phasesRef = useOnceInView<HTMLDivElement>(0.35, () => setCounting(true))
+  // (a figure finished unseen stays finished when the reader comes back up to it)
+  const startCount = () => setCounting((c) => (c === 'wait' ? 'play' : c))
+  const phasesRef = useOnceInView<HTMLDivElement>(0.35, startCount)
   // On a phone the stacked row is taller than the screen: the first figure can come into view before the
   // row is 35% in (in landscape it never gets there), so the count also starts the moment that figure appears.
   useEffect(() => {
     const fig = phasesRef.current?.querySelector('.ic-fig')
     if (!fig || typeof IntersectionObserver === 'undefined') return
-    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); setCounting(true) } })
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); startCount() } })
     io.observe(fig)
     return () => io.disconnect()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+  // gone past before the count started: the final figures, for a reader coming back up
+  useEffect(() => {
+    const el = phasesRef.current
+    if (!el || counting !== 'wait' || reducedMotion()) return
+    return whenPassedUnseen(el, () => setCounting('done'))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [counting])
 
   // The photos start at full width and shrink as they scroll up toward the nav, landing at the width
   // where photos, figures and bars fit one screen (~420px of text and bars below 4:5 photos).
-  useEffect(() => {
+  // A layout effect, so a page opened at the booking form has its photos at their final size before
+  // Next scrolls there (it does so from its own layout-time handler, which runs after this one).
+  useLayoutEffect(() => {
     const el = phasesRef.current
     if (!el) return
     let raf = 0, cur = -1, last = 0, passing = false, endTrip: (() => void) | undefined
@@ -390,7 +435,11 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
       endTrip = whenTripEnds(() => { passing = false; endTrip = undefined; queue() })
     }
     const onResize = () => { box = null; queue() }
-    step(performance.now())
+    // Opened straight at the booking form (the nav's Contact link from another page, a shared link) is the
+    // same trip. Left to shrink after the scroll there, the photos took ~250px out from above the form,
+    // which only the browser's scroll anchoring made good, and Firefox's fell ~130px short of it.
+    if (openedAtContact()) onPass()
+    else step(performance.now())
     window.addEventListener('scroll', queue, { passive: true })
     window.addEventListener('resize', onResize)
     window.addEventListener(PASS_EVENT, onPass)
@@ -400,22 +449,34 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-  const [growing, setGrowing] = useState(false)
-  const liftRef = useOnceInView<HTMLDivElement>(0.4, () => setGrowing(true))
+  const [growing, setGrowing] = useState<Entrance>('wait')
+  const liftRef = useOnceInView<HTMLDivElement>(0.4, () => setGrowing((g) => (g === 'wait' ? 'play' : g)))
+  // gone past before they grew: the bars stand grown, their numbers final
+  useEffect(() => {
+    const el = liftRef.current
+    if (!el || growing !== 'wait' || reducedMotion()) return
+    return whenPassedUnseen(el, () => setGrowing('done'))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [growing])
 
   // Soft scroll-through: blocks fade up as they arrive. Armed only once JS runs (and not
-  // with reduced motion), so without it everything simply shows.
+  // with reduced motion), so without it everything simply shows. A block gone past unseen is
+  // simply there when the reader comes back up (ic-still: no fade).
   const sectionRef = useRef<HTMLElement>(null)
   useEffect(() => {
     const root = sectionRef.current
     if (!root || typeof IntersectionObserver === 'undefined' || reducedMotion()) return
     const items = root.querySelectorAll<HTMLElement>('[data-rv]')
     root.classList.add('ic-armed')
+    const unpass = new Map<Element, () => void>()
     const io = new IntersectionObserver((entries) => {
-      for (const e of entries) if (e.isIntersecting) { e.target.classList.add('ic-in'); io.unobserve(e.target) }
+      for (const e of entries) if (e.isIntersecting) { e.target.classList.add('ic-in'); io.unobserve(e.target); unpass.get(e.target)?.() }
     }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' })
-    items.forEach((el) => io.observe(el))
-    return () => io.disconnect()
+    items.forEach((el) => {
+      io.observe(el)
+      unpass.set(el, whenPassedUnseen(el, () => { io.unobserve(el); el.classList.add('ic-in', 'ic-still') }))
+    })
+    return () => { io.disconnect(); unpass.forEach((stop) => stop()) }
   }, [])
 
   return (
@@ -447,7 +508,7 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
         </div>
 
         {/* growth is a data attribute, not a class: React rewriting className would drop the fade-up's ic-in */}
-        <div className="ic-lift" ref={liftRef} data-rv data-grow={growing ? '' : undefined}>
+        <div className="ic-lift" ref={liftRef} data-rv data-grow={growing === 'wait' ? undefined : growing === 'done' ? 'still' : ''}>
           <div className="ic-lift-head"><b>{t.liftHeading}</b></div>
           <div
             className="ic-lift-grid"
@@ -466,8 +527,8 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
                   <div className="ic-base" style={{ width: pct(100) }} />
                   <div className="ic-gain" style={{ width: pct(c.after - 100) }} />
                 </div>
-                <div className="ic-up">+<Count from={0} to={c.after - 100} run={growing} delay={120 + i * 110} dur={800} />%</div>
-                <div className="ic-end"><Count from={100} to={c.after} run={growing} delay={120 + i * 110} dur={800} /></div>
+                <div className="ic-up">+<Count from={0} to={c.after - 100} run={growing === 'play'} delay={120 + i * 110} dur={800} />%</div>
+                <div className="ic-end"><Count from={100} to={c.after} run={growing === 'play'} delay={120 + i * 110} dur={800} /></div>
               </div>
             ))}
           </div>
