@@ -54,6 +54,21 @@ built 2026-07-10, eyebrow-labelled clauses in hairline-divided two-column rows).
 footer link to `/terms` was removed at client direction, so the page currently exists but is
 unlinked.
 
+**`/watermark/`** (2026-09-30) is the landing page for links from social posts, and the one route
+without the site chrome (`src/app/watermark/page.tsx` → `components/sections/Watermark.tsx`, water
+in `lib/water.ts`). The BEEDS wordmark (Bodoni Moda 700) and the cassette mark lie under live WebGL
+water, with a grey stone carved "the sky people.. / do you hear us?" on the first E. The pitch sits
+bottom left, and ENTER THE ROOM (→ `/`) and BOOK A SESSION (→ `/booking/`) sit bottom right. Phones
+get a lighter water that a finger stirs. Reduced motion, Data Saver and slow or low-memory devices
+get a still. It keeps the homepage's canonical and stays out of the sitemap.
+
+**The cassette mark and the hand-over.** The black cassette (`components/CassetteMark.tsx`, the
+small cut from BEEDS-Marketing/logo/cassette) sits centred in the nav bar at 44 × 32. It links to
+`/watermark/`, where the same mark lies under the water at the same size and place. It is hidden
+from 768px to 1239px, where the link row reaches the middle of the bar. Going either way between
+the two, the page fades to the #f5f5f5 ground with the cassette held still, and the next page fades
+up from it (`lib/handover.ts`, `html.arrive` / `html.leaving` in globals.css).
+
 | Section          | Component                                  | Notes |
 |------------------|--------------------------------------------|-------|
 | Nav              | `components/Navigation.tsx`                 | Sticky, `BEEDS` left. Order: **Work · About · Services · Contact**. Links: Work → `/#work` (the Selected Work section), About → `/about`, Services → `/about#services`, Contact → `/#contact` |

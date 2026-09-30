@@ -73,11 +73,17 @@ h6 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* Arrives like the booking section: the house 0.6s ease, a small settle.
-     Fill is `backwards`, never `forwards` — the from-state holds before it
-     starts, and when it ends the bar goes back to its own plain styles with
-     no transform left behind. A transform that lingers on a sticky element
-     keeps it on its own layer and changes how its text rasterises. */
+}
+
+/* The bar's contents arrive like the booking section: the house 0.6s ease, a
+   small settle. On the contents, not the bar, so the cassette mark can sit
+   out: it is the one thing held still when /watermark/ hands over to the site.
+   (The bar itself paints nothing at the top of the page, so this looks the
+   same as animating it.) Fill is `backwards`, never `forwards` — the
+   from-state holds before it starts, and when it ends each element goes back
+   to its own plain styles with no transform left behind. A transform that
+   lingers inside the sticky bar changes how its text rasterises. */
+.nav > :not(.nav-mark) {
   animation: nav-in 0.6s ease 0.05s backwards;
 }
 
@@ -143,8 +149,81 @@ h6 {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .nav { animation: none; transition: none; }
+  .nav { transition: none; }
+  .nav > * { animation: none; }
   .nav::after { transition: none; }
+}
+
+/* The cassette mark, centred in the bar; it links to /watermark/. That page
+   has the same mark at the same size and place (.wm-mark: 44 x 32, 16px from
+   the top), under its water, so across the fade between the two the mark does
+   not move; keep the two in step. Whole pixels, placed
+   from the centre with calc rather than a -50% transform, so its lines land
+   on the same pixels on both pages. Hidden from 768px to 1239px, where the
+   link row reaches the middle of the bar. */
+.nav-mark {
+  position: absolute;
+  top: calc(50% - 16px);
+  left: calc(50% - 22px);
+  width: 44px;
+  height: 32px;
+  line-height: 0;
+}
+.nav-mark svg { display: block; width: 100%; height: 100%; }
+@media (min-width: 768px) and (max-width: 1239px) {
+  .nav-mark { display: none; }
+}
+
+/* ---- Arriving from /watermark/ ----
+   The landing page fades to the ground with the cassette held above it, then
+   opens the site. The page it opens starts under that same ground and fades up
+   out of it, while the mark in the bar (same size, same place) stays put. The
+   class comes from the head script in layout.tsx, so the veil is on the first
+   paint. It sits just under the bar (z 50), whose contents run their usual
+   entrance. */
+html.arrive body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 49;
+  background: #f5f5f5;
+  pointer-events: none;
+  animation: arrive 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.05s both;
+}
+@keyframes arrive {
+  from { opacity: 1; }
+  to { opacity: 0; visibility: hidden; }
+}
+/* Leaving for /watermark/ (the cassette in the bar): the same ground fades in
+   over the page, and the bar's other contents and its ground fade out with
+   it, so only the cassette is left when the underwater page takes over. */
+html.leaving body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 49;
+  background: #f5f5f5;
+  pointer-events: none;
+  animation: leave 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes leave {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+html.leaving .nav > :not(.nav-mark) {
+  opacity: 0;
+  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+html.leaving .nav.is-scrolled { background-color: transparent; }
+/* the cassette stays at full strength, even under the pointer that clicked it,
+   so it matches the one the underwater page arrives with (specific enough to
+   beat .nav a:hover, which comes later) */
+html.leaving .nav .nav-mark { opacity: 1; }
+html.leaving .nav::after { opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  html.arrive body::after { display: none; }
+  html.leaving body::after { animation: none; }
+  html.leaving .nav > :not(.nav-mark) { transition: none; }
 }
 
 .nav a {
@@ -2840,4 +2919,102 @@ textarea.blank:focus {
   .sc-showcase.motion-paused .sc-sticky { padding: 28px 0 56px; }
   .sc-showcase.motion-paused .sc-nav-row { margin-top: 30px; }
   .sc-showcase.motion-paused .sc-stage { max-height: none; }
+}
+
+/* ---- /watermark/: the landing page for links from social posts ----
+   The BEEDS wordmark under live water (Watermark.tsx, lib/water.ts), with
+   the page's chrome laid on top of the water as real text and links, never
+   drawn into it. One screen tall. */
+/* no scrollbar here, but the site's pages have one: keep its gutter so the
+   middle of this page is the middle of theirs, and the cassette lines up */
+html:has(.wm) { scrollbar-gutter: stable; }
+.wm { position: relative; height: 100vh; height: 100dvh; }
+.wm a:focus-visible { outline: 2px solid #1685f8; outline-offset: 4px; }
+.wm-stage { position: relative; height: 100%; min-height: 560px; }
+.wm-water { position: absolute; inset: 0; overflow: hidden; }
+.wm-water canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.wm-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 36px 40px 40px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  /* the water under the bar stays stirrable; only the links take the pointer */
+  pointer-events: none;
+}
+.wm-bottom a { pointer-events: auto; }
+.wm-pitch { margin: 0; max-width: 34ch; font-size: 19px; line-height: 1.45; }
+.wm-pitch span { color: #666; }
+.wm-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.wm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding-inline: 22px;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #000;
+  background: #f5f5f5;
+  border: 1px solid #000;
+}
+.wm-btn svg { width: 14px; height: 14px; }
+.wm-btn-primary { background: #000; color: #f5f5f5; }
+.wm-btn:hover { background: #000; color: #f5f5f5; }
+.wm-btn-primary:hover { background: #333; }
+/* The cassette: the same mark at the same size and place as in the site's
+   bar (.nav-mark: 44 x 32, centred on a 64px bar); keep the two in step. The
+   one you see here is drawn under the water (lib/water.ts copies this SVG
+   into it). This sharp copy is invisible and takes no pointer: it only shows
+   during the fades, surfacing over the water one as the page leaves and
+   sinking back into it as the page arrives from the site's bar. Either way it
+   changes while the page's ground is thin (quickly, at the start of leaving;
+   once the arrival has faded, for sinking), so the mark never reads lighter
+   mid-fade. Arriving, it is up from the first paint and holds until
+   Watermark.tsx sets .is-settled: the fade is over and the water has the
+   cassette drawn in, so there is always one to see. */
+.wm-mark {
+  position: absolute;
+  z-index: 60;
+  top: 16px;
+  left: calc(50% - 22px);
+  width: 44px;
+  height: 32px;
+  line-height: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease-in-out;
+}
+.wm-mark svg { display: block; width: 100%; height: 100%; }
+html.arrive .wm:not(.is-settled) .wm-mark { opacity: 1; }
+/* Leaving: everything fades to the ground, and the sharp cassette comes up
+   above it wherever the bar it lands in shows it (not 768-1239px; there it
+   fades away with the rest). */
+.wm-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: #f5f5f5;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.wm.is-leaving .wm-veil { opacity: 1; }
+@media (max-width: 767px), (min-width: 1240px) {
+  .wm.is-leaving .wm-mark { opacity: 1; transition: opacity 0.25s ease-out; }
+}
+@media (max-width: 767px) {
+  .wm-stage { min-height: 620px; }
+  .wm-bottom { flex-direction: column; align-items: flex-start; padding: 24px 16px 28px; }
+  .wm-pitch { font-size: 17px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wm-veil, .wm-mark, .wm.is-leaving .wm-mark { transition: none; }
 }

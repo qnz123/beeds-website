@@ -3,8 +3,10 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
+import CassetteMark from '@/components/CassetteMark'
 import type { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
+import { handOver, isPlainClick } from '@/lib/handover'
 
 // Locale-aware nav. `lang` picks the copy; `switchHref` is the counterpart URL
 // for the language toggle (the other-language version of the current page).
@@ -104,6 +106,30 @@ export default function Navigation({
     return true
   }
 
+  // The cassette goes to the underwater page (English only, from either locale). The page fades to
+  // the ground with the cassette held in the bar (html.leaving), then goes; the underwater page
+  // fades up from the same ground.
+  const waterHref = '/watermark/'
+  const toWater = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!isPlainClick(e)) return
+    e.preventDefault()
+    setIsOpen(false)
+    document.documentElement.classList.remove('arrive')
+    document.documentElement.classList.add('leaving')
+    handOver(e.currentTarget.href)
+  }
+  // Back from the underwater page, the browser may restore this page as it was left, under the
+  // ground: fade it back up the way it arrives.
+  useEffect(() => {
+    const onShow = (e: PageTransitionEvent) => {
+      if (e.persisted && document.documentElement.classList.contains('leaving')) {
+        document.documentElement.classList.replace('leaving', 'arrive')
+      }
+    }
+    window.addEventListener('pageshow', onShow)
+    return () => window.removeEventListener('pageshow', onShow)
+  }, [])
+
   // Toggle shows the OTHER language's name and links to its URL.
   const toggleLabel = isJa ? 'English' : '日本語'
   const targetLocale = isJa ? 'en' : 'ja'
@@ -173,6 +199,13 @@ export default function Navigation({
       <div className="nav-wordmark">
         <Link href={home} onClick={() => setIsOpen(false)}>BEEDS</Link>
       </div>
+
+      {/* The cassette, centred in the bar: the same mark at the same size and place as on
+          /watermark/, where it sits under the water. It goes there, with the same fade both
+          ways (lib/handover.ts). A plain <a>: the hand-over is a full page load. */}
+      <a href={waterHref} className="nav-mark" aria-label="BEEDS under water" onClick={toWater}>
+        <CassetteMark />
+      </a>
 
       {/* Desktop Navigation */}
       <div className="nav-links hidden md:flex gap-10 items-center">

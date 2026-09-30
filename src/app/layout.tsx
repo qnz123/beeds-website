@@ -57,7 +57,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    // suppressHydrationWarning: the head script below may add `arrive` to this element's class before
+    // React hydrates it. It covers this element's own attributes only, nothing inside it.
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* Refreshing the homepage starts at the top. The hero plays its
             entrance on every fresh load, and the browser would otherwise put
@@ -72,6 +74,17 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html:
               "try{var p=location.pathname;if((p==='/'||p==='/ja'||p==='/ja/')&&!location.hash){var n=performance.getEntriesByType('navigation')[0];if(n&&n.type==='reload'){if('scrollRestoration' in history){history.scrollRestoration='manual'}var go=true,t0=Date.now(),off=function(){go=false};addEventListener('wheel',off,{passive:true,once:true});addEventListener('touchstart',off,{passive:true,once:true});addEventListener('keydown',off,{once:true});(function tick(){if(!go||Date.now()-t0>1500)return;if(window.scrollY){window.scrollTo({top:0,left:0,behavior:'instant'})}requestAnimationFrame(tick)})()}}}catch(e){}",
+          }}
+        />
+        {/* Arriving from /watermark/: that page leaves a note in this tab's
+            session storage just before it navigates, and the page it opens
+            fades up from the ground (html.arrive in globals.css). Read and
+            cleared here, before the first paint, so the veil is there from the
+            very first frame and a later reload does not replay it. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(sessionStorage.getItem('beeds:arrive')){sessionStorage.removeItem('beeds:arrive');document.documentElement.classList.add('arrive')}}catch(e){}",
           }}
         />
         {/* Warm up the Vimeo connections so the featured film starts sooner. */}
