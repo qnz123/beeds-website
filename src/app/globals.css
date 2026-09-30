@@ -2949,7 +2949,12 @@ html:has(.wm) { scrollbar-gutter: stable; }
 }
 .wm-bottom a { pointer-events: auto; }
 .wm-pitch { margin: 0; max-width: 34ch; font-size: 19px; line-height: 1.45; }
-.wm-pitch span { color: #666; }
+/* the cities are one unit: "Tokyo | New York." never splits across lines */
+.wm-pitch span { color: #666; white-space: nowrap; }
+/* Japanese: breaks only at the phrase ends marked in the copy (keep-all: never inside a word),
+   and a measure that sets it in two lines like the English: the first phrase pair, then the
+   last phrase with the cities */
+.wm-pitch:lang(ja) { max-width: 20em; word-break: keep-all; line-break: strict; }
 .wm-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 .wm-btn {
   display: inline-flex;

@@ -248,7 +248,9 @@ const ja: Dict = {
   watermark: {
     heading: 'BEEDS — 東京とニューヨークのクリエイティブスタジオ',
     water: '揺れる水の下の、BEEDSのロゴとカセットのマーク',
-    pitch: 'クリエイティブ戦略、AI導入支援、プロダクション。',
+    // \u200b marks the only places the line may break (after each phrase); the pitch sets
+    // word-break: keep-all in Japanese, so it never breaks inside a word (as the Impact lede)
+    pitch: 'クリエイティブ戦略、\u200bAI導入支援、\u200bそしてプロダクション。',
     // Cities and buttons kept in English on the JA page too (client direction, 2026-09-30) — only
     // the pitch sentence itself is Japanese.
     cities: ['Tokyo', 'New York'],
