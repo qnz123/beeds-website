@@ -1,6 +1,7 @@
 'use client'
 
 import { Bodoni_Moda, Reenie_Beanie } from 'next/font/google'
+import { useRouter } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
 import CassetteMark from '@/components/CassetteMark'
 import { HANDOVER_MS, handOver, isPlainClick } from '@/lib/handover'
@@ -25,6 +26,10 @@ export default function Watermark() {
   // arriving from the site's cassette: the sharp copy holds until the page has faded up and the
   // water has the cassette drawn into it, then sinks (html.arrive in globals.css)
   const [settled, setSettled] = useState(false)
+  const router = useRouter()
+  // The page a button opens has stylesheets this one doesn't load; they are warmed on intent, and
+  // on the click at the latest, so the fade isn't left waiting on them (Firefox shows white).
+  const warm = (href: string) => ({ onMouseEnter: () => router.prefetch(href), onFocus: () => router.prefetch(href), onTouchStart: () => router.prefetch(href) })
 
   useEffect(() => {
     const host = waterRef.current
@@ -68,6 +73,7 @@ export default function Watermark() {
     const y = e.detail ? e.clientY : r.top + r.height / 2
     water.current?.drop(x, y)
     setLeaving(true)
+    router.prefetch(new URL(a.href).pathname)
     handOver(a.href)
   }
 
@@ -89,13 +95,13 @@ export default function Watermark() {
             <span>Tokyo <span aria-hidden="true">|</span> New York.</span>
           </p>
           <div className="wm-acts">
-            <a className="wm-btn wm-btn-primary" href="/" onClick={leave}>
+            <a className="wm-btn wm-btn-primary" href="/" {...warm('/')} onClick={leave}>
               Enter the room
               <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden="true">
                 <path d="M3 8h10M9 4l4 4-4 4" />
               </svg>
             </a>
-            <a className="wm-btn" href="/booking/" onClick={leave}>Book a session</a>
+            <a className="wm-btn" href="/booking/" {...warm('/booking/')} onClick={leave}>Book a session</a>
           </div>
         </div>
       </main>

@@ -110,9 +110,14 @@ export default function Navigation({
   // the ground with the cassette held in the bar (html.leaving), then goes; the underwater page
   // fades up from the same ground.
   const waterHref = '/watermark/'
+  // Its page needs a stylesheet (its fonts) that no other page loads. Warmed on intent, and on the
+  // click at the latest, so it is in the cache before the fade is over. Firefox otherwise showed a
+  // white frame while it waited on it.
+  const warmWater = { onMouseEnter: () => router.prefetch(waterHref), onFocus: () => router.prefetch(waterHref), onTouchStart: () => router.prefetch(waterHref) }
   const toWater = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!isPlainClick(e)) return
     e.preventDefault()
+    router.prefetch(waterHref)
     setIsOpen(false)
     document.documentElement.classList.remove('arrive')
     document.documentElement.classList.add('leaving')
@@ -203,7 +208,7 @@ export default function Navigation({
       {/* The cassette, centred in the bar: the same mark at the same size and place as on
           /watermark/, where it sits under the water. It goes there, with the same fade both
           ways (lib/handover.ts). A plain <a>: the hand-over is a full page load. */}
-      <a href={waterHref} className="nav-mark" aria-label="BEEDS under water" onClick={toWater}>
+      <a href={waterHref} className="nav-mark" aria-label="BEEDS under water" {...warmWater} onClick={toWater}>
         <CassetteMark />
       </a>
 

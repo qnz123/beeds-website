@@ -59,7 +59,9 @@ export default function RootLayout({
   return (
     // suppressHydrationWarning: the head script below may add `arrive` to this element's class before
     // React hydrates it. It covers this element's own attributes only, nothing inside it.
-    <html lang="en" suppressHydrationWarning>
+    // The ground colour inline, not only in the stylesheet: a browser that paints a page before its
+    // stylesheets arrive (Firefox, between pages) then paints the ground, never white.
+    <html lang="en" suppressHydrationWarning style={{ backgroundColor: '#f5f5f5' }}>
       <head>
         {/* Refreshing the homepage starts at the top. The hero plays its
             entrance on every fresh load, and the browser would otherwise put
