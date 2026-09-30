@@ -104,7 +104,8 @@ export function bakeStickers(svg: SVGSVGElement) {
 /** Puts every part in its finished place (also the reduced-motion / no-JS picture). */
 export function restCraft(wrap: HTMLElement) {
   const q = (id: string) => wrap.querySelector<SVGGraphicsElement>('#ic-' + id)
-  wrap.querySelector('.lt[data-ch="R"]')?.removeAttribute('transform') // the R stands upright at rest
+  const rest = wrap.querySelector('.lt[data-ch="R"]') // the R stands upright, in ink, at rest
+  rest?.removeAttribute('transform'); rest?.querySelectorAll<SVGPathElement>('path').forEach((p) => p.style.removeProperty('stroke'))
   for (const id of ['pola', 'c-glint', 'c-ring', 'phone', 'star-a', 'star-b', 'star-c']) {
     const el = q(id)
     el?.style.setProperty('visibility', 'hidden')
@@ -217,14 +218,19 @@ export function playCraft(wrap: HTMLElement, svg: SVGSVGElement, onSettled: () =
 
   // ── R: leans into italic, then back upright (his ask, 2026-10-01; this replaced the wave sticker).
   //    A skew about the baseline (y 0), so the foot stays put and the top leans right. ──
+  //    While it leans it turns neon blue, and goes back to the ink as it straightens (his ask, same day).
   const rLetter = wrap.querySelector<SVGGElement>('.lt[data-ch="R"]')
-  const R_SLANT = -12
+  const rPaths = rLetter ? Array.from(rLetter.querySelectorAll<SVGPathElement>('path')) : []
+  const R_SLANT = -12, NEON = [31, 81, 255] // #1f51ff
+  const ink = (() => { const m = rPaths[0] && getComputedStyle(rPaths[0]).stroke.match(/\d+/g); return m ? m.slice(0, 3).map(Number) : [17, 17, 17] })()
   function rAt(t: number) {
     if (!rLetter) return
     const I = TL.rItalic
     const k = t < I.back[0] ? inOut(sg(t, I.lean)) : 1 - inOut(sg(t, I.back))
-    if (k <= 0) rLetter.removeAttribute('transform')
-    else rLetter.setAttribute('transform', `skewX(${(R_SLANT * k).toFixed(2)})`)
+    if (k <= 0) { rLetter.removeAttribute('transform'); rPaths.forEach((p) => p.style.removeProperty('stroke')); return }
+    rLetter.setAttribute('transform', `skewX(${(R_SLANT * k).toFixed(2)})`)
+    const c = `rgb(${ink.map((v, i) => Math.round(mix(v, NEON[i], k))).join(',')})`
+    rPaths.forEach((p) => { p.style.stroke = c })
   }
 
   // ── cellphone: lands right on the + with a small settling tilt, then morphs straight into the
