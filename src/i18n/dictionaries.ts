@@ -22,11 +22,9 @@ type Dict = {
     cta: string
   }
   footer: {
-    contact: string
-    businessEmail: string
-    information: string
     rights: string
-    location: string
+    /** The studio's cities, in order; the footer sets them apart with space, not punctuation. */
+    places: string[]
   }
   work: { heading: string }
   clients: { heading: string }
@@ -113,11 +111,8 @@ const en: Dict = {
     cta: 'I want to build…',
   },
   footer: {
-    contact: 'Contact',
-    businessEmail: 'Business Email —',
-    information: 'Information',
     rights: 'All Rights Reserved',
-    location: 'Tokyo, Japan · New York, U.S',
+    places: ['Tokyo', 'New York'],
   },
   work: { heading: 'Selected Work' },
   clients: { heading: 'Selected Clients' },
@@ -227,11 +222,8 @@ const ja: Dict = {
     cta: 'ご相談はこちら',
   },
   footer: {
-    contact: 'お問い合わせ',
-    businessEmail: 'ビジネスメール —',
-    information: '会社情報',
     rights: '無断転載を禁じます',
-    location: '東京, 日本 · New York, U.S',
+    places: ['東京', 'New York'],
   },
   work: { heading: '制作実績' },
   clients: { heading: '主なクライアント' },

@@ -1,38 +1,32 @@
+import React from 'react'
 import type { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 
+// Two lines, all in the grey: the copyright, then the cities and the email, the email last. The
+// second line's items are set apart by a wide space, no dots. Each item keeps together, so a narrow
+// screen wraps between them, never inside one.
 export default function Footer({ lang = 'en' }: { lang?: Locale }) {
   const currentYear = new Date().getFullYear()
   const t = getDictionary(lang).footer
 
   return (
-    <footer className="bg-light py-16 px-10 text-xs">
+    // No side padding of its own on phones, where container-x's 40px already lines it up with the
+    // bar (and leaves the second line room to stay one line).
+    <footer className="bg-light py-16 md:px-10 text-xs">
       <div className="container-x">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pb-0">
-          <div>
-            <h4 className="eyebrow mb-5" style={{ letterSpacing: '1px' }}>
-              {t.contact}
-            </h4>
-            <p className="leading-[1.8] text-black">
-              {t.businessEmail}{' '}
-              <a href="mailto:booking@beedstu.com" className="text-black no-underline">
-                booking@beedstu.com
-              </a>
-            </p>
-          </div>
-          <div>
-            <h4 className="eyebrow mb-5" style={{ letterSpacing: '1px' }}>
-              {t.information}
-            </h4>
-            <p className="leading-[1.8] text-[#666]">
-              BEEDS © {currentYear}
-              <br />
-              {t.rights}
-              <br />
-              {t.location}
-            </p>
-          </div>
-        </div>
+        <p className="leading-[1.8] text-[#666]">
+          <span className="whitespace-nowrap">BEEDS © {currentYear}</span>{' '}
+          <span className="whitespace-nowrap">{t.rights}</span>
+          <br />
+          {t.places.map((place) => (
+            <React.Fragment key={place}>
+              <span className="mr-[1em] whitespace-nowrap">{place}</span>{' '}
+            </React.Fragment>
+          ))}
+          <a href="mailto:booking@beedstu.com" className="whitespace-nowrap text-[#666] no-underline hover:underline">
+            booking@beedstu.com
+          </a>
+        </p>
       </div>
     </footer>
   )

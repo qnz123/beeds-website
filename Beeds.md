@@ -63,7 +63,7 @@ unlinked.
 | Clients          | `components/sections/Clients.tsx`           | Client component; "Selected Clients" — black-ink logos in a full-bleed hairline index strip on the light ground ("colophon strip"); see the dedicated section below |
 | Impact           | `components/sections/Impact.tsx`            | Client component; animated scroll-reveal charts. Now a SINGLE block — "Results of Creative Consulting" (stat count-ups + quarterly line chart + before/after bar chart). Market Research and How We Deliver blocks were removed. All figures illustrative placeholders. See the dedicated section below |
 | Booking/Contact  | `components/BookingCalendar.tsx`            | "The Concierge" — booking as three editorial sentence-stanzas with underline blanks (see the dedicated section below) |
-| Footer           | `components/Footer.tsx`                      | **Contact / Information** columns (2026-07-10). Contact column: "Business Email — booking@beedstu.com" (`mailto:`). The old Follow/Instagram link and a briefly-added "Terms of use" link were both removed |
+| Footer           | `components/Footer.tsx`                      | **Two grey (#666) lines, 12px** (2026-09-30, replaced the Contact / Information columns): "BEEDS © {year} All Rights Reserved", then "Tokyo   New York   booking@beedstu.com" (JA 東京), items set apart by a wide space (1em margin, no dots), email last (`mailto:`). No side padding of its own on phones, so it lines up with the bar at 40px. The old Follow/Instagram link and a briefly-added "Terms of use" link were both removed |
 
 Services (`components/sections/Services.tsx`, `id="services"`) now lives on the `/about`
 page, not the homepage. **Folio tabs since 2026-07-09** (client component — this replaced,
