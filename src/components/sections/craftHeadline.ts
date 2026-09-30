@@ -2,7 +2,7 @@
 //
 // Choreography: the R draws first; the C closes into a solid disc that shoots a Polaroid
 // out on a slant (spinning twice) and pockets it again; then A, F and the T — first as a +
-// level with the F's middle arm — snap in, the R leaning into italic meanwhile and back,
+// level with the F's middle arm — snap in, the R leaning into italic until the T is done,
 // three stars pop out of the F and pop away above the T, a cellphone becomes the T's upright,
 // and the sunglasses drop onto the A last.
 //
@@ -36,10 +36,9 @@ const bez = (a: number, b: number, c: number, u: number) => (1 - u) * (1 - u) * 
 const TL = {
   c: { close: [700, 840], fill: [840, 980], peek: [980, 1200], swell: [1200, 1340], flash: [1200, 1380], fly: [1340, 1780], back: [1780, 2000], shrink: [2000, 2140], unfill: [2140, 2280], open: [2220, 2380] },
   tee: { stem: [2440, 2600], bar: [2500, 2700], morph: [3320, 3600] },
-  // the R leans into italic while the A and F come in, and stands up again once the F has slid home
-  // (its join ends at 2780)
-  // it turns neon blue first, just before it starts to lean
-  rItalic: { blue: [2280, 2420], lean: [2420, 2600], back: [2780, 2960] },
+  // the R turns neon blue, leans into italic while the A and F come in, and holds there until the T
+  // is finished (the phone's morph into the upright ends at 3600, as the glasses start to drop)
+  rItalic: { blue: [2280, 2420], lean: [2420, 2600], back: [3600, 3780] },
   stars: { pop: [2720, 3240], gap: 90, burst: 3380, burstGap: 70 },
   phone: { land: [2700, 2900], morph: [3320, 3600] },
   shades: { drop: [3600, 3880], swing: [3880, 4280] },
