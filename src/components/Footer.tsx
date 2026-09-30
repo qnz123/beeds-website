@@ -15,8 +15,7 @@ export default function Footer({ lang = 'en' }: { lang?: Locale }) {
     <footer className="bg-light py-16 md:px-10 text-xs">
       <div className="container-x">
         <p className="leading-[1.8] text-[#666]">
-          <span className="whitespace-nowrap">BEEDS © {currentYear}</span>{' '}
-          <span className="whitespace-nowrap">{t.rights}</span>
+          <span className="whitespace-nowrap">© {currentYear} BEEDS</span>
           <br />
           {t.places.map((place) => (
             <React.Fragment key={place}>

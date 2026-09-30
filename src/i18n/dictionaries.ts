@@ -22,7 +22,6 @@ type Dict = {
     cta: string
   }
   footer: {
-    rights: string
     /** The studio's cities, in order; the footer sets them apart with space, not punctuation. */
     places: string[]
   }
@@ -122,7 +121,6 @@ const en: Dict = {
     cta: 'I want to build…',
   },
   footer: {
-    rights: 'All Rights Reserved',
     places: ['Tokyo', 'New York'],
   },
   watermark: {
@@ -242,15 +240,14 @@ const ja: Dict = {
     cta: 'ご相談はこちら',
   },
   footer: {
-    rights: '無断転載を禁じます',
     places: ['東京', 'New York'],
   },
   watermark: {
     heading: 'BEEDS — 東京とニューヨークのクリエイティブスタジオ',
     water: '揺れる水の下の、BEEDSのロゴとカセットのマーク',
-    // \u200b marks the only places the line may break (after each phrase); the pitch sets
-    // word-break: keep-all in Japanese, so it never breaks inside a word (as the Impact lede)
-    pitch: 'クリエイティブ戦略、\u200bAI導入支援、\u200bそしてプロダクション。',
+    // the newline is the one break, after the second phrase (the pitch sets white-space: pre-line in
+    // Japanese), so the copyright at the end of the second line has room
+    pitch: 'クリエイティブ戦略、AI導入支援、\nそしてプロダクション。',
     // Cities and buttons kept in English on the JA page too (client direction, 2026-09-30) — only
     // the pitch sentence itself is Japanese.
     cities: ['Tokyo', 'New York'],

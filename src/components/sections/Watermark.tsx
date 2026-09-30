@@ -114,7 +114,8 @@ export default function Watermark({ lang = 'en' }: { lang?: Locale }) {
           <p className="wm-pitch" lang={lang}>
             {t.pitch}{' '}
             {/* the cities set apart by a bar */}
-            <span>{t.cities[0]} <span aria-hidden="true">|</span> {t.cities[1]}{t.citiesEnd}</span>
+            <span>{t.cities[0]} <span aria-hidden="true">|</span> {t.cities[1]}{t.citiesEnd}</span>{' '}
+            <span className="wm-copy">© {new Date().getFullYear()} BEEDS</span>
           </p>
           <div className="wm-acts">
             <a className="wm-btn wm-btn-primary" href={home} {...warm(home)} onClick={leave}>
