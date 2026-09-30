@@ -39,10 +39,11 @@ const nextBlinkBoundary = (el: HTMLElement | null) =>
     el.addEventListener('animationiteration', finish)
   })
 
-// OFF (his ask, 2026-10-01): the hero no longer types itself out or rains. The underwater page is
-// the site's opening now, so the homepage simply stands finished. Everything below still works —
-// set this back to true to bring the entrance back.
-const HERO_MOTION = false
+// The headline types itself out as it always did (his ask, 2026-10-01), but the rain that used to
+// follow it stays off: the underwater page is the site's opening now, so the homepage keeps to the
+// words. Either can be set back on its own; the code for both is untouched below.
+const HERO_TYPING = true
+const HERO_RAIN = false
 
 // In-memory flag (resets on full page load): the hero animates on every fresh
 // visit or reload, but sits static when the visitor navigates back to the
@@ -217,7 +218,7 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
     const myRun = ++runId.current
     const alive = () => runId.current === myRun
 
-    if (!HERO_MOTION || playedThisPageLoad) {
+    if (!HERO_TYPING || playedThisPageLoad) {
       setTyped([...LINES])
       setActiveLine(-1) // renders no cursor at all
       setCursorBlinkOut(true)
@@ -269,6 +270,7 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
       setRevealReady(true)
 
       // ---- the rain, and the ripple that lights the headline on its way out ----
+      if (!HERO_RAIN) return
       const title = titleRef.current
       const hero = heroRef.current
       if (!desktopRef.current || !title || !hero) return
