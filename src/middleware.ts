@@ -11,14 +11,20 @@ import { NextRequest, NextResponse } from 'next/server'
 // 2) The underwater intro. A visitor entering the site at / or /ja/ is shown the underwater page
 //    (/watermark/ or /ja/watermark/) at that same address, so the address bar keeps saying
 //    beedstu.com. Its ENTER THE ROOM button loads the address again, and this time it is the
-//    homepage. "Entering" means a page load that doesn't come from the site itself, once a browser
-//    session (a session cookie, set with the intro itself, so it can't loop). Clicks within the
-//    site, prefetches, search engines, link-preview bots and speed tests always get the homepage,
-//    so it keeps its content for everyone who indexes or measures it.
+//    homepage. "Entering" means a page load that doesn't come from the site itself: opening the
+//    address, a bookmark, a link from elsewhere, or a reload. The cookie below is only a brief
+//    guard against looping, not a once-a-visit rule — he asked (2026-10-01) that coming from the
+//    browser always start here. Clicks within the site, prefetches, search engines, link-preview
+//    bots and speed tests always get the homepage, so it keeps its content for everyone who
+//    indexes or measures it.
 
 const SUPPORTED = ['en', 'ja'] as const
 
 const INTRO_SEEN = 'beeds_in'
+// Long enough to carry ENTER THE ROOM (and a reload straight after it) through to the homepage,
+// short enough that coming back to the address later starts at the water again. The referer check
+// below already skips clicks within the site; this covers a browser that sends none.
+const INTRO_GUARD_S = 60
 const NOT_A_VISITOR = /bot|crawl|spider|slurp|preview|facebookexternalhit|embedly|whatsapp|telegram|discord|lighthouse|pagespeed|headless/i
 
 function resolveLocale(req: NextRequest): string {
@@ -57,7 +63,7 @@ export function middleware(req: NextRequest) {
     const url = req.nextUrl.clone()
     url.pathname = ja ? '/ja/watermark/' : '/watermark/'
     const res = NextResponse.rewrite(url)
-    res.cookies.set(INTRO_SEEN, '1', { path: '/', sameSite: 'lax' })
+    res.cookies.set(INTRO_SEEN, '1', { path: '/', sameSite: 'lax', maxAge: INTRO_GUARD_S })
     return res
   }
   return NextResponse.next()
