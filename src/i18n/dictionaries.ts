@@ -26,6 +26,17 @@ type Dict = {
     /** The studio's cities, in order; the footer sets them apart with space, not punctuation. */
     places: string[]
   }
+  /** /watermark/: the underwater landing page, which is also the way in (middleware.ts). */
+  watermark: {
+    heading: string
+    water: string
+    pitch: string
+    /** The two cities, set apart by a bar, and what follows them. */
+    cities: [string, string]
+    citiesEnd: string
+    enter: string
+    book: string
+  }
   work: { heading: string }
   clients: { heading: string }
   booking: {
@@ -113,6 +124,15 @@ const en: Dict = {
   footer: {
     rights: 'All Rights Reserved',
     places: ['Tokyo', 'New York'],
+  },
+  watermark: {
+    heading: 'BEEDS, a creative studio in Tokyo and New York',
+    water: 'The BEEDS wordmark and cassette mark under moving water',
+    pitch: 'Creative strategy, AI enablement and Production.',
+    cities: ['Tokyo', 'New York'],
+    citiesEnd: '.',
+    enter: 'Enter the room',
+    book: 'Book a session',
   },
   work: { heading: 'Selected Work' },
   clients: { heading: 'Selected Clients' },
@@ -224,6 +244,17 @@ const ja: Dict = {
   footer: {
     rights: '無断転載を禁じます',
     places: ['東京', 'New York'],
+  },
+  watermark: {
+    heading: 'BEEDS — 東京とニューヨークのクリエイティブスタジオ',
+    water: '揺れる水の下の、BEEDSのロゴとカセットのマーク',
+    pitch: 'クリエイティブ戦略、AI導入支援、そしてプロダクション。',
+    // Cities and buttons kept in English on the JA page too (client direction, 2026-09-30) — only
+    // the pitch sentence itself is Japanese.
+    cities: ['Tokyo', 'New York'],
+    citiesEnd: '.',
+    enter: 'Enter The Room',
+    book: 'Book a session',
   },
   work: { heading: '制作実績' },
   clients: { heading: '主なクライアント' },

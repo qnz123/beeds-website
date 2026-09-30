@@ -54,17 +54,26 @@ built 2026-07-10, eyebrow-labelled clauses in hairline-divided two-column rows).
 footer link to `/terms` was removed at client direction, so the page currently exists but is
 unlinked.
 
-**`/watermark/`** (2026-09-30) is the landing page for links from social posts, and the one route
-without the site chrome (`src/app/watermark/page.tsx` → `components/sections/Watermark.tsx`, water
+**`/watermark/`** and **`/ja/watermark/`** (2026-09-30) are the underwater landing page in English
+and Japanese (copy in `dictionaries.ts` → `watermark`), the only routes without the site chrome
+(`src/app/watermark/page.tsx`, `src/app/ja/watermark/page.tsx` → `components/sections/Watermark.tsx`, water
 in `lib/water.ts`). The BEEDS wordmark (Bodoni Moda 700) and the cassette mark lie under live WebGL
 water, with a grey stone carved "the sky people.. / do you hear us?" on the first E. The pitch sits
 bottom left, and ENTER THE ROOM (→ `/`) and BOOK A SESSION (→ `/booking/`) sit bottom right. Phones
 get a lighter water that a finger stirs. Reduced motion, Data Saver and slow or low-memory devices
-get a still. It keeps the homepage's canonical and stays out of the sitemap.
+get a still. Each keeps its homepage's canonical and stays out of the sitemap. **It is also the way
+in:** a visitor entering the site at `/` or `/ja/` from outside (a link, the address bar, social)
+is shown it first at that same address, once a browser session. The middleware rewrites the request
+(`src/middleware.ts`, cookie `beeds_in`), so the address bar keeps saying beedstu.com. ENTER THE
+ROOM / 部屋に入る then loads the address again, which is now the homepage. A Japanese-preferring
+browser is sent from `/` to `/ja/` first, as before, and sees the Japanese one there. Clicks within
+the site, search engines, link-preview bots and speed tests always get the homepage. A shared
+`/#section` link passes through to its section.
 
 **The cassette mark and the hand-over.** The black cassette (`components/CassetteMark.tsx`, the
 small cut from BEEDS-Marketing/logo/cassette) sits centred in the nav bar at 44 × 32. It links to
-`/watermark/`, where the same mark lies under the water at the same size and place. It is hidden
+the underwater page in the page's language, where the same mark lies under the water at the same
+size and place. It is hidden
 from 768px to 1239px, where the link row reaches the middle of the bar. Going either way between
 the two, the page fades to the #f5f5f5 ground with the cassette held still, and the next page fades
 up from it (`lib/handover.ts`, `html.arrive` / `html.leaving` in globals.css).

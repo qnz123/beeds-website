@@ -106,10 +106,10 @@ export default function Navigation({
     return true
   }
 
-  // The cassette goes to the underwater page (English only, from either locale). The page fades to
-  // the ground with the cassette held in the bar (html.leaving), then goes; the underwater page
-  // fades up from the same ground.
-  const waterHref = '/watermark/'
+  // The cassette goes to the underwater page in this page's language. The page fades to the ground
+  // with the cassette held in the bar (html.leaving), then goes; the underwater page fades up from
+  // the same ground.
+  const waterHref = isJa ? '/ja/watermark/' : '/watermark/'
   // Its page needs a stylesheet (its fonts) that no other page loads. Warmed on intent, and on the
   // click at the latest, so it is in the cache before the fade is over. Firefox otherwise showed a
   // white frame while it waited on it.
