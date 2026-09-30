@@ -1535,7 +1535,6 @@ html.leaving .nav::after { opacity: 0; }
 .ic .asset, .ic .c-ring, .ic .c-glint { visibility: hidden; }
 .ic .c-ring { fill: none; stroke: var(--ic-ink); stroke-linecap: square; }
 .ic .c-glint { fill: #ffffff; }
-.ic .star-burst path { fill: none; stroke-linecap: square; stroke-dasharray: 1 2; visibility: hidden; }
 
 /* the three phases: the photograph is the mark */
 /* the photos arrive full width; as they scroll up to the nav, Impact.tsx narrows them (--ic-phw, set on
