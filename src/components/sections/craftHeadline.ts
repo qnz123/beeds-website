@@ -38,7 +38,8 @@ const TL = {
   tee: { stem: [2440, 2600], bar: [2500, 2700], morph: [3320, 3600] },
   // the R leans into italic while the A and F come in, and stands up again once the F has slid home
   // (its join ends at 2780)
-  rItalic: { lean: [2420, 2600], back: [2780, 2960] },
+  // it turns neon blue first, just before it starts to lean
+  rItalic: { blue: [2280, 2420], lean: [2420, 2600], back: [2780, 2960] },
   stars: { pop: [2720, 3240], gap: 90, burst: 3380, burstGap: 70 },
   phone: { land: [2700, 2900], morph: [3320, 3600] },
   shades: { drop: [3600, 3880], swing: [3880, 4280] },
@@ -226,10 +227,13 @@ export function playCraft(wrap: HTMLElement, svg: SVGSVGElement, onSettled: () =
   function rAt(t: number) {
     if (!rLetter) return
     const I = TL.rItalic
-    const k = t < I.back[0] ? inOut(sg(t, I.lean)) : 1 - inOut(sg(t, I.back))
-    if (k <= 0) { rLetter.removeAttribute('transform'); rPaths.forEach((p) => p.style.removeProperty('stroke')); return }
-    rLetter.setAttribute('transform', `skewX(${(R_SLANT * k).toFixed(2)})`)
-    const c = `rgb(${ink.map((v, i) => Math.round(mix(v, NEON[i], k))).join(',')})`
+    const back = 1 - inOut(sg(t, I.back))
+    const k = t < I.back[0] ? inOut(sg(t, I.lean)) : back          // the slant
+    const kc = t < I.back[0] ? inOut(sg(t, I.blue)) : back         // the colour, a beat ahead of it
+    if (k <= 0) rLetter.removeAttribute('transform')
+    else rLetter.setAttribute('transform', `skewX(${(R_SLANT * k).toFixed(2)})`)
+    if (kc <= 0) { rPaths.forEach((p) => p.style.removeProperty('stroke')); return }
+    const c = `rgb(${ink.map((v, i) => Math.round(mix(v, NEON[i], kc))).join(',')})`
     rPaths.forEach((p) => { p.style.stroke = c })
   }
 
