@@ -2960,7 +2960,7 @@ html:has(.wm) { scrollbar-gutter: stable; }
 /* Two lines (his call, 2026-10-01, after trying one): the measure sets the English in two */
 .wm-pitch { margin: 0; max-width: 40ch; font-size: 17px; line-height: 1.45; }
 /* the cities are one unit: "Tokyo | New York." never splits across lines */
-.wm-pitch span { color: #666; white-space: nowrap; }
+.wm-pitch span { white-space: nowrap; }
 /* Japanese: breaks only at the phrase ends marked in the copy (keep-all: never inside a word),
    and a measure that sets it in two lines like the English: the first phrase pair, then the
    last phrase with the cities */
