@@ -20,11 +20,16 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const SUPPORTED = ['en', 'ja'] as const
 
-const INTRO_SEEN = 'beeds_in'
-// Long enough to carry ENTER THE ROOM (and a reload straight after it) through to the homepage,
-// short enough that coming back to the address later starts at the water again. The referer check
-// below already skips clicks within the site; this covers a browser that sends none.
-const INTRO_GUARD_S = 60
+// A new name (2026-10-01): the first version of this cookie had no expiry, and because the intro is
+// skipped whenever the cookie is there, that one was never replaced — it sat in the browser blocking
+// the water until the visitor quit the browser altogether. Reading a new name ignores those, and
+// this one is always written with an expiry, so it can never get stuck the same way.
+const INTRO_SEEN = 'beeds_intro'
+const INTRO_SEEN_LEGACY = 'beeds_in'
+// Only a few seconds: long enough to carry ENTER THE ROOM through to the homepage in a browser that
+// sends no referer (the referer check below already skips clicks within the site), short enough that
+// coming back to the address is the water again, which is the point of it.
+const INTRO_GUARD_S = 10
 const NOT_A_VISITOR = /bot|crawl|spider|slurp|preview|facebookexternalhit|embedly|whatsapp|telegram|discord|lighthouse|pagespeed|headless/i
 
 function resolveLocale(req: NextRequest): string {
@@ -64,6 +69,7 @@ export function middleware(req: NextRequest) {
     url.pathname = ja ? '/ja/watermark/' : '/watermark/'
     const res = NextResponse.rewrite(url)
     res.cookies.set(INTRO_SEEN, '1', { path: '/', sameSite: 'lax', maxAge: INTRO_GUARD_S })
+    if (req.cookies.has(INTRO_SEEN_LEGACY)) res.cookies.delete(INTRO_SEEN_LEGACY)
     return res
   }
   return NextResponse.next()
