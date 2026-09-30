@@ -2959,12 +2959,13 @@ html:has(.wm) { scrollbar-gutter: stable; }
   container-type: inline-size;
 }
 .wm-bottom a { pointer-events: auto; }
-/* One line from tablet up (his ask, 2026-10-01): 19px, and smaller only if the bar is ever too
-   narrow for it. The line is 27.5em long in English and 34.5em in Japanese, so the type is the
-   bar's width over a touch more than that. Phones keep two lines (below). */
+/* Two lines from tablet up (his ask, 2026-10-01): the copyright, then the pitch on one line at
+   19px, smaller only if the bar is ever too narrow for it. The pitch is 27.5em long in English and
+   34.5em in Japanese, so the type is the bar's width over a touch more than that. On phones the
+   pitch wraps to two lines under the copyright (below). */
 .wm-pitch { margin: 0; white-space: nowrap; font-size: min(19px, calc(100cqi / 28)); line-height: 1.45; }
 .wm-pitch:lang(ja) { font-size: min(19px, calc(100cqi / 35)); }
-/* the cities are one unit: "Tokyo | New York." never splits across lines */
+/* the copyright and the cities, in grey, each one unit that never splits across lines */
 .wm-pitch span { color: #666; white-space: nowrap; }
 .wm-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 .wm-btn {

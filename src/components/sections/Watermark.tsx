@@ -24,6 +24,7 @@ const reenie = Reenie_Beanie({ subsets: ['latin'], weight: '400', display: 'swap
 // cassette, the page fades up with the sharp copy held, then it sinks back under the water.
 export default function Watermark({ lang = 'en' }: { lang?: Locale }) {
   const t = getDictionary(lang).watermark
+  const rights = getDictionary(lang).footer.rights
   const home = lang === 'ja' ? '/ja/' : '/'
   const booking = lang === 'ja' ? '/ja/booking/' : '/booking/'
   const waterRef = useRef<HTMLDivElement>(null)
@@ -112,6 +113,9 @@ export default function Watermark({ lang = 'en' }: { lang?: Locale }) {
         </div>
         <div className="wm-bottom">
           <p className="wm-pitch" lang={lang}>
+            {/* the copyright first, as the site's footer words it, on a line of its own */}
+            <span>BEEDS © {new Date().getFullYear()} {rights}</span>
+            <br />
             {t.pitch}{' '}
             {/* the cities set apart by a bar */}
             <span>{t.cities[0]} <span aria-hidden="true">|</span> {t.cities[1]}{t.citiesEnd}</span>
