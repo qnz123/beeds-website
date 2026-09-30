@@ -2955,15 +2955,16 @@ html:has(.wm) { scrollbar-gutter: stable; }
   gap: 24px;
   /* the water under the bar stays stirrable; only the links take the pointer */
   pointer-events: none;
+  /* the pitch sizes itself to this bar's width (cqi) */
+  container-type: inline-size;
 }
 .wm-bottom a { pointer-events: auto; }
-.wm-pitch { margin: 0; max-width: 34ch; font-size: 19px; line-height: 1.45; }
-/* the cities are one unit: "Tokyo | New York." never splits across lines */
-.wm-pitch span { color: #666; white-space: nowrap; }
-/* Japanese: breaks only at the phrase ends marked in the copy (keep-all: never inside a word),
-   and a measure that sets it in two lines like the English: the first phrase pair, then the
-   last phrase with the cities */
-.wm-pitch:lang(ja) { max-width: 20em; word-break: keep-all; line-break: strict; }
+/* One line, always (his ask, 2026-10-01): 19px wherever it fits, and smaller only where the bar is
+   too narrow for it. The line is 27.5em long in English and 34.5em in Japanese, so the type is the
+   bar's width over a touch more than that. The buttons wrap under it on a narrower screen. */
+.wm-pitch { margin: 0; white-space: nowrap; font-size: min(19px, calc(100cqi / 28)); line-height: 1.45; }
+.wm-pitch:lang(ja) { font-size: min(19px, calc(100cqi / 35)); }
+.wm-pitch span { color: #666; }
 .wm-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 .wm-btn {
   display: inline-flex;
@@ -3027,7 +3028,6 @@ html.arrive .wm:not(.is-settled) .wm-mark { opacity: 1; }
 @media (max-width: 767px) {
   .wm-stage { min-height: 620px; }
   .wm-bottom { flex-direction: column; align-items: flex-start; padding: 24px 16px 28px; }
-  .wm-pitch { font-size: 17px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .wm-veil, .wm-mark, .wm.is-leaving .wm-mark { transition: none; }
