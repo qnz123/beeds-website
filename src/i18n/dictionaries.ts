@@ -248,7 +248,7 @@ const ja: Dict = {
   watermark: {
     heading: 'BEEDS — 東京とニューヨークのクリエイティブスタジオ',
     water: '揺れる水の下の、BEEDSのロゴとカセットのマーク',
-    pitch: 'クリエイティブ戦略、AI導入支援、そしてプロダクション。',
+    pitch: 'クリエイティブ戦略、AI導入支援、プロダクション。',
     // Cities and buttons kept in English on the JA page too (client direction, 2026-09-30) — only
     // the pitch sentence itself is Japanese.
     cities: ['Tokyo', 'New York'],
