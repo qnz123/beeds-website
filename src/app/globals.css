@@ -3030,11 +3030,14 @@ textarea.blank:focus {
 /* no scrollbar here, but the site's pages have one: keep its gutter so the
    middle of this page is the middle of theirs, and the cassette lines up */
 html:has(.wm) { scrollbar-gutter: stable; }
+/* One screen tall, by the browser's own measure. The page is laid out under
+   the whole screen (viewport-fit=cover, watermark/page.tsx), so on an iPhone
+   the ground runs down under the home indicator to the very edge, and the foot
+   below keeps the buttons clear of it with env(safe-area-inset-bottom). Sized
+   from visualViewport instead, Instagram's in-app browser ended the page above
+   the indicator and showed its own white below it, and the foot was cut (his
+   report, 2026-10-01): so the height is the plain one it was before. */
 .wm { position: relative; height: 100vh; height: 100dvh; }
-/* --wm-h is what the window really shows (Watermark.tsx, from visualViewport):
-   an in-app browser's own bars are not part of it, so the buttons at the foot
-   are never under one. */
-.wm { height: var(--wm-h, 100dvh); }
 /* The intro fades up out of the ground when it opens, slowly, so the water
    arrives rather than appearing (his ask, 2026-10-01). Watermark.tsx adds
    .is-shown once the water is drawn, or after 1.8s, whichever comes first. */
@@ -3056,7 +3059,7 @@ html.arrive .wm { opacity: 1; transition: none; }
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 36px 40px max(40px, env(safe-area-inset-bottom, 0px));
+  padding: 36px max(40px, env(safe-area-inset-right, 0px)) max(40px, env(safe-area-inset-bottom, 0px)) max(40px, env(safe-area-inset-left, 0px));
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -3140,15 +3143,20 @@ html.arrive .wm:not(.is-settled) .wm-mark { opacity: 1; }
   .wm-mark { top: 19px; left: calc(50% - 18px); width: 36px; height: 26px; transition-duration: 0.2s; }
   .wm-veil { transition-duration: 0.35s; }
   .wm-stage { min-height: min(620px, 100%); }
-  /* a deeper foot on a phone: an in-app browser can hold the page a little
-     past the screen, and this keeps the second button clear of the edge */
-  .wm-bottom { flex-direction: column; align-items: flex-start; padding: 24px 16px calc(44px + env(safe-area-inset-bottom, 0px)); }
+  /* a deep foot on a phone, so the second button sits well clear of the edge;
+     on an iPhone it rises further, clear of the home indicator the ground now
+     runs under (viewport-fit=cover) */
+  .wm-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 24px max(16px, env(safe-area-inset-right, 0px)) max(44px, calc(28px + env(safe-area-inset-bottom, 0px))) max(16px, env(safe-area-inset-left, 0px));
+  }
   .wm-pitch { font-size: 15px; }
 }
 /* A short window — an in-app browser, or a phone held in landscape: the block
    at the foot closes up so all of it stays on the screen. */
 @media (max-height: 620px) {
-  .wm-bottom { gap: 14px; padding-top: 20px; padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); }
+  .wm-bottom { gap: 14px; padding-top: 20px; padding-bottom: max(32px, calc(20px + env(safe-area-inset-bottom, 0px))); }
   .wm-pitch { font-size: 14px; line-height: 1.4; }
 }
 @media (prefers-reduced-motion: reduce) {

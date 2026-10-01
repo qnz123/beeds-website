@@ -84,28 +84,6 @@ export default function Watermark({ lang = 'en' }: { lang?: Locale }) {
     return () => { alive = false; w.destroy(); water.current = null }
   }, [home, lang])
 
-  // The page is exactly as tall as the window really shows. An in-app browser (a link from a post
-  // opens one) keeps a bar at the top and another at the bottom, and reports a height that counts
-  // the one at the bottom, so the buttons sat under it (his report, 2026-10-01). visualViewport
-  // measures what is actually in view; without it the CSS falls back to 100dvh.
-  useEffect(() => {
-    const vv = window.visualViewport
-    const set = () => {
-      const h = vv?.height ?? window.innerHeight
-      if (h) document.documentElement.style.setProperty('--wm-h', `${Math.round(h)}px`)
-    }
-    set()
-    vv?.addEventListener('resize', set)
-    window.addEventListener('resize', set)
-    window.addEventListener('orientationchange', set)
-    return () => {
-      vv?.removeEventListener('resize', set)
-      window.removeEventListener('resize', set)
-      window.removeEventListener('orientationchange', set)
-      document.documentElement.style.removeProperty('--wm-h')
-    }
-  }, [])
-
   // Back from the site: the browser may restore this page as it was left, faded out. Bring it back.
   useEffect(() => {
     const onShow = (e: PageTransitionEvent) => { if (e.persisted) setLeaving(false) }
