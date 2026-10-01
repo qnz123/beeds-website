@@ -191,7 +191,14 @@ h6 {
 html.arrive body::after {
   content: '';
   position: fixed;
-  inset: 0;
+  /* past the bottom edge, not just to it: Safari's floating toolbar (iOS 26)
+     sits over the page below where a fixed layer ends, and the page being
+     left showed through under it (his report, 2026-10-01) */
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(100vh + 160px);
+  height: calc(100lvh + 160px);
   z-index: 49;
   background: #f5f5f5;
   pointer-events: none;
@@ -207,7 +214,12 @@ html.arrive body::after {
 html.leaving body::after {
   content: '';
   position: fixed;
-  inset: 0;
+  /* past the bottom edge, under Safari's toolbar (see html.arrive) */
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(100vh + 160px);
+  height: calc(100lvh + 160px);
   z-index: 49;
   background: #f5f5f5;
   pointer-events: none;
@@ -3126,7 +3138,12 @@ html.arrive .wm:not(.is-settled) .wm-mark { opacity: 1; }
    fades away with the rest). */
 .wm-veil {
   position: fixed;
-  inset: 0;
+  /* past the bottom edge, under Safari's toolbar (see html.arrive) */
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(100vh + 160px);
+  height: calc(100lvh + 160px);
   z-index: 20;
   background: #f5f5f5;
   opacity: 0;
