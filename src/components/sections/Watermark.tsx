@@ -6,7 +6,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import CassetteMark from '@/components/CassetteMark'
 import type { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
-import { handOver, handoverMs, isPlainClick } from '@/lib/handover'
+import { handOver, isPlainClick } from '@/lib/handover'
 import { mountWater, type Water } from '@/lib/water'
 
 // Drawn into the water on canvas, so they are only ever used by family name (see mountWater).
@@ -30,11 +30,8 @@ export default function Watermark({ lang = 'en' }: { lang?: Locale }) {
   const markRef = useRef<HTMLDivElement>(null)
   const water = useRef<Water | null>(null)
   const [leaving, setLeaving] = useState(false)
-  // arriving from the site's cassette: the sharp copy holds until the page has faded up and the
-  // water has the cassette drawn into it, then sinks (html.arrive in globals.css)
-  const [settled, setSettled] = useState(false)
-  // Opening the page fresh (not from the site's cassette): it fades up from the ground once the
-  // water is drawn, rather than the canvas appearing all at once (his ask, 2026-10-01).
+  // Opening, fresh or from the site's cassette alike: it fades up from the ground once the water is
+  // drawn, rather than the canvas appearing all at once (his ask, 2026-10-01).
   const [shown, setShown] = useState(false)
   const router = useRouter()
   // The page a button opens has stylesheets this one doesn't load; they are warmed on intent, and
@@ -76,11 +73,6 @@ export default function Watermark({ lang = 'en' }: { lang?: Locale }) {
     Promise.race([w.ready, new Promise((r) => window.setTimeout(r, 1800))]).then(() => {
       if (alive) requestAnimationFrame(() => { if (alive) setShown(true) })
     })
-    if (document.documentElement.classList.contains('arrive')) {
-      const faded = new Promise((r) => window.setTimeout(r, handoverMs() + 50))
-      const giveUp = new Promise((r) => window.setTimeout(r, 2500))   // never leave it up for good
-      Promise.race([Promise.all([w.ready, faded]), giveUp]).then(() => { if (alive) setSettled(true) })
-    }
     return () => { alive = false; w.destroy(); water.current = null }
   }, [home, lang])
 
@@ -110,7 +102,7 @@ export default function Watermark({ lang = 'en' }: { lang?: Locale }) {
   // and arrives from the ground.
   /* eslint-disable @next/next/no-html-link-for-pages */
   return (
-    <div className={`wm${shown ? ' is-shown' : ''}${leaving ? ' is-leaving' : ''}${settled ? ' is-settled' : ''}`}>
+    <div className={`wm${shown ? ' is-shown' : ''}${leaving ? ' is-leaving' : ''}`}>
       <main className="wm-stage">
         <h1 className="sr-only">{t.heading}</h1>
         <div ref={waterRef} className="wm-water" role="img" aria-label={t.water} />
