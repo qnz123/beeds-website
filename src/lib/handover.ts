@@ -6,8 +6,10 @@
 
 export const ARRIVE_KEY = 'beeds:arrive'
 
-// How long the leaving page takes to fade to the ground (the .wm-veil and html.leaving fades).
-export const HANDOVER_MS = 700
+// How long the leaving page takes to fade to the ground (the .wm-veil and html.leaving fades): half
+// as long on a phone (his ask, 2026-10-01: the trip felt slow there). The CSS fades follow the same
+// split at 767px; keep the two in step.
+export const handoverMs = () => (window.matchMedia('(max-width: 767px)').matches ? 350 : 700)
 
 // A plain left click, which the hand-over takes over; new-tab and modified clicks are left to the
 // browser.
@@ -18,5 +20,5 @@ export const isPlainClick = (e: { button: number; metaKey: boolean; ctrlKey: boo
 export function handOver(href: string) {
   try { sessionStorage.setItem(ARRIVE_KEY, '1') } catch {}
   const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  window.setTimeout(() => window.location.assign(href), still ? 0 : HANDOVER_MS)
+  window.setTimeout(() => window.location.assign(href), still ? 0 : handoverMs())
 }

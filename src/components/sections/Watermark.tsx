@@ -6,7 +6,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import CassetteMark from '@/components/CassetteMark'
 import type { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
-import { HANDOVER_MS, handOver, isPlainClick } from '@/lib/handover'
+import { handOver, handoverMs, isPlainClick } from '@/lib/handover'
 import { mountWater, type Water } from '@/lib/water'
 
 // Drawn into the water on canvas, so they are only ever used by family name (see mountWater).
@@ -70,7 +70,7 @@ export default function Watermark({ lang = 'en' }: { lang?: Locale }) {
     water.current = w
     let alive = true
     if (document.documentElement.classList.contains('arrive')) {
-      const faded = new Promise((r) => window.setTimeout(r, HANDOVER_MS + 50))
+      const faded = new Promise((r) => window.setTimeout(r, handoverMs() + 50))
       const giveUp = new Promise((r) => window.setTimeout(r, 2500))   // never leave it up for good
       Promise.race([Promise.all([w.ready, faded]), giveUp]).then(() => { if (alive) setSettled(true) })
     }

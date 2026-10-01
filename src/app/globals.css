@@ -173,6 +173,13 @@ h6 {
 @media (min-width: 768px) and (max-width: 1239px) {
   .nav-mark { display: none; }
 }
+/* it keeps its colours under the pointer: the bar's links dim on hover (.nav a:hover, later in the
+   file, hence the extra .nav), the mark does not (his ask, 2026-10-01) */
+.nav .nav-mark:hover { opacity: 1; }
+/* a bit smaller on phones (36 x 26, his ask, 2026-10-01); .wm-mark matches */
+@media (max-width: 767px) {
+  .nav-mark { top: calc(50% - 13px); left: calc(50% - 18px); width: 36px; height: 26px; }
+}
 
 /* ---- Arriving from /watermark/ ----
    The landing page fades to the ground with the cassette held above it, then
@@ -220,6 +227,12 @@ html.leaving .nav.is-scrolled { background-color: transparent; }
    beat .nav a:hover, which comes later) */
 html.leaving .nav .nav-mark { opacity: 1; }
 html.leaving .nav::after { opacity: 0; }
+/* on a phone the hand-over runs at half length (handoverMs in lib/handover.ts) */
+@media (max-width: 767px) {
+  html.arrive body::after { animation-duration: 0.35s; animation-delay: 0s; }
+  html.leaving body::after { animation-duration: 0.35s; }
+  html.leaving .nav > :not(.nav-mark) { transition-duration: 0.35s; }
+}
 @media (prefers-reduced-motion: reduce) {
   html.arrive body::after { display: none; }
   html.leaving body::after { animation: none; }
@@ -3025,6 +3038,10 @@ html.arrive .wm:not(.is-settled) .wm-mark { opacity: 1; }
   .wm.is-leaving .wm-mark { opacity: 1; transition: opacity 0.25s ease-out; }
 }
 @media (max-width: 767px) {
+  /* the phone's smaller cassette (.nav-mark: 36 x 26, centred on the 64px bar), and the hand-over at
+     half length (handoverMs in lib/handover.ts) */
+  .wm-mark { top: 19px; left: calc(50% - 18px); width: 36px; height: 26px; transition-duration: 0.2s; }
+  .wm-veil { transition-duration: 0.35s; }
   .wm-stage { min-height: 620px; }
   .wm-bottom { flex-direction: column; align-items: flex-start; padding: 24px 16px 28px; }
   .wm-pitch { font-size: 15px; }
