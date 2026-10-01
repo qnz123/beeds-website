@@ -2999,8 +2999,7 @@ textarea.blank:focus {
 html:has(.wm) { scrollbar-gutter: stable; }
 /* One screen tall, by the browser's own measure. The page is laid out under
    the whole screen (viewport-fit=cover, watermark/page.tsx), so on an iPhone
-   the ground runs down under the home indicator to the very edge, and the foot
-   below keeps the buttons clear of it with env(safe-area-inset-bottom). Sized
+   the ground runs down under the home indicator to the very edge. Sized
    from visualViewport instead, Instagram's in-app browser ended the page above
    the indicator and showed its own white below it, and the foot was cut (his
    report, 2026-10-01): so the height is the plain one it was before. */
@@ -3102,20 +3101,23 @@ html:has(.wm) { scrollbar-gutter: stable; }
   .wm-mark { top: 19px; left: calc(50% - 18px); width: 36px; height: 26px; transition-duration: 0.2s; }
   .wm-veil { transition-duration: 0.35s; }
   .wm-stage { min-height: min(620px, 100%); }
-  /* a deep foot on a phone, so the second button sits well clear of the edge;
-     on an iPhone it rises further, clear of the home indicator the ground now
-     runs under (viewport-fit=cover) */
+  /* a deep foot on a phone, so the second button sits well clear of the edge.
+     The same in every browser, not raised by the home indicator's inset:
+     Instagram's in-app browser reports that inset though its window stops
+     above the indicator, so the buttons rode ~20px higher there than in Safari
+     and the page looked off (his report, 2026-10-01). 44px clears the
+     indicator where a browser does run under it. */
   .wm-bottom {
     flex-direction: column;
     align-items: flex-start;
-    padding: 24px max(16px, env(safe-area-inset-right, 0px)) max(44px, calc(28px + env(safe-area-inset-bottom, 0px))) max(16px, env(safe-area-inset-left, 0px));
+    padding: 24px max(16px, env(safe-area-inset-right, 0px)) 44px max(16px, env(safe-area-inset-left, 0px));
   }
   .wm-pitch { font-size: 15px; }
 }
 /* A short window — an in-app browser, or a phone held in landscape: the block
    at the foot closes up so all of it stays on the screen. */
 @media (max-height: 620px) {
-  .wm-bottom { gap: 14px; padding-top: 20px; padding-bottom: max(32px, calc(20px + env(safe-area-inset-bottom, 0px))); }
+  .wm-bottom { gap: 14px; padding-top: 20px; padding-bottom: 32px; }
   .wm-pitch { font-size: 14px; line-height: 1.4; }
 }
 @media (prefers-reduced-motion: reduce) {
