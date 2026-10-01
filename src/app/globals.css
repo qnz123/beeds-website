@@ -3031,6 +3031,10 @@ textarea.blank:focus {
    middle of this page is the middle of theirs, and the cassette lines up */
 html:has(.wm) { scrollbar-gutter: stable; }
 .wm { position: relative; height: 100vh; height: 100dvh; }
+/* --wm-h is what the window really shows (Watermark.tsx, from visualViewport):
+   an in-app browser's own bars are not part of it, so the buttons at the foot
+   are never under one. */
+.wm { height: var(--wm-h, 100dvh); }
 /* The intro fades up out of the ground when it opens, slowly, so the water
    arrives rather than appearing (his ask, 2026-10-01). Watermark.tsx adds
    .is-shown once the water is drawn, or after 1.8s, whichever comes first. */
