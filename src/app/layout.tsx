@@ -80,6 +80,21 @@ export default function RootLayout({
               "try{var p=location.pathname;if((p==='/'||p==='/ja'||p==='/ja/')&&!location.hash&&!matchMedia('(max-width: 767px)').matches){var n=performance.getEntriesByType('navigation')[0];if(n&&n.type==='reload'){if('scrollRestoration' in history){history.scrollRestoration='manual'}var go=true,t0=Date.now(),off=function(){go=false};addEventListener('wheel',off,{passive:true,once:true});addEventListener('touchstart',off,{passive:true,once:true});addEventListener('keydown',off,{once:true});(function tick(){if(!go||Date.now()-t0>1500)return;if(window.scrollY){window.scrollTo({top:0,left:0,behavior:'instant'})}requestAnimationFrame(tick)})()}}}catch(e){}",
           }}
         />
+        {/* Refreshing a page opened at a #section (Services, from the menu):
+            Safari forgets both the restored position and the #target and starts
+            at the top, so the section the visitor was reading disappears (his
+            report, 2026-10-01). Only when the browser has restored nothing —
+            Chrome keeps the position itself, and this must not pull a visitor
+            who refreshed further down the page back up to the target. It is
+            held for a moment, as the homepage's top is above, because Safari
+            puts the page back at the top again after load, and given up the
+            moment the visitor scrolls themselves. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var h=location.hash;var n=performance.getEntriesByType('navigation')[0];if(h&&h.length>1&&n&&n.type==='reload'){var id=decodeURIComponent(h.slice(1)),t0=Date.now(),go=true,off=function(){go=false};addEventListener('wheel',off,{passive:true,once:true});addEventListener('touchstart',off,{passive:true,once:true});addEventListener('keydown',off,{once:true});(function tick(){if(!go||Date.now()-t0>1200)return;requestAnimationFrame(tick);if(window.scrollY>20)return;var el=document.getElementById(id);if(!el)return;var y=el.getBoundingClientRect().top+window.scrollY-70;if(y>20){window.scrollTo({top:y,left:0,behavior:'instant'})}})()}}catch(e){}",
+          }}
+        />
         {/* Arriving from /watermark/: that page leaves a note in this tab's
             session storage just before it navigates, and the page it opens
             fades up from the ground (html.arrive in globals.css). Read and
