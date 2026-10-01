@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import Watermark from '@/components/sections/Watermark'
+import { introReloadScript } from '@/lib/introReload'
 
 // Laid out under the whole screen (viewport-fit=cover), so on an iPhone the ground reaches the very
 // bottom edge, under the home indicator, rather than stopping above it: Instagram's in-app browser
@@ -19,5 +20,11 @@ export const metadata: Metadata = {
 }
 
 export default function WatermarkJaPage() {
-  return <Watermark lang="ja" />
+  return (
+    <>
+      {/* a refresh from the room goes back to it (lib/introReload.ts) */}
+      <script dangerouslySetInnerHTML={{ __html: introReloadScript }} />
+      <Watermark lang="ja" />
+    </>
+  )
 }

@@ -26,14 +26,12 @@ const SUPPORTED = ['en', 'ja'] as const
 // this one is always written with an expiry, so it can never get stuck the same way.
 const INTRO_SEEN = 'beeds_intro'
 const INTRO_SEEN_LEGACY = 'beeds_in'
-// One minute, renewed on every homepage load (his call, 2026-10-01: the water should come back
-// soon). It carries ENTER THE ROOM through to the homepage in a browser that sends no referer, and — his report,
-// 2026-10-01 — it also carries a refresh: on a phone, pulling the page down to reload sends no
-// referer either, and Safari sends nothing that tells a reload apart from a fresh arrival, so a
-// ten-second guard made every refresh start at the water and then at the top of the page. At a
-// minute, a refresh soon after arriving stays where it was; later into a read, the water comes
-// back, which is what he wants the address to do.
-const INTRO_GUARD_S = 60
+// Only a few seconds, and never renewed: long enough to carry ENTER THE ROOM through to the
+// homepage in a browser that sends no referer, short enough that any later arrival from outside —
+// a link from a post, the address typed again — is the water (his ask, 2026-10-01: links always
+// land on the intro). A refresh, which Safari can't be told apart from an arrival here, is taken
+// back to the page the tab was on by the intro page itself (lib/introReload.ts).
+const INTRO_GUARD_S = 10
 const NOT_A_VISITOR = /bot|crawl|spider|slurp|preview|facebookexternalhit|embedly|whatsapp|telegram|discord|lighthouse|pagespeed|headless/i
 
 function resolveLocale(req: NextRequest): string {
@@ -76,11 +74,7 @@ export function middleware(req: NextRequest) {
     if (req.cookies.has(INTRO_SEEN_LEGACY)) res.cookies.delete(INTRO_SEEN_LEGACY)
     return res
   }
-  // Still reading: push the guard out again, so the water doesn't come back under a refresh
-  // however long the visit lasts.
-  const res = NextResponse.next()
-  if (req.cookies.has(INTRO_SEEN)) res.cookies.set(INTRO_SEEN, '1', { path: '/', sameSite: 'lax', maxAge: INTRO_GUARD_S })
-  return res
+  return NextResponse.next()
 }
 
 // Only the two homepage roots. Other paths are unaffected.

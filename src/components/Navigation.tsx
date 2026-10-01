@@ -7,6 +7,7 @@ import CassetteMark from '@/components/CassetteMark'
 import type { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 import { isPlainClick, toWater as goToWater } from '@/lib/handover'
+import { PLACE_KEY, ROOM_KEY } from '@/lib/introReload'
 
 // Locale-aware nav. `lang` picks the copy; `switchHref` is the counterpart URL
 // for the language toggle (the other-language version of the current page).
@@ -120,6 +121,24 @@ export default function Navigation({
     setIsOpen(false)
     goToWater(e.currentTarget.href)
   }
+
+  // On the homepage, this tab is in the room: a refresh, which the server answers with the intro,
+  // comes straight back here, to the same place (lib/introReload.ts).
+  useEffect(() => {
+    const path = window.location.pathname.replace(/\/$/, '') || '/'
+    if (path !== '/' && path !== '/ja') return
+    try { sessionStorage.setItem(ROOM_KEY, path) } catch {}
+    const keep = () => {
+      try { sessionStorage.setItem(PLACE_KEY, JSON.stringify({ p: path, y: Math.round(window.scrollY) })) } catch {}
+    }
+    const onHidden = () => { if (document.visibilityState === 'hidden') keep() }
+    window.addEventListener('pagehide', keep)
+    document.addEventListener('visibilitychange', onHidden)
+    return () => {
+      window.removeEventListener('pagehide', keep)
+      document.removeEventListener('visibilitychange', onHidden)
+    }
+  }, [])
 
   // Toggle shows the OTHER language's name and links to its URL.
   const toggleLabel = isJa ? 'English' : '日本語'
