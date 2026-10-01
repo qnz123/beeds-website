@@ -95,11 +95,12 @@ export default function RootLayout({
               "try{var h=location.hash;var n=performance.getEntriesByType('navigation')[0];if(h&&h.length>1&&n&&n.type==='reload'){var id=decodeURIComponent(h.slice(1)),t0=Date.now(),go=true,off=function(){go=false};addEventListener('wheel',off,{passive:true,once:true});addEventListener('touchstart',off,{passive:true,once:true});addEventListener('keydown',off,{once:true});(function tick(){if(!go||Date.now()-t0>1200)return;requestAnimationFrame(tick);if(window.scrollY>20)return;var el=document.getElementById(id);if(!el)return;var y=el.getBoundingClientRect().top+window.scrollY-70;if(y>20){window.scrollTo({top:y,left:0,behavior:'instant'})}})()}}catch(e){}",
           }}
         />
-        {/* Arriving from /watermark/: that page leaves a note in this tab's
-            session storage just before it navigates, and the page it opens
-            fades up from the ground (html.arrive in globals.css). Read and
-            cleared here, before the first paint, so the veil is there from the
-            very first frame and a later reload does not replay it. */}
+        {/* Arriving at /watermark/ from the site's cassette: the cassette
+            leaves a note in this tab's session storage just before it
+            navigates, and the underwater page fades up from the ground
+            (html.arrive in globals.css). Read and cleared here, before the
+            first paint, so the veil is there from the very first frame and a
+            later reload does not replay it. */}
         <script
           dangerouslySetInnerHTML={{
             __html:

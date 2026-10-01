@@ -6,7 +6,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import CassetteMark from '@/components/CassetteMark'
 import type { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
-import { handOver, isPlainClick } from '@/lib/handover'
+import { isPlainClick, toWater as goToWater } from '@/lib/handover'
 
 // Locale-aware nav. `lang` picks the copy; `switchHref` is the counterpart URL
 // for the language toggle (the other-language version of the current page).
@@ -106,34 +106,20 @@ export default function Navigation({
     return true
   }
 
-  // The cassette goes to the underwater page in this page's language. The page fades to the ground
-  // with the cassette held in the bar (html.leaving), then goes; the underwater page fades up from
-  // the same ground.
+  // The cassette goes to the underwater page in this page's language, at once: this page doesn't
+  // fade, the underwater page fades up from the ground with the cassette held where the bar has it
+  // (lib/handover.ts).
   const waterHref = isJa ? '/ja/watermark/' : '/watermark/'
   // Its page needs a stylesheet (its fonts) that no other page loads. Warmed on intent, and on the
-  // click at the latest, so it is in the cache before the fade is over. Firefox otherwise showed a
-  // white frame while it waited on it.
+  // click at the latest. Firefox otherwise showed a white frame while it waited on it.
   const warmWater = { onMouseEnter: () => router.prefetch(waterHref), onFocus: () => router.prefetch(waterHref), onTouchStart: () => router.prefetch(waterHref) }
   const toWater = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!isPlainClick(e)) return
     e.preventDefault()
     router.prefetch(waterHref)
     setIsOpen(false)
-    document.documentElement.classList.remove('arrive')
-    document.documentElement.classList.add('leaving')
-    handOver(e.currentTarget.href)
+    goToWater(e.currentTarget.href)
   }
-  // Back from the underwater page, the browser may restore this page as it was left, under the
-  // ground: fade it back up the way it arrives.
-  useEffect(() => {
-    const onShow = (e: PageTransitionEvent) => {
-      if (e.persisted && document.documentElement.classList.contains('leaving')) {
-        document.documentElement.classList.replace('leaving', 'arrive')
-      }
-    }
-    window.addEventListener('pageshow', onShow)
-    return () => window.removeEventListener('pageshow', onShow)
-  }, [])
 
   // Toggle shows the OTHER language's name and links to its URL.
   const toggleLabel = isJa ? 'English' : '日本語'
