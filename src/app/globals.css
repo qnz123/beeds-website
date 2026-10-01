@@ -766,9 +766,12 @@ html.leaving .nav::after { opacity: 0; }
   left: 12px;
   right: 8px;
   text-align: left;
-  font-size: 9px;
+  /* 12px, the site's small-capital size (nav, eyebrows), up from 9 (his ask, 2026-10-01); a long
+     name like Market Expansion takes two lines from the tab's foot */
+  font-size: 12px;
+  line-height: 1.25;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: 1.2px;
   color: rgba(255, 255, 255, 0.92);
 }
 
@@ -788,6 +791,17 @@ html.leaving .nav::after { opacity: 0; }
 @media (max-width: 760px) {
   .svct-tab {
     width: clamp(96px, 21vw, 130px);
+  }
+  .svct-cat {
+    left: 8px;
+    bottom: 8px;
+    font-size: 11px;
+    letter-spacing: 0.8px;
+  }
+  /* the Japanese names are whole phrases: a step smaller, so they stay clear of the tab's number */
+  .svct-cat:lang(ja) {
+    font-size: 10px;
+    letter-spacing: 0.3px;
   }
 }
 
