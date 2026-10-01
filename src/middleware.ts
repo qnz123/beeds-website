@@ -26,14 +26,14 @@ const SUPPORTED = ['en', 'ja'] as const
 // this one is always written with an expiry, so it can never get stuck the same way.
 const INTRO_SEEN = 'beeds_intro'
 const INTRO_SEEN_LEGACY = 'beeds_in'
-// Half an hour, renewed on every homepage load, so it lasts as long as the visit does. It carries
-// ENTER THE ROOM through to the homepage in a browser that sends no referer, and — his report,
+// One minute, renewed on every homepage load (his call, 2026-10-01: the water should come back
+// soon). It carries ENTER THE ROOM through to the homepage in a browser that sends no referer, and — his report,
 // 2026-10-01 — it also carries a refresh: on a phone, pulling the page down to reload sends no
 // referer either, and Safari sends nothing that tells a reload apart from a fresh arrival, so a
-// short guard made every refresh start at the water and then at the top of the page. Long enough
-// that a refresh mid-visit stays where it was, short enough that coming back to the address later
-// is the water again, which is the point of it.
-const INTRO_GUARD_S = 60 * 30
+// ten-second guard made every refresh start at the water and then at the top of the page. At a
+// minute, a refresh soon after arriving stays where it was; later into a read, the water comes
+// back, which is what he wants the address to do.
+const INTRO_GUARD_S = 60
 const NOT_A_VISITOR = /bot|crawl|spider|slurp|preview|facebookexternalhit|embedly|whatsapp|telegram|discord|lighthouse|pagespeed|headless/i
 
 function resolveLocale(req: NextRequest): string {
