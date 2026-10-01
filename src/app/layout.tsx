@@ -70,12 +70,14 @@ export default function RootLayout({
             own — Chrome still restores on a reload — so the top is held
             briefly and given up the moment the visitor scrolls themselves.
             Only reloads of the two home routes, and never when the URL
-            carries a #work or #contact target. Inline and in the head so it
+            carries a #work or #contact target. Not on phones: there a
+            refresh keeps the visitor on the section they were reading
+            (his ask, 2026-10-01), as every other page already does. Inline and in the head so it
             runs before the browser has a chance to restore. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{var p=location.pathname;if((p==='/'||p==='/ja'||p==='/ja/')&&!location.hash){var n=performance.getEntriesByType('navigation')[0];if(n&&n.type==='reload'){if('scrollRestoration' in history){history.scrollRestoration='manual'}var go=true,t0=Date.now(),off=function(){go=false};addEventListener('wheel',off,{passive:true,once:true});addEventListener('touchstart',off,{passive:true,once:true});addEventListener('keydown',off,{once:true});(function tick(){if(!go||Date.now()-t0>1500)return;if(window.scrollY){window.scrollTo({top:0,left:0,behavior:'instant'})}requestAnimationFrame(tick)})()}}}catch(e){}",
+              "try{var p=location.pathname;if((p==='/'||p==='/ja'||p==='/ja/')&&!location.hash&&!matchMedia('(max-width: 767px)').matches){var n=performance.getEntriesByType('navigation')[0];if(n&&n.type==='reload'){if('scrollRestoration' in history){history.scrollRestoration='manual'}var go=true,t0=Date.now(),off=function(){go=false};addEventListener('wheel',off,{passive:true,once:true});addEventListener('touchstart',off,{passive:true,once:true});addEventListener('keydown',off,{once:true});(function tick(){if(!go||Date.now()-t0>1500)return;if(window.scrollY){window.scrollTo({top:0,left:0,behavior:'instant'})}requestAnimationFrame(tick)})()}}}catch(e){}",
           }}
         />
         {/* Arriving from /watermark/: that page leaves a note in this tab's
