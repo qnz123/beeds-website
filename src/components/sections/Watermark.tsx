@@ -33,6 +33,9 @@ export default function Watermark({ lang = 'en' }: { lang?: Locale }) {
   // arriving from the site's cassette: the sharp copy holds until the page has faded up and the
   // water has the cassette drawn into it, then sinks (html.arrive in globals.css)
   const [settled, setSettled] = useState(false)
+  // Opening the page fresh (not from the site's cassette): it fades up from the ground once the
+  // water is drawn, rather than the canvas appearing all at once (his ask, 2026-10-01).
+  const [shown, setShown] = useState(false)
   const router = useRouter()
   // The page a button opens has stylesheets this one doesn't load; they are warmed on intent, and
   // on the click at the latest, so the fade isn't left waiting on them (Firefox shows white). Shown
@@ -69,6 +72,10 @@ export default function Watermark({ lang = 'en' }: { lang?: Locale }) {
     })
     water.current = w
     let alive = true
+    // The fade waits on the water, but never on it for long: a slow machine still sees the page.
+    Promise.race([w.ready, new Promise((r) => window.setTimeout(r, 1800))]).then(() => {
+      if (alive) requestAnimationFrame(() => { if (alive) setShown(true) })
+    })
     if (document.documentElement.classList.contains('arrive')) {
       const faded = new Promise((r) => window.setTimeout(r, handoverMs() + 50))
       const giveUp = new Promise((r) => window.setTimeout(r, 2500))   // never leave it up for good
@@ -103,7 +110,7 @@ export default function Watermark({ lang = 'en' }: { lang?: Locale }) {
   // and arrives from the ground.
   /* eslint-disable @next/next/no-html-link-for-pages */
   return (
-    <div className={`wm${leaving ? ' is-leaving' : ''}${settled ? ' is-settled' : ''}`}>
+    <div className={`wm${shown ? ' is-shown' : ''}${leaving ? ' is-leaving' : ''}${settled ? ' is-settled' : ''}`}>
       <main className="wm-stage">
         <h1 className="sr-only">{t.heading}</h1>
         <div ref={waterRef} className="wm-water" role="img" aria-label={t.water} />

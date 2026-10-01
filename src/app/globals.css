@@ -3031,6 +3031,15 @@ textarea.blank:focus {
    middle of this page is the middle of theirs, and the cassette lines up */
 html:has(.wm) { scrollbar-gutter: stable; }
 .wm { position: relative; height: 100vh; height: 100dvh; }
+/* The intro fades up out of the ground when it opens, slowly, so the water
+   arrives rather than appearing (his ask, 2026-10-01). Watermark.tsx adds
+   .is-shown once the water is drawn, or after 1.8s, whichever comes first. */
+.wm { opacity: 0; transition: opacity 1.4s cubic-bezier(0.33, 0, 0.2, 1); }
+.wm.is-shown { opacity: 1; }
+/* Arriving from the site's cassette the ground above it fades instead
+   (html.arrive body::after, at the hand-over's own length), so the page under
+   it is up from the first paint and the trip is not faded twice. */
+html.arrive .wm { opacity: 1; transition: none; }
 .wm a:focus-visible { outline: 2px solid #1685f8; outline-offset: 4px; }
 .wm-stage { position: relative; height: 100%; min-height: 560px; }
 .wm-water { position: absolute; inset: 0; overflow: hidden; }
@@ -3129,4 +3138,5 @@ html.arrive .wm:not(.is-settled) .wm-mark { opacity: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
   .wm-veil, .wm-mark, .wm.is-leaving .wm-mark { transition: none; }
+  .wm { opacity: 1; transition: none; }
 }
