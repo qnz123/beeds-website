@@ -3140,13 +3140,15 @@ html.arrive .wm:not(.is-settled) .wm-mark { opacity: 1; }
   .wm-mark { top: 19px; left: calc(50% - 18px); width: 36px; height: 26px; transition-duration: 0.2s; }
   .wm-veil { transition-duration: 0.35s; }
   .wm-stage { min-height: min(620px, 100%); }
-  .wm-bottom { flex-direction: column; align-items: flex-start; padding: 24px 16px calc(28px + env(safe-area-inset-bottom, 0px)); }
+  /* a deeper foot on a phone: an in-app browser can hold the page a little
+     past the screen, and this keeps the second button clear of the edge */
+  .wm-bottom { flex-direction: column; align-items: flex-start; padding: 24px 16px calc(44px + env(safe-area-inset-bottom, 0px)); }
   .wm-pitch { font-size: 15px; }
 }
 /* A short window — an in-app browser, or a phone held in landscape: the block
    at the foot closes up so all of it stays on the screen. */
 @media (max-height: 620px) {
-  .wm-bottom { gap: 14px; padding-top: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }
+  .wm-bottom { gap: 14px; padding-top: 20px; padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); }
   .wm-pitch { font-size: 14px; line-height: 1.4; }
 }
 @media (prefers-reduced-motion: reduce) {
