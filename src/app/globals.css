@@ -191,7 +191,14 @@ h6 {
 html.arrive body::after {
   content: '';
   position: fixed;
-  inset: 0;
+  /* past the bottom edge, not just to it: Safari's floating toolbar (iOS 26)
+     sits over the page below where a fixed layer ends, and the page being
+     left showed through under it (his report, 2026-10-01) */
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(100vh + 160px);
+  height: calc(100lvh + 160px);
   z-index: 49;
   background: #f5f5f5;
   pointer-events: none;
@@ -207,32 +214,18 @@ html.arrive body::after {
 html.leaving body::after {
   content: '';
   position: fixed;
-  inset: 0;
+  /* past the bottom edge, under Safari's toolbar (see html.arrive) */
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(100vh + 160px);
+  height: calc(100lvh + 160px);
   z-index: 49;
   background: #f5f5f5;
   pointer-events: none;
   animation: leave 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 @keyframes leave {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-/* The page's own content fades with the ground, not only behind it. On an
-   iPhone, Safari's floating toolbar shows the page through it, and a fixed
-   layer (the ground above) is cut off where the toolbar begins however tall it
-   is, so the page being left showed through under the toolbar (his report,
-   2026-10-01, checked on his phone). The content itself is what is drawn
-   there, so it is the content that fades. */
-html.leaving main,
-html.leaving footer {
-  opacity: 0;
-  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-}
-html.arrive main,
-html.arrive footer {
-  animation: arrive-content 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.05s backwards;
-}
-@keyframes arrive-content {
   from { opacity: 0; }
   to { opacity: 1; }
 }
@@ -251,15 +244,11 @@ html.leaving .nav::after { opacity: 0; }
   html.arrive body::after { animation-duration: 0.35s; animation-delay: 0s; }
   html.leaving body::after { animation-duration: 0.35s; }
   html.leaving .nav > :not(.nav-mark) { transition-duration: 0.35s; }
-  html.leaving main, html.leaving footer { transition-duration: 0.35s; }
-  html.arrive main, html.arrive footer { animation-duration: 0.35s; animation-delay: 0s; }
 }
 @media (prefers-reduced-motion: reduce) {
   html.arrive body::after { display: none; }
   html.leaving body::after { animation: none; }
   html.leaving .nav > :not(.nav-mark) { transition: none; }
-  html.leaving main, html.leaving footer { transition: none; }
-  html.arrive main, html.arrive footer { animation: none; }
 }
 
 .nav a {
@@ -3149,7 +3138,12 @@ html.arrive .wm:not(.is-settled) .wm-mark { opacity: 1; }
    fades away with the rest). */
 .wm-veil {
   position: fixed;
-  inset: 0;
+  /* past the bottom edge, under Safari's toolbar (see html.arrive) */
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(100vh + 160px);
+  height: calc(100lvh + 160px);
   z-index: 20;
   background: #f5f5f5;
   opacity: 0;
