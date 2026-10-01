@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import DeckAccess from './DeckAccess'
 import StudyLightbox from './StudyLightbox'
 import DeviceToggle from './DeviceToggle'
+import StudyIndex from './StudyIndex'
 import type { ReviewMode } from './ReviewCanvas'
 import type { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
@@ -19,6 +20,11 @@ import { getDictionary } from '@/i18n/dictionaries'
 // The iframe is rendered at a fixed desktop viewport (1280×800) and scaled to
 // the card width, so the window shows a faithful mini-browser of the real page.
 //
+// Phones (767px and below) don't get these cards at all: they get StudyIndex,
+// three rows that pull down to a study the reader scrolls themselves, with
+// nothing auto-playing. Touch tablets (768px and up, coarse pointer) still get
+// the cards below with the portrait mobile embed.
+//
 // Access model: before access the cards are non-interactive teasers and the
 // gated CTA below (DeckAccess) captures a lead. AFTER access is granted, these
 // same cards become clickable — clicking one opens it in the larger scroll-only
@@ -33,9 +39,11 @@ type Study = {
 }
 
 const STUDIES: Study[] = [
-  { slug: 'meridian', name: 'MERIDIAN', accent: '#c9a96a' },
-  { slug: 'aura', name: 'aura', accent: '#e8c4c4' },
-  { slug: 'volt', name: 'VOLT', accent: '#d8ff00' },
+  // Display names (his ask, 2026-10-01). The slugs and the study pages' own brands (MERIDIAN, aura,
+  // VOLT inside the embeds) are unchanged.
+  { slug: 'meridian', name: 'Stainless', accent: '#c9a96a' },
+  { slug: 'aura', name: 'Next Wave', accent: '#e8c4c4' },
+  { slug: 'volt', name: 'Quick Tap', accent: '#d8ff00' },
 ]
 
 const EN_STUDY_COPY = getDictionary('en').explore.studies
@@ -436,6 +444,20 @@ export default function StudyShowcase({ lang = 'en' }: { lang?: Locale }) {
   const t = getDictionary(lang).explore
   const [granted, setGranted] = useState(false)
   const [active, setActive] = useState<string | null>(null)
+  // Phones (767px and below) get the study index instead of the card grid: the
+  // three studies as rows that pull down one at a time, read by the reader's
+  // own scrolling (StudyIndex). Unknown until mounted, so the server renders
+  // both and CSS shows the right one; after that only the matching one stays
+  // mounted, so a phone never builds the cards and the desktop never builds
+  // the index. Crossing the breakpoint swaps them.
+  const [phone, setPhone] = useState<boolean | null>(null)
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)')
+    const sync = () => setPhone(mq.matches)
+    sync()
+    mq.addEventListener('change', sync)
+    return () => mq.removeEventListener('change', sync)
+  }, [])
 
   // Returning visitors who already unlocked get the interactive cards straight
   // away. Both accesses are guarded: with cookies blocked for the site the
@@ -478,19 +500,33 @@ export default function StudyShowcase({ lang = 'en' }: { lang?: Locale }) {
           {t.introAfterLink}
         </p>
 
-        <div className="grid items-start gap-x-8 gap-y-12 md:grid-cols-3">
-          {STUDIES.map((study) => (
-            <StudyCard
-              key={study.slug}
-              study={study}
-              // Fall back to English if a locale is ever missing this study —
-              // a client-component throw here would blank the whole page.
-              copy={t.studies[study.slug] ?? EN_STUDY_COPY[study.slug]}
-              granted={granted}
-              onOpen={setActive}
-            />
-          ))}
-        </div>
+        {phone !== true && (
+          <div className="study-grid grid items-start gap-x-8 gap-y-12 md:grid-cols-3">
+            {STUDIES.map((study) => (
+              <StudyCard
+                key={study.slug}
+                study={study}
+                // Fall back to English if a locale is ever missing this study —
+                // a client-component throw here would blank the whole page.
+                copy={t.studies[study.slug] ?? EN_STUDY_COPY[study.slug]}
+                granted={granted}
+                onOpen={setActive}
+              />
+            ))}
+          </div>
+        )}
+
+        {phone !== false && (
+          <StudyIndex
+            rows={STUDIES.map((study) => ({
+              ...study,
+              copy: t.studies[study.slug] ?? EN_STUDY_COPY[study.slug],
+            }))}
+            lang={lang}
+            granted={granted}
+            onReview={setActive}
+          />
+        )}
 
         {!granted && (
           // Single gated CTA — one-click Google sign-in + email fallback.

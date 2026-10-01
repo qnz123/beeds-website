@@ -2551,6 +2551,68 @@ textarea.blank:focus {
   .study-showcase .container-x { padding-left: 22px; padding-right: 22px; }
 }
 
+/* Explore, first section on phones: the study index (StudyIndex.tsx). The three studies sit
+   as rows on one screen, a still beside the name, tag and descriptor; a tap pulls a row down
+   to the live study, which the reader scrolls themselves. The server renders both the cards
+   and the index and these two rules pick one before hydration; after it, only one mounts. */
+.study-index { display: none; }
+@media (max-width: 767px) {
+  .study-showcase .study-grid { display: none; }
+  .study-index { display: block; border-bottom: 1px solid #000; }
+  /* The deck access CTA after the list: the list's closing hairline is its rule now, so
+     its own top rule and the 64px above it would read as a second, empty row. */
+  .study-index + div { margin-top: 0; border-top: 0; }
+}
+.si-item { border-top: 1px solid #000; }
+.si-heading { margin: 0; font-weight: 400; }
+.si-toggle {
+  display: grid; grid-template-columns: 84px 1fr 14px; gap: 16px; align-items: center;
+  width: 100%; padding: 14px 0; text-align: left;
+  font: inherit; color: inherit; background: none; border: 0; cursor: pointer;
+}
+.si-toggle:focus-visible { outline: 2px solid #000; outline-offset: 2px; }
+/* A faint inner hairline so the pale aura still reads as a frame on the grey ground. */
+.si-thumb { display: block; width: 84px; height: 112px; object-fit: cover; outline: 1px solid rgba(0,0,0,.1); outline-offset: -1px; background: #0d0d0d; }
+.si-text { display: block; min-width: 0; }
+.si-name { display: block; font-size: 20px; line-height: 1; }
+.si-tag { display: block; margin-top: 8px; font-size: 10.5px; letter-spacing: 1.5px; text-transform: uppercase; color: #666; }
+.si-desc { display: block; margin-top: 8px; font-size: 13px; line-height: 1.5; color: #666; word-break: auto-phrase; }
+/* Japanese: the Latin tracking spreads kana into loose letters, and auto-phrase (Chromium)
+   keeps a descriptor's phrases whole where the narrow column has to break them. */
+.si-tag:lang(ja) { letter-spacing: .06em; }
+/* Plus that folds into a minus: the upright stroke turns flat. Transform only. */
+.si-sign { position: relative; width: 14px; height: 14px; align-self: center; }
+.si-sign::before, .si-sign::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; margin-top: -.5px; background: #000; }
+.si-sign::after { transform: rotate(90deg); transition: transform .4s cubic-bezier(0.22, 0.61, 0.36, 1); }
+.si-toggle[aria-expanded="true"] .si-sign::after { transform: rotate(0deg); }
+/* The panel clips its contents, which slide down out from under the header (see StudyIndex). */
+.si-panel { overflow: hidden; }
+.si-inner { padding-bottom: 6px; }
+/* The study window: the phone's 9:16 at full width, but never taller than the screen can hold
+   with the row header above it and the Close row below it (nav 64 + header 140 + actions 56 +
+   air), so a stretch of page is always there to swipe and the way out is always in sight. */
+.si-window {
+  position: relative; width: 100%; aspect-ratio: 9 / 16; max-height: calc(100svh - 290px);
+  overflow: hidden; background: #0d0d0d;
+}
+.si-window iframe { position: absolute; top: 0; left: 0; border: 0; transform-origin: top left; opacity: 0; transition: opacity .3s; }
+.si-window iframe.is-loaded { opacity: 1; }
+.si-poster { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: #f2f2f2; }
+.si-poster span { font-size: 30px; letter-spacing: .025em; }
+.si-poster i { display: block; width: 56px; height: 4px; }
+.si-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0 8px; }
+.si-hint { font-size: 10.5px; letter-spacing: 1.5px; text-transform: uppercase; color: #666; }
+.si-buttons { display: flex; gap: 8px; flex-shrink: 0; }
+.si-btn {
+  padding: 10px 14px; border: 1px solid #000; background: transparent; color: #000;
+  font: inherit; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
+}
+.si-btn:hover, .si-btn:focus-visible { background: #000; color: #f5f5f5; }
+.si-btn:focus-visible { outline: 2px solid #000; outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  .si-sign::after, .si-window iframe { transition: none; }
+}
+
 /* ---- Explore — Showcase (three fictional-brand studies in a sticky stage) ----
    Ported 2026-09-16 from Studio_Landing/showcase.css (Performance scene approved
    by the client that day). Everything is scoped under .sc-showcase; the scene
