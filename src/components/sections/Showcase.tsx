@@ -31,6 +31,11 @@ const TR = [
 ]
 const GROUND = ['#eeeeee', '#efe9df', '#f1eee8'] // light grey · cream · bone
 
+// Played through once this page load (his ask, 2026-10-02): from then on the stage rests on its last
+// scene and scrolling back up no longer rewinds it, like the homepage's CRAFT. Module-level, so a
+// return to the page within the visit finds it at rest too; a fresh load plays it again.
+let playedThisPageLoad = false
+
   const NOTES_EN = [
     {
       num: '01', industry: 'Shop', title: 'Preparation is the edge',
@@ -124,8 +129,9 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
     // the stage pins and the page carries the visitor through Shop, Booking and Service. It
     // used to freeze below 1000px and let the study buttons pick a still frame; only a
     // reduced-motion preference stills it now.
-    let paused = reduce.matches;
-    let staticChapter = 0;
+    let played = playedThisPageLoad;
+    let paused = reduce.matches || played;
+    let staticChapter = played ? 2 : 0;
     let frame = 0;
     let lastChapter = -1;
     let chapterOffset = 0;
@@ -307,6 +313,7 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
     const RENDER = [renderRun, renderHotel, renderCalm];
     function render() {
       frame = 0;
+      if (!paused && forcedP === null && rawProgress() + chapterOffset >= 1) { finish(); return; }
       const p = progress();
       if (solo !== null) {
         stage.style.background = GROUND[solo];
@@ -347,6 +354,28 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
     }
 
     function schedule() { if (!frame) frame = requestAnimationFrame(render); }
+
+    // The end reached: the stage drops into its still mode on the last study (motion-paused in
+    // globals.css). Its tall scroll track folds to the stage's own height, so on the way back up
+    // the visitor passes one still frame rather than screens of a pinned one; the page is moved
+    // by however far the fold moved the stage, so on screen nothing jumps. Firefox's scroll
+    // anchoring is held off for the moment, or it would move the page a second time.
+    function finish() {
+      playedThisPageLoad = played = true;
+      const html = document.documentElement;
+      const anchor = html.style.overflowAnchor;
+      html.style.overflowAnchor = 'none';
+      const before = stage.getBoundingClientRect().top;
+      paused = true;
+      staticChapter = 2;
+      chapterOffset = 0;
+      lastChapter = -1;
+      root.classList.add('motion-paused');
+      const moved = stage.getBoundingClientRect().top - before;
+      if (Math.abs(moved) > 0.5) window.scrollBy({ top: moved, left: 0, behavior: 'instant' as ScrollBehavior });
+      requestAnimationFrame(() => requestAnimationFrame(() => { html.style.overflowAnchor = anchor }));
+      schedule();
+    }
 
     // ---- navigation ----
     function goChapter(i: number) {
@@ -467,7 +496,7 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
       root.classList.toggle('motion-paused', paused);
       schedule();
     }
-    const onReduce = () => { paused = reduce.matches; updateMotion(); };
+    const onReduce = () => { paused = reduce.matches || played; updateMotion(); };
     const onResize = () => { navHeight(); schedule(); };
     const onScroll = () => { schedule(); ribbonScroll(); };
     reduce.addEventListener('change', onReduce);
