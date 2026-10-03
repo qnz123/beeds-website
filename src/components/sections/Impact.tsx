@@ -9,7 +9,7 @@ import React, { memo, useEffect, useLayoutEffect, useRef, useState } from 'react
 import type { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 import { whenPassedUnseen } from '@/lib/passedUnseen'
-import { bakeStickers, balanceShades, CRAFT_END, CRAFT_LAND, CRAFT_SVG, playCraft, restCraft } from './craftHeadline'
+import { addCTrail, bakeStickers, balanceShades, CRAFT_END, CRAFT_LAND, CRAFT_SVG, playCraft, restCraft } from './craftHeadline'
 
 // preload: false — first used by the data block ~4,400px down; a preload made every page
 // (via the '/' prefetch) download it and competed with the hero on first paint.
@@ -253,6 +253,7 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
     const svg = wrap?.querySelector('svg')
     if (!wrap || !svg || typeof IntersectionObserver === 'undefined') return
     bakeStickers(svg)
+    addCTrail(svg)
     restCraft(wrap)
     if (reducedMotion()) return
     if (craftPlayedThisPageLoad) {
