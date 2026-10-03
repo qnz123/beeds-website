@@ -114,6 +114,7 @@ export function bakeStickers(svg: SVGSVGElement) {
 // The C's reference shots (his asks, 2026-10-03): eight animals and places, no people, sent round the
 // word on a flat ring behind the lollipop photo and back into the C (see playCraft).
 const C_SHOTS = ['dog', 'ocean', 'fox', 'horse', 'lake', 'cat', 'desert', 'bird']
+const LEAD_CARDS = ['cassette-green', 'cassette-white', 'cassette-black']
 
 /** Adds the reference shots: copies of the lollipop's polaroid (so they share its die-cut border),
  *  each with its own photo, hidden until playCraft moves them. Also a layer under the letters, masked
@@ -149,7 +150,16 @@ export function addCTrail(svg: SVGSVGElement) {
   // 2026-10-03): white paper, with only a faint wash of the photo's colours showing through where the
   // photo is, mirrored as it would be from behind and too soft to make out. The wash is the photo
   // shrunk to 8 x 7 pixels and stretched, not a blur filter, which Safari would redraw every frame.
-  const cards: [SVGGElement, string][] = [[pola, 'lollipop'], ...Array.from(svg.querySelectorAll<SVGGElement>('.c-trail')).map((g) => [g, C_SHOTS[+(g.dataset.i ?? 0)]] as [SVGGElement, string])]
+  // The lead card's photo is one of the three cassette marks, picked afresh on each page load (his ask,
+  // 2026-10-03): it replaces the lollipop shot, framed whole in the photo window on the polaroid's paper.
+  const lead = LEAD_CARDS[Math.floor(Math.random() * LEAD_CARDS.length)]
+  const leadImg = pola.querySelector('image')
+  if (leadImg) {
+    leadImg.setAttribute('href', `/impact/trail/${lead}.webp`)
+    leadImg.setAttribute('x', '8'); leadImg.setAttribute('y', '8'); leadImg.setAttribute('width', '70'); leadImg.setAttribute('height', '64')
+    leadImg.setAttribute('preserveAspectRatio', 'xMidYMid slice')
+  }
+  const cards: [SVGGElement, string][] = [[pola, lead], ...Array.from(svg.querySelectorAll<SVGGElement>('.c-trail')).map((g) => [g, C_SHOTS[+(g.dataset.i ?? 0)]] as [SVGGElement, string])]
   for (const [g, name] of cards) {
     const card = g.firstElementChild
     if (!card || card.querySelector('.c-backface')) continue
@@ -165,7 +175,7 @@ export function addCTrail(svg: SVGSVGElement) {
     card.appendChild(backface)
   }
   for (const n of C_SHOTS) for (const f of [n, `${n}-leak`]) { const im = new Image(); im.src = `/impact/trail/${f}.webp` }
-  { const im = new Image(); im.src = '/impact/trail/lollipop-leak.webp' }
+  for (const f of [lead, `${lead}-leak`]) { const im = new Image(); im.src = `/impact/trail/${f}.webp` }
 }
 
 /** Puts every part in its finished place (also the reduced-motion / no-JS picture). */
