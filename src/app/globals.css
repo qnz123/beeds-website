@@ -707,15 +707,50 @@ html.arrive footer {
 
 .fw-paper {
   position: absolute;
-  /* the field shows as a hairline (half a CSS pixel: one device pixel on a
-     Retina screen) along the top and right of the page (his ask, 2026-10-04),
-     and nowhere else */
-  inset: 0.5px 0.5px -1px -1px;
+  /* a pixel past the plate (which clips it), so no sliver of the field shows */
+  inset: -1px;
   z-index: 0;
   pointer-events: none;
   background: #f2eee4;
   clip-path: inset(0 0 100% 0);
   transition: clip-path 0.6s cubic-bezier(0.65, 0, 0.35, 1) 0.1s;
+}
+
+/* A hairline of the card's colour along the top and right of the page (his
+   ask, 2026-10-04). Drawn as a border, one device pixel thick: an earlier
+   version left a half-pixel sliver of the field uncovered, which Safari and
+   Firefox rounded differently from card to card ("not stable"). It is always
+   there, in the field's own colour, so it only shows once the page is down. */
+.fw-hairline {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  border-top: 1px solid var(--fw-hair);
+  border-right: 1px solid var(--fw-hair);
+}
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx) {
+  .fw-hairline {
+    border-top-width: 0.5px;
+    border-right-width: 0.5px;
+  }
+}
+
+.fw-hairline--gold {
+  --fw-hair: #8b7d0a;
+}
+
+.fw-hairline--navy {
+  --fw-hair: #1d2a41;
+}
+
+.fw-hairline--red {
+  --fw-hair: #a13636;
+}
+
+.fw-hairline--charcoal {
+  --fw-hair: #262626;
 }
 
 /* a little light and a fine grain, so it reads as paper */

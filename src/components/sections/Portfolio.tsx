@@ -386,6 +386,7 @@ function FolioFrame({
       >
         <div className={`fw-field fw-field--${frame.field}`} />
         <div className="fw-paper" aria-hidden="true" />
+        <div className={`fw-hairline fw-hairline--${frame.field}`} aria-hidden="true" />
         <Specimen frame={frame} />
         <div ref={descRef} className="fw-desc" aria-hidden={!open}>
           {text.map((p, i) => (
