@@ -913,9 +913,7 @@ html.arrive footer {
     rgba(255, 255, 255, 0.02);
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.45),
-    inset 0 1px 0 1px rgba(255, 255, 255, 0.35),
-    /* a thin inner shadow along the top, just under the rim */
-    inset 0 9px 10px -8px rgba(0, 0, 0, 0.35);
+    inset 0 1px 0 1px rgba(255, 255, 255, 0.35);
 }
 
 .fw-back-in {
