@@ -660,6 +660,284 @@ html.arrive footer {
   }
 }
 
+/* ---- The Folio — turning plates (client-approved 2026-10-04) ----
+   Clicking a plate turns it over (Portfolio.tsx). Built as a real card:
+   faces pushed out by half the board's thickness, and two edge slabs standing
+   at the sides. Each face is switched off with `visibility` at the half-turn,
+   when it is edge-on; backface-visibility alone let the far face show through,
+   and the switch only lands edge-on because the easing is SYMMETRIC (half the
+   time = half the turn). --fw-dur / --fw-rev must match TURN_MS / REVEAL_MS. */
+.fw-cell {
+  --fw-dur: 1.733s;
+  --fw-rev: 2s;
+  --fw-t: 12px;
+  position: relative;
+  perspective: 1600px;
+}
+
+/* Room for a turning plate to swing out of the strip (at mid-turn its near
+   side looms toward the viewer) without the scroller clipping it; the negative
+   margins keep the layout where it was. */
+.fw-strip {
+  padding-top: 80px;
+  margin-top: -80px;
+  padding-bottom: 80px;
+  margin-bottom: -66px;
+}
+
+.fw-card {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform var(--fw-dur) cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.fw-cell.is-open .fw-card {
+  transform: rotateY(180deg);
+}
+
+.fw-face {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  cursor: pointer;
+}
+
+.fw-face:focus-visible {
+  outline: 2px solid #ccb718;
+  outline-offset: 3px;
+}
+
+.fw-front {
+  position: relative;
+  display: block;
+  transform: translateZ(calc(var(--fw-t) / 2));
+  transition: visibility 0s calc(var(--fw-dur) / 2);
+}
+
+.fw-back {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  color: #fff;
+  visibility: hidden;
+  transform: rotateY(180deg) translateZ(calc(var(--fw-t) / 2));
+  transition: visibility 0s calc(var(--fw-dur) / 2);
+}
+
+.fw-cell.is-open .fw-front {
+  visibility: hidden;
+}
+
+.fw-cell.is-open .fw-back {
+  visibility: visible;
+}
+
+/* the board's edge: the field colour on both skins, a pale core between */
+.fw-edge {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--fw-t) / -2);
+  width: var(--fw-t);
+  transform: rotateY(90deg);
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(0, 0, 0, 0.28)),
+    linear-gradient(90deg, var(--fw-solid) 0 30%, #ece5d3 30% 70%, var(--fw-solid) 70%);
+}
+
+.fw-edge--r {
+  left: calc(100% - var(--fw-t) / 2);
+}
+
+/* the face darkens as it turns away from the light */
+.fw-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: #000;
+  opacity: 0;
+}
+
+.fw-cell.is-turning .fw-shade {
+  animation: fw-shade var(--fw-dur) cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+@keyframes fw-shade {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* The back: the front's artwork mirrored, the long description up top, the
+   front's caption readable at the foot (same place as on the front). */
+.fw-mirror {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  transform: scaleX(-1);
+}
+
+.fw-reveal,
+.fw-haze {
+  position: absolute;
+  inset: 0;
+}
+
+.fw-back-in {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.fw-back-top {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 56px 26px 18px;
+}
+
+.fw-back-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding-right: 4px;
+  font-size: 16px;
+  line-height: 1.55;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
+}
+
+/* the phrases the Services page brushes yellow are set a size up here */
+.fw-lift {
+  font-size: 1.2em;
+  line-height: 1.3;
+}
+
+/* The reveal: the back comes into view under moving water (the filter in
+   Portfolio.tsx), and one ring spreads from the clicked spot (--fw-ox/--fw-oy,
+   mirrored) wiping it clear. It starts with the turn and waits out its first
+   half in the unclear frame (delay + fill both), so no clear frame flashes.
+   The ring radius is a registered property animated between LITERAL values:
+   a var() inside registered-property keyframes makes Firefox jump. */
+@property --fw-r {
+  syntax: '<percentage>';
+  inherits: true;
+  initial-value: 115%;
+}
+
+.fw-haze {
+  filter: url(#fw-water) blur(4px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.fw-ring {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    circle at var(--fw-ox, 50%) var(--fw-oy, 50%),
+    transparent calc(var(--fw-r) + 1%),
+    rgba(255, 255, 255, 0.04) calc(var(--fw-r) + 3%),
+    rgba(255, 255, 255, 0.15) calc(var(--fw-r) + 4%),
+    rgba(255, 255, 255, 0.04) calc(var(--fw-r) + 5%),
+    transparent calc(var(--fw-r) + 8%)
+  );
+}
+
+.fw-cell.is-revealing {
+  animation: fw-ripple var(--fw-rev) cubic-bezier(0.35, 0.3, 0.45, 1) calc(var(--fw-dur) / 2) both;
+}
+
+.fw-cell.is-revealing .fw-haze {
+  opacity: 0.55;
+  -webkit-mask-image: radial-gradient(circle at var(--fw-ox) var(--fw-oy), transparent var(--fw-r), #000 calc(var(--fw-r) + 14%));
+  mask-image: radial-gradient(circle at var(--fw-ox) var(--fw-oy), transparent var(--fw-r), #000 calc(var(--fw-r) + 14%));
+}
+
+.fw-cell.is-revealing .fw-reveal {
+  -webkit-mask-image: radial-gradient(circle at var(--fw-ox) var(--fw-oy), #000 var(--fw-r), transparent calc(var(--fw-r) + 14%));
+  mask-image: radial-gradient(circle at var(--fw-ox) var(--fw-oy), #000 var(--fw-r), transparent calc(var(--fw-r) + 14%));
+}
+
+.fw-cell.is-revealing .fw-ring {
+  animation: fw-ring var(--fw-rev) cubic-bezier(0.35, 0.3, 0.45, 1) calc(var(--fw-dur) / 2) both;
+}
+
+@keyframes fw-ripple {
+  from {
+    --fw-r: 0%;
+  }
+  to {
+    --fw-r: 115%;
+  }
+}
+
+@keyframes fw-ring {
+  0% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.fw-water-defs {
+  position: absolute;
+}
+
+@media (max-width: 760px) {
+  .fw-strip {
+    padding-top: 80px;
+    padding-bottom: 80px;
+  }
+
+  .fw-back-top {
+    padding-top: 34px;
+  }
+
+  .fw-back-body {
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  /* The Japanese descriptions are longer and have no shorter card copy: a size
+     down fits 01–02; 03–04 still scroll a few lines inside the card. */
+  :lang(ja) .fw-back-top {
+    padding-top: 30px;
+  }
+
+  :lang(ja) .fw-back-body {
+    gap: 4px;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fw-card,
+  .fw-front,
+  .fw-back {
+    transition: none;
+  }
+}
+
 /* ---- Services — folio tabs ----
    The section speaks the Featured Work language: the four folio frames as
    SMALL TAB-PLATES (brand field + instrument watermark + specimen numeral +

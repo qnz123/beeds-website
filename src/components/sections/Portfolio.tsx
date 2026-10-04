@@ -16,8 +16,8 @@
 // running; prefers-reduced-motion renders everything static from the start.
 // Styles live in the "Featured Work — The Folio" block of globals.css.
 
-import { useEffect, useRef, useState } from 'react'
-import { getFrames, type FrameDatum } from './folioData'
+import { Fragment, useEffect, useRef, useState, type MutableRefObject } from 'react'
+import { getFrames, HIGHLIGHT_PHRASES, type FrameDatum } from './folioData'
 import type { Locale } from '@/i18n/config'
 import { whenPassedUnseen } from '@/lib/passedUnseen'
 
@@ -203,34 +203,256 @@ function ScrambleWord({ word }: { word: string }) {
   )
 }
 
-function FolioFrame({ frame }: { frame: FrameDatum }) {
+// ---------------------------------------------------------------------------
+// The plate turns over (client-approved 2026-10-04, from the Service Plate
+// Reveals study). Clicking a plate turns it like a thick duplex board: its side
+// shows the field colour with a pale core, and the face darkens as it turns
+// from the light. The back carries the front's artwork mirrored (as if seen
+// through the card), the long description up top, and the front's caption,
+// readable, at the foot. As the back comes into view it lies under moving
+// water, and one ripple spreads from the spot that was clicked and wipes the
+// water away (the BEEDS intro's water). Clicking again turns it back; one
+// plate is open at a time. Styles: "The Folio — turning plates" in globals.css.
+// Timings there and here must agree (TURN_MS = --fw-dur, REVEAL_MS = --fw-rev).
+// ---------------------------------------------------------------------------
+
+const TURN_MS = 1733
+const REVEAL_MS = 2000
+
+type Point = { x: number; y: number }
+
+// The phrases the Services page brushes yellow, set a size up on the card.
+function withLifts(paragraph: string, phrases: string[]) {
+  const hit = phrases.filter((p) => paragraph.includes(p))
+  if (hit.length === 0) return paragraph
+  const pattern = new RegExp(`(${hit.map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`)
+  return paragraph.split(pattern).map((part, i) =>
+    hit.includes(part) ? (
+      <span key={i} className="fw-lift">
+        {part}
+      </span>
+    ) : (
+      <Fragment key={i}>{part}</Fragment>
+    )
+  )
+}
+
+// The water the back lies under: one filter for the strip (one plate turns at
+// a time), its ripples kept moving while the wipe crosses the card.
+let waterRaf = 0
+function stirWater(ms: number) {
+  const map = document.getElementById('fw-water-map')
+  const noise = document.getElementById('fw-water-noise')
+  if (!map || !noise) return
+  cancelAnimationFrame(waterRaf)
+  const t0 = performance.now()
+  const tick = (now: number) => {
+    const t = Math.min(1, (now - t0) / ms)
+    const s = (now - t0) / 1000
+    map.setAttribute('scale', (40 - 12 * t).toFixed(2))
+    noise.setAttribute(
+      'baseFrequency',
+      `${(0.012 + 0.005 * Math.sin(s * 5)).toFixed(4)} ${(0.03 + 0.01 * Math.cos(s * 4)).toFixed(4)}`
+    )
+    if (t < 1) waterRaf = requestAnimationFrame(tick)
+    else map.setAttribute('scale', '0')
+  }
+  waterRaf = requestAnimationFrame(tick)
+}
+
+function Specimen({ frame }: { frame: FrameDatum }) {
   return (
-    <div className="fw-cell">
-      <div className="fw-plate">
-        <div className={`fw-field fw-field--${frame.field}`} />
-        <span className="fw-word" aria-hidden="true">
-          {frame.word}
-        </span>
-        <span className="fw-mark" style={frame.markStyle}>
-          {frame.mark}
-        </span>
-        <span className="fw-num" aria-hidden="true">
-          {frame.num}
-        </span>
-        <div className="fw-meta">
-          <div className="fw-rule">
-            <div className="fw-cat">{frame.category}</div>
-            <h3>{frame.title}</h3>
-            <p>{frame.blurb}</p>
+    <>
+      <span className="fw-word" aria-hidden="true">
+        {frame.word}
+      </span>
+      <span className="fw-mark" style={frame.markStyle}>
+        {frame.mark}
+      </span>
+      <span className="fw-num" aria-hidden="true">
+        {frame.num}
+      </span>
+    </>
+  )
+}
+
+function Caption({ frame }: { frame: FrameDatum }) {
+  return (
+    <div className="fw-meta">
+      <div className="fw-rule">
+        <div className="fw-cat">{frame.category}</div>
+        <h3>{frame.title}</h3>
+        <p>{frame.blurb}</p>
+      </div>
+    </div>
+  )
+}
+
+// The back's contents: the front's artwork mirrored, the description, the caption.
+function BackFace({ frame, phrases }: { frame: FrameDatum; phrases: string[] }) {
+  const text = frame.card ?? frame.about ?? [frame.blurb]
+  return (
+    <>
+      <div className="fw-mirror" aria-hidden="true">
+        <Specimen frame={frame} />
+      </div>
+      <div className="fw-back-in">
+        <div className="fw-back-top">
+          <div className="fw-back-body">
+            {text.map((p, i) => (
+              <p key={i}>{withLifts(p, phrases)}</p>
+            ))}
           </div>
+        </div>
+        <Caption frame={frame} />
+      </div>
+    </>
+  )
+}
+
+function FolioFrame({
+  frame,
+  phrases,
+  open,
+  onToggle,
+  lastPoint,
+}: {
+  frame: FrameDatum
+  phrases: string[]
+  open: boolean
+  onToggle: () => void
+  lastPoint: MutableRefObject<Point | null>
+}) {
+  const cellRef = useRef<HTMLDivElement>(null)
+  const frontRef = useRef<HTMLDivElement>(null)
+  const backRef = useRef<HTMLDivElement>(null)
+  const mounted = useRef(false)
+
+  useEffect(() => {
+    const cell = cellRef.current
+    if (!cell) return
+    if (!mounted.current) {
+      mounted.current = true
+      return
+    }
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    // Focus follows the card only for a keyboard turn (no point recorded): a
+    // pointer turn would otherwise light the focus ring on the card.
+    const byKeyboard = lastPoint.current === null
+    let flipTimer = 0
+    let focusTimer = 0
+    if (!reduce) {
+      // the turn's shading plays on every turn, either way
+      cell.classList.remove('is-turning')
+      void cell.offsetWidth
+      cell.classList.add('is-turning')
+      flipTimer = window.setTimeout(() => cell.classList.remove('is-turning'), TURN_MS + 50)
+    }
+    if (open) {
+      // The ripple starts where the plate was clicked; the back is the front
+      // seen from behind, so that spot is mirrored left to right.
+      const card = cell.getBoundingClientRect()
+      const pt = lastPoint.current
+      let x = 0.5
+      let y = 0.5
+      if (pt && pt.x >= card.left && pt.x <= card.right && pt.y >= card.top && pt.y <= card.bottom) {
+        x = (pt.x - card.left) / card.width
+        y = (pt.y - card.top) / card.height
+      }
+      cell.style.setProperty('--fw-ox', `${(1 - x) * 100}%`)
+      cell.style.setProperty('--fw-oy', `${y * 100}%`)
+      if (!reduce) {
+        // The reveal starts now and waits out the first half of the turn in its
+        // unclear first frame (animation-delay), so no clear frame can flash.
+        cell.classList.remove('is-revealing')
+        void cell.offsetWidth
+        cell.classList.add('is-revealing')
+        stirWater(TURN_MS / 2 + REVEAL_MS)
+      }
+      if (byKeyboard)
+        focusTimer = window.setTimeout(() => backRef.current?.focus({ preventScroll: true }), reduce ? 0 : TURN_MS / 2 + 50)
+    } else {
+      cell.classList.remove('is-revealing')
+      if (byKeyboard)
+        focusTimer = window.setTimeout(() => frontRef.current?.focus({ preventScroll: true }), reduce ? 0 : TURN_MS / 2 + 50)
+    }
+    return () => {
+      clearTimeout(flipTimer)
+      clearTimeout(focusTimer)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
+
+  const onKey = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      lastPoint.current = null
+      onToggle()
+    }
+  }
+
+  return (
+    <div
+      ref={cellRef}
+      className={`fw-cell${open ? ' is-open' : ''}`}
+      style={{ ['--fw-solid' as string]: FIELD_SOLID[frame.field] }}
+    >
+      <div className="fw-card">
+        <span className="fw-edge" aria-hidden="true" />
+        <span className="fw-edge fw-edge--r" aria-hidden="true" />
+        <div
+          ref={frontRef}
+          className="fw-face fw-front"
+          role="button"
+          tabIndex={open ? -1 : 0}
+          aria-expanded={open}
+          aria-hidden={open}
+          onClick={onToggle}
+          onKeyDown={onKey}
+        >
+          <div className="fw-plate">
+            <div className={`fw-field fw-field--${frame.field}`} />
+            <Specimen frame={frame} />
+            <Caption frame={frame} />
+          </div>
+          <span className="fw-shade" aria-hidden="true" />
+        </div>
+        <div
+          ref={backRef}
+          className={`fw-face fw-back fw-field--${frame.field}`}
+          role="button"
+          tabIndex={open ? 0 : -1}
+          aria-hidden={!open}
+          onClick={onToggle}
+          onKeyDown={onKey}
+        >
+          <div className="fw-haze" aria-hidden="true">
+            <BackFace frame={frame} phrases={phrases} />
+          </div>
+          <div className="fw-reveal">
+            <BackFace frame={frame} phrases={phrases} />
+          </div>
+          <span className="fw-ring" aria-hidden="true" />
+          <span className="fw-shade" aria-hidden="true" />
         </div>
       </div>
     </div>
   )
 }
 
+// The deep end of each field's gradient: the colour of the board's skins on its edge.
+const FIELD_SOLID: Record<FrameDatum['field'], string> = {
+  gold: '#8b7d0a',
+  navy: '#1d2a41',
+  red: '#a13636',
+  charcoal: '#262626',
+}
+
 export default function Portfolio({ lang = 'en' as Locale }: { lang?: Locale }) {
   const frames = getFrames(lang)
+  const phrases = HIGHLIGHT_PHRASES[lang] ?? []
+  const [openIndex, setOpenIndex] = useState<number | null>(null)
+  const lastPoint = useRef<Point | null>(null)
   const sectionRef = useRef<HTMLElement>(null)
   const { ref: folioRef, dataAnimate, still } = useInView<HTMLDivElement>(0.15)
 
@@ -330,11 +552,28 @@ export default function Portfolio({ lang = 'en' as Locale }: { lang?: Locale }) 
           tabIndex={0}
           role="region"
           aria-label="Featured work — four frames, scrolls horizontally"
+          onPointerDown={(e) => {
+            lastPoint.current = { x: e.clientX, y: e.clientY }
+          }}
         >
-          {frames.map((frame) => (
-            <FolioFrame key={frame.title} frame={frame} />
+          {frames.map((frame, i) => (
+            <FolioFrame
+              key={frame.title}
+              frame={frame}
+              phrases={phrases}
+              open={openIndex === i}
+              onToggle={() => setOpenIndex((cur) => (cur === i ? null : i))}
+              lastPoint={lastPoint}
+            />
           ))}
         </div>
+        {/* The water on the back of a turning plate (see stirWater). */}
+        <svg width="0" height="0" className="fw-water-defs" aria-hidden="true" focusable="false">
+          <filter id="fw-water" x="-5%" y="-5%" width="110%" height="110%">
+            <feTurbulence id="fw-water-noise" type="fractalNoise" baseFrequency="0.012 0.03" numOctaves={2} seed={7} result="n" />
+            <feDisplacementMap id="fw-water-map" in="SourceGraphic" in2="n" scale="0" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+        </svg>
       </div>
     </section>
   )

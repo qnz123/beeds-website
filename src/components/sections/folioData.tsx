@@ -15,6 +15,9 @@ export type FrameDatum = {
   /** Optional long-form description for the /about Services tab panel
    *  (paragraphs). The homepage plate always uses the short `blurb`. */
   about?: string[]
+  /** Optional shorter description for the back of the homepage card, where
+   *  the full `about` runs too long (falls back to `about`). */
+  card?: string[]
   field: 'gold' | 'navy' | 'red' | 'charcoal'
   mark: ReactNode
   /** Per-frame offset of the oversized instrument, from the approved plates. */
@@ -128,6 +131,9 @@ export const frames: FrameDatum[] = [
     about: [
       "Have an idea but not sure how to bring it to life? We help turn it into something people can see, experience, and connect with. From the first conversation to the final launch, we create commercials, APPS, films, AI-powered content, digital platforms, and e-commerce websites\u2014all with the right team for the job. Whether it's telling your story or building the platform behind it, we make sure everything works together from start to finish.",
     ],
+    card: [
+      'Have an idea but not sure how to bring it to life? From the first conversation to the final launch, we create commercials, APPS, films, AI-powered content, digital platforms, and e-commerce websites\u2014all with the right team, working together from start to finish.',
+    ],
     field: 'red',
     mark: apertureMark,
     markStyle: { top: '12%' },
@@ -142,6 +148,9 @@ export const frames: FrameDatum[] = [
       "Breaking into a new market isn't easy\u2014we've been there. Whether you're expanding into APAC or the U.S., we help you navigate the challenges, avoid common mistakes, and figure out what works for the local market.",
       'From strategy and partnerships to brand localization and launch, we work alongside your team to make the process smoother, faster, and more effective\u2014so you can focus on growing your business.',
     ],
+    card: [
+      "Breaking into a new market isn't easy\u2014we've been there. Whether you're expanding into APAC or the U.S., we help you navigate the challenges and find what works locally, from strategy and partnerships to launch, so you can focus on growing your business.",
+    ],
     field: 'charcoal',
     mark: globeMark,
     markStyle: { left: '-10%', top: '12%' },
@@ -151,7 +160,7 @@ export const frames: FrameDatum[] = [
 // Japanese copy per frame (client-supplied). Only the text differs; the marks,
 // fields, numerals and specimen words are shared. `category` is the small
 // eyebrow/tab label, `title` the heading, `blurb`/`about` the description.
-type FrameText = Pick<FrameDatum, 'category' | 'title' | 'blurb' | 'about'>
+type FrameText = Pick<FrameDatum, 'category' | 'title' | 'blurb' | 'about' | 'card'>
 
 const jaFrameText: FrameText[] = [
   {
@@ -207,5 +216,22 @@ const jaFrameText: FrameText[] = [
 // visual data. English is the base; `ja` overlays the client-supplied copy.
 export function getFrames(locale: Locale = 'en'): FrameDatum[] {
   if (locale !== 'ja') return frames
-  return frames.map((f, i) => ({ ...f, ...jaFrameText[i] }))
+  return frames.map((f, i) => ({ ...f, card: undefined, ...jaFrameText[i] }))
+}
+
+// Phrases that stand out inside the long service copy, per locale: the /about
+// Services panel gives them the yellow brush, the back of the homepage card
+// sets them a size up. Each must be an exact substring of its paragraph (and,
+// for the card, of `card` where a frame has one). The Japanese phrases mirror
+// the English ones in meaning: the "practical skills" payoff (AI) and the
+// deliverables list (Production).
+export const HIGHLIGHT_PHRASES: Record<Locale, string[]> = {
+  en: [
+    'walk away with practical skills',
+    'commercials, APPS, films, AI-powered content, digital platforms, and e-commerce websites',
+  ],
+  ja: [
+    '仕事に活かせる実践力',
+    '映像制作、アプリケーション開発、AIコンテンツ、デジタルプラットフォーム、ECサイト構築',
+  ],
 }
