@@ -280,9 +280,12 @@ function BackFace({ frame, phrases }: { frame: FrameDatum; phrases: string[] }) 
   const text = frame.card ?? frame.about ?? [frame.blurb]
   return (
     <>
+      {/* a pane of glass: the field's colour let through, the front seen through it blurred and mirrored, a frosted surface */}
+      <div className={`fw-glass-tint fw-field--${frame.field}`} aria-hidden="true" />
       <div className="fw-mirror" aria-hidden="true">
         <Specimen frame={frame} />
       </div>
+      <div className="fw-glass" aria-hidden="true" />
       <div className="fw-back-in">
         <div className="fw-back-top">
           <div className="fw-back-body">
@@ -385,7 +388,7 @@ function FolioFrame({
         </div>
         <div
           ref={backRef}
-          className={`fw-face fw-back fw-field--${frame.field}`}
+          className="fw-face fw-back"
           role="button"
           tabIndex={open ? 0 : -1}
           aria-hidden={!open}
