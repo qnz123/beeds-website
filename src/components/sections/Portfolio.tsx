@@ -205,19 +205,17 @@ function ScrambleWord({ word }: { word: string }) {
 
 // ---------------------------------------------------------------------------
 // The plate turns over (client-approved 2026-10-04, from the Service Plate
-// Reveals study). Clicking a plate turns it like a thick duplex board: its side
-// shows the field colour with a pale core, and the face darkens as it turns
-// from the light. The back carries the front's artwork mirrored (as if seen
-// through the card), the long description up top, and the front's caption,
-// readable, at the foot. As the back comes into view it lies under moving
-// water, and one ripple spreads from the spot that was clicked and wipes the
-// water away (the BEEDS intro's water). Clicking again turns it back; one
-// plate is open at a time. Styles: "The Folio — turning plates" in globals.css.
-// Timings there and here must agree (TURN_MS = --fw-dur, REVEAL_MS = --fw-rev).
+// Reveals study). Clicking a plate turns it, slowly, like a thick duplex board:
+// its side shows the field colour with a pale core, and the face darkens as it
+// turns from the light. The back carries the front's artwork mirrored (as if
+// seen through the card), the long description up top, and the front's
+// caption, readable, at the foot. Clicking again turns it back; one plate is
+// open at a time. (A water-and-ripple reveal on the back was tried and removed
+// at his ask.) Styles: "The Folio — turning plates" in globals.css; TURN_MS
+// must match --fw-dur there.
 // ---------------------------------------------------------------------------
 
 const TURN_MS = 1733
-const REVEAL_MS = 2000
 
 type Point = { x: number; y: number }
 
@@ -235,50 +233,6 @@ function withLifts(paragraph: string, phrases: string[]) {
       <Fragment key={i}>{part}</Fragment>
     )
   )
-}
-
-// The ripple, driven here rather than by a CSS animation of a registered
-// property: Safari did not pass such an animated value on to the layers inside
-// the card, so the ripple never showed there. Each frame sets the radius on the
-// three layers that draw it (the clear card, the water outside it, the ring).
-// The water itself is a FIXED filter (drawn once and reused): changing its
-// settings every frame made Firefox, which draws it on the CPU, lag.
-const easeOut = (t: number) => 1 - Math.pow(1 - t, 2.2)
-
-function runRipple(cell: HTMLElement, delay: number, ms: number) {
-  const layers = ['.fw-reveal', '.fw-haze', '.fw-ring']
-    .map((sel) => cell.querySelector<HTMLElement>(sel))
-    .filter((el): el is HTMLElement => el !== null)
-  const ring = cell.querySelector<HTMLElement>('.fw-ring')
-  const set = (r: number, ringOpacity: number) => {
-    for (const el of layers) el.style.setProperty('--fw-r', `${r.toFixed(2)}%`)
-    ring?.style.setProperty('opacity', ringOpacity.toFixed(3))
-  }
-  const clear = () => {
-    for (const el of layers) el.style.removeProperty('--fw-r')
-    ring?.style.removeProperty('opacity')
-    cell.classList.remove('is-revealing')
-  }
-  set(0, 0)
-  cell.classList.add('is-revealing')
-  let raf = 0
-  let t0 = 0
-  const timer = window.setTimeout(() => {
-    const tick = (now: number) => {
-      if (!t0) t0 = now
-      const t = Math.min(1, (now - t0) / ms)
-      const ringOpacity = t < 0.75 ? 1 - 0.4 * (t / 0.75) : 0.6 * (1 - (t - 0.75) / 0.25)
-      set(115 * easeOut(t), ringOpacity)
-      if (t < 1) raf = requestAnimationFrame(tick)
-      else clear()
-    }
-    raf = requestAnimationFrame(tick)
-  }, delay)
-  return () => {
-    clearTimeout(timer)
-    cancelAnimationFrame(raf)
-    clear()
-  }
 }
 
 function Specimen({ frame }: { frame: FrameDatum }) {
@@ -362,7 +316,6 @@ function FolioFrame({
     const byKeyboard = lastPoint.current === null
     let flipTimer = 0
     let focusTimer = 0
-    let stopRipple: (() => void) | null = null
     if (!reduce) {
       // the turn's shading plays on every turn, either way
       cell.classList.remove('is-turning')
@@ -371,21 +324,6 @@ function FolioFrame({
       flipTimer = window.setTimeout(() => cell.classList.remove('is-turning'), TURN_MS + 50)
     }
     if (open) {
-      // The ripple starts where the plate was clicked; the back is the front
-      // seen from behind, so that spot is mirrored left to right.
-      const card = cell.getBoundingClientRect()
-      const pt = lastPoint.current
-      let x = 0.5
-      let y = 0.5
-      if (pt && pt.x >= card.left && pt.x <= card.right && pt.y >= card.top && pt.y <= card.bottom) {
-        x = (pt.x - card.left) / card.width
-        y = (pt.y - card.top) / card.height
-      }
-      cell.style.setProperty('--fw-ox', `${(1 - x) * 100}%`)
-      cell.style.setProperty('--fw-oy', `${y * 100}%`)
-      // The back is under water from the start of the turn, so no clear frame
-      // can flash as it comes into view; the ripple starts at the half-turn.
-      if (!reduce) stopRipple = runRipple(cell, TURN_MS / 2, REVEAL_MS)
       if (byKeyboard)
         focusTimer = window.setTimeout(() => backRef.current?.focus({ preventScroll: true }), reduce ? 0 : TURN_MS / 2 + 50)
     } else {
@@ -395,7 +333,6 @@ function FolioFrame({
     return () => {
       clearTimeout(flipTimer)
       clearTimeout(focusTimer)
-      stopRipple?.()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
@@ -443,15 +380,7 @@ function FolioFrame({
           onClick={onToggle}
           onKeyDown={onKey}
         >
-          <div className="fw-haze" aria-hidden="true">
-            <div className="fw-haze-in">
-              <BackFace frame={frame} phrases={phrases} />
-            </div>
-          </div>
-          <div className="fw-reveal">
-            <BackFace frame={frame} phrases={phrases} />
-          </div>
-          <span className="fw-ring" aria-hidden="true" />
+          <BackFace frame={frame} phrases={phrases} />
           <span className="fw-shade" aria-hidden="true" />
         </div>
       </div>
@@ -586,13 +515,6 @@ export default function Portfolio({ lang = 'en' as Locale }: { lang?: Locale }) 
             />
           ))}
         </div>
-        {/* The water on the back of a turning plate (fixed: see runRipple). */}
-        <svg width="0" height="0" className="fw-water-defs" aria-hidden="true" focusable="false">
-          <filter id="fw-water" x="-5%" y="-5%" width="110%" height="110%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.012 0.03" numOctaves={2} seed={7} result="n" />
-            <feDisplacementMap in="SourceGraphic" in2="n" scale="34" xChannelSelector="R" yChannelSelector="G" />
-          </filter>
-        </svg>
       </div>
     </section>
   )
