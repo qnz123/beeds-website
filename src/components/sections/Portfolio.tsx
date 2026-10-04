@@ -16,7 +16,7 @@
 // running; prefers-reduced-motion renders everything static from the start.
 // Styles live in the "Featured Work — The Folio" block of globals.css.
 
-import { Fragment, useEffect, useRef, useState, type MutableRefObject } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { getFrames, HIGHLIGHT_PHRASES, type FrameDatum } from './folioData'
 import type { Locale } from '@/i18n/config'
 import { whenPassedUnseen } from '@/lib/passedUnseen'
@@ -204,35 +204,65 @@ function ScrambleWord({ word }: { word: string }) {
 }
 
 // ---------------------------------------------------------------------------
-// The plate turns over (client-approved 2026-10-04, from the Service Plate
-// Reveals study). Clicking a plate turns it, slowly, like a thick duplex board:
-// its side shows the field colour with a pale core, and the face darkens as it
-// turns from the light. The back carries the front's artwork mirrored (as if
-// seen through the card), the long description up top, and the front's
-// caption, readable, at the foot. Clicking again turns it back; one plate is
-// open at a time. (A water-and-ripple reveal on the back was tried and removed
-// at his ask.) Styles: "The Folio — turning plates" in globals.css; TURN_MS
-// must match --fw-dur there.
+// The plate writes its description: "Ink on paper" (client-approved
+// 2026-10-04, from the Service Plate Writing study; it replaced the turning
+// plate). Clicking a plate turns its coloured field into an ivory page with
+// the artwork pressed faintly into it, and the description writes on, letter
+// by letter, in ink; the caption turns to ink too and
+// the book fills solid. The ink is black on every plate (his ask). Clicking
+// again clears it; one plate is open at a time.
+// Styles: "The Folio — ink on paper" in globals.css.
 // ---------------------------------------------------------------------------
 
-const TURN_MS = 1733
+const SETTLE_MS = 350 // the page settles before the writing starts
+const WRITE_MS = 1700
 
-type Point = { x: number; y: number }
-
-// The phrases the Services page brushes yellow, set a size up on the card.
-function withLifts(paragraph: string, phrases: string[]) {
+// The description as letters. In spaced scripts words are kept whole so lines
+// wrap as normal text; Japanese wraps between any letters. The phrases the
+// Services page brushes yellow are set a size up.
+const CJK = /[　-鿿＀-￯]/
+function Letters({ paragraph, phrases }: { paragraph: string; phrases: string[] }) {
   const hit = phrases.filter((p) => paragraph.includes(p))
-  if (hit.length === 0) return paragraph
-  const pattern = new RegExp(`(${hit.map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`)
-  return paragraph.split(pattern).map((part, i) =>
-    hit.includes(part) ? (
-      <span key={i} className="fw-lift">
-        {part}
-      </span>
-    ) : (
-      <Fragment key={i}>{part}</Fragment>
-    )
-  )
+  const segs: { text: string; lift: boolean }[] = []
+  if (hit.length) {
+    const pattern = new RegExp(`(${hit.map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`)
+    for (const part of paragraph.split(pattern)) if (part) segs.push({ text: part, lift: hit.includes(part) })
+  } else segs.push({ text: paragraph, lift: false })
+  const out: React.ReactNode[] = []
+  let k = 0
+  for (const seg of segs) {
+    const cls = seg.lift ? 'fw-l fw-lift' : 'fw-l'
+    if (CJK.test(seg.text)) {
+      for (const ch of Array.from(seg.text))
+        out.push(
+          <span key={k++} className={cls}>
+            {ch}
+          </span>
+        )
+      continue
+    }
+    for (const tok of seg.text.split(/(\s+)/)) {
+      if (!tok) continue
+      if (/^\s+$/.test(tok)) {
+        out.push(
+          <span key={k++} className="fw-l">
+            {' '}
+          </span>
+        )
+        continue
+      }
+      out.push(
+        <span key={k++} className="fw-w">
+          {Array.from(tok).map((ch, i) => (
+            <span key={i} className={cls}>
+              {ch}
+            </span>
+          ))}
+        </span>
+      )
+    }
+  }
+  return <>{out}</>
 }
 
 function Specimen({ frame }: { frame: FrameDatum }) {
@@ -275,147 +305,105 @@ function Caption({ frame, cue = false }: { frame: FrameDatum; cue?: boolean }) {
   )
 }
 
-// The back's contents: the front's artwork mirrored, the description, the caption.
-function BackFace({ frame, phrases }: { frame: FrameDatum; phrases: string[] }) {
-  const text = frame.card ?? frame.about ?? [frame.blurb]
-  return (
-    <>
-      {/* a pane of glass: the field's colour let through, the front seen through it blurred and mirrored, a frosted surface */}
-      <div className={`fw-glass-tint fw-field--${frame.field}`} aria-hidden="true" />
-      <div className="fw-mirror" aria-hidden="true">
-        <Specimen frame={frame} />
-      </div>
-      <div className="fw-glass" aria-hidden="true" />
-      <div className="fw-back-in">
-        <div className="fw-back-top">
-          <div className="fw-back-body">
-            {text.map((p, i) => (
-              <p key={i}>{withLifts(p, phrases)}</p>
-            ))}
-          </div>
-        </div>
-        <Caption frame={frame} />
-      </div>
-    </>
-  )
-}
-
 function FolioFrame({
   frame,
   phrases,
   open,
   onToggle,
-  lastPoint,
 }: {
   frame: FrameDatum
   phrases: string[]
   open: boolean
   onToggle: () => void
-  lastPoint: MutableRefObject<Point | null>
 }) {
-  const cellRef = useRef<HTMLDivElement>(null)
-  const frontRef = useRef<HTMLDivElement>(null)
-  const backRef = useRef<HTMLDivElement>(null)
+  const descRef = useRef<HTMLDivElement>(null)
   const mounted = useRef(false)
+  const text = frame.card ?? frame.about ?? [frame.blurb]
 
   useEffect(() => {
-    const cell = cellRef.current
-    if (!cell) return
+    const desc = descRef.current
+    if (!desc) return
     if (!mounted.current) {
       mounted.current = true
       return
     }
+    const letters = Array.from(desc.querySelectorAll<HTMLElement>('.fw-l'))
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    // Focus follows the card only for a keyboard turn (no point recorded): a
-    // pointer turn would otherwise light the focus ring on the card.
-    const byKeyboard = lastPoint.current === null
-    let flipTimer = 0
-    let focusTimer = 0
-    if (!reduce) {
-      // the turn's shading plays on every turn, either way
-      cell.classList.remove('is-turning')
-      void cell.offsetWidth
-      cell.classList.add('is-turning')
-      flipTimer = window.setTimeout(() => cell.classList.remove('is-turning'), TURN_MS + 50)
-    }
+    let raf = 0
+    let timer = 0
     if (open) {
-      if (byKeyboard)
-        focusTimer = window.setTimeout(() => backRef.current?.focus({ preventScroll: true }), reduce ? 0 : TURN_MS / 2 + 50)
+      desc.classList.remove('is-leaving')
+      desc.scrollTop = 0
+      letters.forEach((l) => l.classList.remove('is-on'))
+      if (reduce) {
+        letters.forEach((l) => l.classList.add('is-on'))
+      } else {
+        // written on time, not on scroll: a letter for each slice of WRITE_MS
+        timer = window.setTimeout(() => {
+          const t0 = performance.now()
+          let shown = 0
+          const tick = (now: number) => {
+            const t = Math.min(1, (now - t0) / WRITE_MS)
+            const n = Math.round(t * letters.length)
+            for (; shown < n; shown++) letters[shown].classList.add('is-on')
+            if (t < 1) raf = requestAnimationFrame(tick)
+          }
+          raf = requestAnimationFrame(tick)
+        }, SETTLE_MS)
+      }
     } else {
-      if (byKeyboard)
-        focusTimer = window.setTimeout(() => frontRef.current?.focus({ preventScroll: true }), reduce ? 0 : TURN_MS / 2 + 50)
+      desc.classList.add('is-leaving')
+      timer = window.setTimeout(
+        () => {
+          letters.forEach((l) => l.classList.remove('is-on'))
+          desc.classList.remove('is-leaving')
+        },
+        reduce ? 0 : 400
+      )
     }
     return () => {
-      clearTimeout(flipTimer)
-      clearTimeout(focusTimer)
+      clearTimeout(timer)
+      cancelAnimationFrame(raf)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
   const onKey = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
-      lastPoint.current = null
       onToggle()
     }
   }
 
   return (
-    <div
-      ref={cellRef}
-      className={`fw-cell${open ? ' is-open' : ''}`}
-      style={{ ['--fw-solid' as string]: FIELD_SOLID[frame.field] }}
-    >
-      <div className="fw-card">
-        <span className="fw-edge" aria-hidden="true" />
-        <span className="fw-edge fw-edge--r" aria-hidden="true" />
-        <div
-          ref={frontRef}
-          className="fw-face fw-front"
-          role="button"
-          tabIndex={open ? -1 : 0}
-          aria-expanded={open}
-          aria-hidden={open}
-          onClick={onToggle}
-          onKeyDown={onKey}
-        >
-          <div className="fw-plate">
-            <div className={`fw-field fw-field--${frame.field}`} />
-            <Specimen frame={frame} />
-            <Caption frame={frame} cue />
-          </div>
-          <span className="fw-shade" aria-hidden="true" />
+    <div className="fw-cell">
+      <div
+        className={`fw-plate${open ? ' is-open' : ''}`}
+        role="button"
+        tabIndex={0}
+        aria-expanded={open}
+        onClick={onToggle}
+        onKeyDown={onKey}
+      >
+        <div className={`fw-field fw-field--${frame.field}`} />
+        <div className="fw-paper" aria-hidden="true" />
+        <Specimen frame={frame} />
+        <div ref={descRef} className="fw-desc" aria-hidden={!open}>
+          {text.map((p, i) => (
+            <p key={i}>
+              <Letters paragraph={p} phrases={phrases} />
+            </p>
+          ))}
         </div>
-        <div
-          ref={backRef}
-          className="fw-face fw-back"
-          role="button"
-          tabIndex={open ? 0 : -1}
-          aria-hidden={!open}
-          onClick={onToggle}
-          onKeyDown={onKey}
-        >
-          <BackFace frame={frame} phrases={phrases} />
-          <span className="fw-shade" aria-hidden="true" />
-        </div>
+        <Caption frame={frame} cue />
       </div>
     </div>
   )
-}
-
-// The deep end of each field's gradient: the colour of the board's skins on its edge.
-const FIELD_SOLID: Record<FrameDatum['field'], string> = {
-  gold: '#8b7d0a',
-  navy: '#1d2a41',
-  red: '#a13636',
-  charcoal: '#262626',
 }
 
 export default function Portfolio({ lang = 'en' as Locale }: { lang?: Locale }) {
   const frames = getFrames(lang)
   const phrases = HIGHLIGHT_PHRASES[lang] ?? []
   const [openIndex, setOpenIndex] = useState<number | null>(null)
-  const lastPoint = useRef<Point | null>(null)
   const sectionRef = useRef<HTMLElement>(null)
   const { ref: folioRef, dataAnimate, still } = useInView<HTMLDivElement>(0.15)
 
@@ -515,9 +503,6 @@ export default function Portfolio({ lang = 'en' as Locale }: { lang?: Locale }) 
           tabIndex={0}
           role="region"
           aria-label="Featured work — four frames, scrolls horizontally"
-          onPointerDown={(e) => {
-            lastPoint.current = { x: e.clientX, y: e.clientY }
-          }}
         >
           {frames.map((frame, i) => (
             <FolioFrame
@@ -526,7 +511,6 @@ export default function Portfolio({ lang = 'en' as Locale }: { lang?: Locale }) 
               phrases={phrases}
               open={openIndex === i}
               onToggle={() => setOpenIndex((cur) => (cur === i ? null : i))}
-              lastPoint={lastPoint}
             />
           ))}
         </div>

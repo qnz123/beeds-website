@@ -625,12 +625,9 @@ html.arrive footer {
     -webkit-line-clamp: 3;
   }
 
-  /* the third caption line comes out of the description's room on the back */
-  :lang(en) .fw-back-top {
-    padding-top: 18px;
-  }
-
-  :lang(en) .fw-back-body {
+  /* the third caption line comes out of the description's room */
+  :lang(en) .fw-desc {
+    padding-top: 12px;
     font-size: 14px;
   }
 }
@@ -682,171 +679,153 @@ html.arrive footer {
   }
 }
 
-/* ---- The Folio — turning plates (client-approved 2026-10-04) ----
-   Clicking a plate turns it over (Portfolio.tsx). Built as a real card:
-   faces pushed out by half the board's thickness, and two edge slabs standing
-   at the sides. Each face is switched off with `visibility` at the half-turn,
-   when it is edge-on; backface-visibility alone let the far face show through,
-   and the switch only lands edge-on because the easing is SYMMETRIC (half the
-   time = half the turn). --fw-dur must match TURN_MS in Portfolio.tsx. */
+/* ---- The Folio — ink on paper (client-approved 2026-10-04) ----
+   Clicking a plate (Portfolio.tsx) turns its coloured field into an ivory page
+   with the artwork pressed faintly into it, writes the description on letter
+   by letter in black ink, turns the caption to
+   ink and fills the book. It replaced the turning plate the same day. */
+/* The page slides down over the card with a crisp edge rather than fading in:
+   a fade passed every caption through light ink on a half-faded page, where it
+   all but vanished (his "the text blinked", 2026-10-04). So each part of the
+   card is either white on colour or ink on paper, and the caption, rule and
+   book SWITCH (no fade) to ink as the page's edge crosses them (0.37–0.4s in),
+   and back as it uncovers them on the way out (0.31–0.32s). */
+/* the ink on the page: black on every plate (his ask, 2026-10-04) */
 .fw-cell {
-  --fw-dur: 1.733s;
-  --fw-t: 12px;
-  position: relative;
-  perspective: 1600px;
+  --fw-solid: #141414;
 }
 
-/* Room for a turning plate to swing out of the strip (at mid-turn its near
-   side looms toward the viewer) without the scroller clipping it; the negative
-   margins keep the layout where it was. */
-.fw-strip {
-  padding-top: 80px;
-  margin-top: -80px;
-  padding-bottom: 80px;
-  margin-bottom: -66px;
-}
-
-.fw-card {
-  position: relative;
-  transform-style: preserve-3d;
-  transition: transform var(--fw-dur) cubic-bezier(0.65, 0, 0.35, 1);
-}
-
-.fw-cell.is-open .fw-card {
-  transform: rotateY(180deg);
-}
-
-.fw-face {
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
+.fw-plate {
   cursor: pointer;
+  transition: color 0s linear 0.32s;
 }
 
-.fw-face:focus-visible {
+.fw-plate:focus-visible {
   outline: 2px solid #ccb718;
   outline-offset: 3px;
 }
 
-.fw-front {
-  position: relative;
-  display: block;
-  transform: translateZ(calc(var(--fw-t) / 2));
-  transition: visibility 0s calc(var(--fw-dur) / 2);
-}
-
-.fw-back {
+.fw-paper {
   position: absolute;
-  inset: 0;
-  overflow: hidden;
-  color: #fff;
-  visibility: hidden;
-  transform: rotateY(180deg) translateZ(calc(var(--fw-t) / 2));
-  transition: visibility 0s calc(var(--fw-dur) / 2);
-}
-
-.fw-cell.is-open .fw-front {
-  visibility: hidden;
-}
-
-.fw-cell.is-open .fw-back {
-  visibility: visible;
-}
-
-/* The edge is GLASS, lit by daylight from the top (his ask, 2026-10-04,
-   replacing the duplex board's darkening): clear, faintly tinted with the
-   field, the sun caught bright along its top and fading down, polished
-   faces at its two sides, and a soft glow spilling out of it. */
-.fw-edge {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: calc(var(--fw-t) / -2);
-  width: var(--fw-t);
-  transform: rotateY(90deg);
+  /* the field shows as a hairline (half a CSS pixel: one device pixel on a
+     Retina screen) along the top and right of the page (his ask, 2026-10-04),
+     and nowhere else */
+  inset: 0.5px 0.5px -1px -1px;
+  z-index: 0;
   pointer-events: none;
-  background:
-    linear-gradient(180deg, rgba(252, 254, 255, 0.98) 0%, rgba(246, 250, 255, 0.5) 16%, rgba(255, 255, 255, 0.1) 52%, rgba(255, 255, 255, 0.22) 100%),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.95) 0 4%, transparent 4% 96%, rgba(255, 255, 255, 0.95) 96%),
-    color-mix(in srgb, var(--fw-solid) 30%, rgba(225, 238, 242, 0.25));
-  box-shadow: 0 0 18px 4px rgba(244, 249, 255, 0.55);
+  background: #f2eee4;
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 0.6s cubic-bezier(0.65, 0, 0.35, 1) 0.1s;
 }
 
-.fw-edge--r {
-  left: calc(100% - var(--fw-t) / 2);
-}
-
-/* the hard line of light: a thin bright stroke down the glass, flashing as the
-   edge comes across the light at mid-turn */
-.fw-edge::after {
+/* a little light and a fine grain, so it reads as paper */
+.fw-paper::after {
   content: '';
   position: absolute;
   inset: 0;
-  opacity: 0;
-  background: linear-gradient(90deg, transparent 42%, #fff 47%, #fff 53%, transparent 58%);
-  box-shadow: 0 0 10px 1px rgba(255, 255, 255, 0.7);
-}
-
-.fw-cell.is-turning .fw-edge::after {
-  animation: fw-flash var(--fw-dur) cubic-bezier(0.65, 0, 0.35, 1);
-}
-
-@keyframes fw-flash {
-  0%,
-  38%,
-  62%,
-  100% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-/* Sunshine from the top as the plate turns: a daylight (neutral, not warm)
-   wash pouring down the face, quiet at both ends and peaking hard at mid-turn, and a glint sweeping across it like light on glass.
-   (Class kept as .fw-shade; it no longer darkens.) */
-.fw-shade {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  pointer-events: none;
-  opacity: 0;
-  mix-blend-mode: screen;
   background:
-    linear-gradient(100deg, transparent 48.6%, rgba(255, 255, 255, 0.95) 49.7%, rgba(255, 255, 255, 0.95) 50.3%, transparent 51.4%) no-repeat,
-    linear-gradient(100deg, transparent 40%, rgba(255, 255, 255, 0.22) 47%, rgba(255, 255, 255, 0.32) 50%, rgba(255, 255, 255, 0.22) 53%, transparent 60%) no-repeat,
-    linear-gradient(180deg, rgba(246, 250, 255, 0.95) 0%, rgba(240, 246, 255, 0.45) 26%, rgba(255, 255, 255, 0.06) 58%, rgba(255, 255, 255, 0) 70%);
-  background-size: 300% 100%, 300% 100%, 100% 100%;
-  background-position: 100% 0, 100% 0, 0 0;
+    radial-gradient(120% 90% at 30% 10%, rgba(255, 255, 255, 0.55), transparent 60%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.012) 0 2px, transparent 2px 4px);
 }
 
-.fw-cell.is-turning .fw-shade {
-  animation: fw-sun var(--fw-dur) cubic-bezier(0.65, 0, 0.35, 1);
+.fw-plate.is-open {
+  color: var(--fw-solid);
+  transition: color 0s linear 0.4s;
 }
 
-@keyframes fw-sun {
-  0% {
-    opacity: 0;
-    background-position: 100% 0, 100% 0, 0 0;
-  }
-  36% {
-    opacity: 0.3;
-  }
-  50% {
-    opacity: 1;
-  }
-  64% {
-    opacity: 0.3;
-  }
-  100% {
-    opacity: 0;
-    background-position: 0 0, 0 0, 0 0;
-  }
+.fw-plate.is-open .fw-paper {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 0.6s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
-/* The front's cue that there is more on the back: an open book at the end of
-   the category line, drawn in the plates' white hairline. It lifts a little
-   on hover / focus. */
+/* the artwork pressed into the page */
+.fw-mark svg,
+.fw-goldfill,
+.fw-whitefill,
+.fw-goldstroke,
+.fw-word {
+  transition: stroke 0.6s, fill 0.6s, color 0.6s;
+}
+
+.fw-rule {
+  transition: border-color 0s linear 0.31s;
+}
+
+.fw-plate.is-open .fw-rule {
+  transition: border-color 0s linear 0.37s;
+}
+
+.fw-num {
+  transition: -webkit-text-stroke-color 0.7s;
+}
+
+.fw-plate.is-open .fw-mark svg,
+.fw-plate.is-open .fw-goldstroke {
+  stroke: color-mix(in srgb, var(--fw-solid) 22%, transparent);
+}
+
+.fw-plate.is-open .fw-goldfill,
+.fw-plate.is-open .fw-whitefill {
+  fill: color-mix(in srgb, var(--fw-solid) 12%, transparent);
+}
+
+.fw-plate.is-open .fw-num {
+  -webkit-text-stroke-color: color-mix(in srgb, var(--fw-solid) 22%, transparent);
+}
+
+.fw-plate.is-open .fw-word {
+  color: color-mix(in srgb, var(--fw-solid) 7%, transparent);
+}
+
+.fw-plate.is-open .fw-rule {
+  border-top-color: color-mix(in srgb, var(--fw-solid) 55%, transparent);
+}
+
+/* The description, written in the upper part of the page above the caption. */
+.fw-desc {
+  position: relative;
+  z-index: 3;
+  color: var(--fw-solid);
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 56px 26px 18px;
+  font-size: 16px;
+  line-height: 1.55;
+  scrollbar-width: thin;
+}
+
+.fw-desc.is-leaving {
+  opacity: 0;
+  transition: opacity 0.35s;
+}
+
+.fw-w {
+  white-space: nowrap;
+}
+
+/* each letter simply appears, in order (no blur ahead of the writing) */
+.fw-l {
+  opacity: 0;
+  transition: opacity 0.08s;
+}
+
+.fw-l.is-on {
+  opacity: 1;
+}
+
+/* the phrases the Services page brushes yellow are set a size up here */
+.fw-lift {
+  font-size: 1.2em;
+  line-height: 1.3;
+}
+
+/* The front's cue that there is more: an open book at the end of the category
+   line, in the plates' white hairline. It lifts a little on hover / focus, and
+   fills solid white while the description is written and open. */
 .fw-cat-row {
   display: flex;
   align-items: center;
@@ -863,130 +842,54 @@ html.arrive footer {
   flex: none;
   width: 22px;
   height: 22px;
-  fill: none;
+  fill: rgba(255, 255, 255, 0);
   stroke: rgba(255, 255, 255, 0.85);
   stroke-width: 1.2;
   stroke-linecap: round;
   stroke-linejoin: round;
-  transition: transform 0.35s ease, stroke 0.35s ease;
+  /* back to the outline as the page uncovers it, not before (see .fw-plate) */
+  transition: transform 0.35s ease, stroke 0s linear 0.32s, fill 0s linear 0.32s;
 }
 
 .fw-cue-page {
+  fill: none;
   stroke: rgba(204, 183, 24, 0.9);
   transform-origin: 12px 6.6px;
-  transition: transform 0.45s ease;
+  transition: transform 0.45s ease, stroke 0.35s ease;
 }
 
-.fw-front:hover .fw-cue,
-.fw-front:focus-visible .fw-cue {
+.fw-plate:hover .fw-cue,
+.fw-plate:focus-visible .fw-cue {
   stroke: #fff;
   transform: translateY(-2px);
 }
 
-.fw-front:hover .fw-cue-page,
-.fw-front:focus-visible .fw-cue-page {
+.fw-plate:hover .fw-cue-page,
+.fw-plate:focus-visible .fw-cue-page {
   transform: rotate(-14deg);
 }
 
-/* The back is a pane of glass (his ask, 2026-10-04): the field's colour let
-   through so a little of the page shows, the front's artwork seen through it
-   mirrored and well blurred, a frosted surface with a light across its top
-   corner and a bright rim, and the text clear white on top. */
-.fw-glass-tint {
-  position: absolute;
-  inset: 0;
-  opacity: 0.88;
+.fw-plate.is-open .fw-cue {
+  fill: #fff;
+  stroke: var(--fw-solid);
+  transition: transform 0.35s ease, stroke 0s linear 0.4s, fill 0s linear 0.4s;
 }
 
-.fw-back .fw-mirror {
-  filter: blur(9px);
-  opacity: 0.85;
-}
-
-.fw-glass {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.06) 30%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.06) 100%),
-    rgba(255, 255, 255, 0.02);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.45),
-    inset 0 1px 0 1px rgba(255, 255, 255, 0.35);
-}
-
-.fw-back-in {
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.28);
-}
-
-/* The back: the front's artwork mirrored, the long description up top, the
-   front's caption readable at the foot (same place as on the front). */
-.fw-mirror {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  transform: scaleX(-1);
-}
-
-.fw-back-in {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.fw-back-top {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  padding: 56px 26px 18px;
-}
-
-.fw-back-body {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  display: grid;
-  align-content: start;
-  gap: 10px;
-  padding-right: 4px;
-  font-size: 16px;
-  line-height: 1.55;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
-}
-
-/* the phrases the Services page brushes yellow are set a size up here */
-.fw-lift {
-  font-size: 1.2em;
-  line-height: 1.3;
+.fw-plate.is-open .fw-cue-page {
+  stroke: color-mix(in srgb, var(--fw-solid) 50%, transparent);
 }
 
 @media (max-width: 760px) {
-  .fw-strip {
-    padding-top: 80px;
-    padding-bottom: 80px;
-  }
-
-  .fw-back-top {
+  .fw-desc {
     padding-top: 34px;
-  }
-
-  .fw-back-body {
     font-size: 15px;
     line-height: 1.5;
   }
 
   /* The Japanese descriptions are longer and have no shorter card copy: a size
      down fits 01–02; 03–04 still scroll a few lines inside the card. */
-  :lang(ja) .fw-back-top {
+  :lang(ja) .fw-desc {
     padding-top: 30px;
-  }
-
-  :lang(ja) .fw-back-body {
     gap: 4px;
     font-size: 13px;
     line-height: 1.55;
@@ -994,9 +897,14 @@ html.arrive footer {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fw-card,
-  .fw-front,
-  .fw-back {
+  .fw-plate,
+  .fw-plate.is-open,
+  .fw-paper,
+  .fw-plate.is-open .fw-paper,
+  .fw-rule,
+  .fw-plate.is-open .fw-rule,
+  .fw-l,
+  .fw-desc.is-leaving {
     transition: none;
   }
 }
