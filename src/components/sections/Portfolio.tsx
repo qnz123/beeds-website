@@ -237,27 +237,48 @@ function withLifts(paragraph: string, phrases: string[]) {
   )
 }
 
-// The water the back lies under: one filter for the strip (one plate turns at
-// a time), its ripples kept moving while the wipe crosses the card.
-let waterRaf = 0
-function stirWater(ms: number) {
-  const map = document.getElementById('fw-water-map')
-  const noise = document.getElementById('fw-water-noise')
-  if (!map || !noise) return
-  cancelAnimationFrame(waterRaf)
-  const t0 = performance.now()
-  const tick = (now: number) => {
-    const t = Math.min(1, (now - t0) / ms)
-    const s = (now - t0) / 1000
-    map.setAttribute('scale', (40 - 12 * t).toFixed(2))
-    noise.setAttribute(
-      'baseFrequency',
-      `${(0.012 + 0.005 * Math.sin(s * 5)).toFixed(4)} ${(0.03 + 0.01 * Math.cos(s * 4)).toFixed(4)}`
-    )
-    if (t < 1) waterRaf = requestAnimationFrame(tick)
-    else map.setAttribute('scale', '0')
+// The ripple, driven here rather than by a CSS animation of a registered
+// property: Safari did not pass such an animated value on to the layers inside
+// the card, so the ripple never showed there. Each frame sets the radius on the
+// three layers that draw it (the clear card, the water outside it, the ring).
+// The water itself is a FIXED filter (drawn once and reused): changing its
+// settings every frame made Firefox, which draws it on the CPU, lag.
+const easeOut = (t: number) => 1 - Math.pow(1 - t, 2.2)
+
+function runRipple(cell: HTMLElement, delay: number, ms: number) {
+  const layers = ['.fw-reveal', '.fw-haze', '.fw-ring']
+    .map((sel) => cell.querySelector<HTMLElement>(sel))
+    .filter((el): el is HTMLElement => el !== null)
+  const ring = cell.querySelector<HTMLElement>('.fw-ring')
+  const set = (r: number, ringOpacity: number) => {
+    for (const el of layers) el.style.setProperty('--fw-r', `${r.toFixed(2)}%`)
+    ring?.style.setProperty('opacity', ringOpacity.toFixed(3))
   }
-  waterRaf = requestAnimationFrame(tick)
+  const clear = () => {
+    for (const el of layers) el.style.removeProperty('--fw-r')
+    ring?.style.removeProperty('opacity')
+    cell.classList.remove('is-revealing')
+  }
+  set(0, 0)
+  cell.classList.add('is-revealing')
+  let raf = 0
+  let t0 = 0
+  const timer = window.setTimeout(() => {
+    const tick = (now: number) => {
+      if (!t0) t0 = now
+      const t = Math.min(1, (now - t0) / ms)
+      const ringOpacity = t < 0.75 ? 1 - 0.4 * (t / 0.75) : 0.6 * (1 - (t - 0.75) / 0.25)
+      set(115 * easeOut(t), ringOpacity)
+      if (t < 1) raf = requestAnimationFrame(tick)
+      else clear()
+    }
+    raf = requestAnimationFrame(tick)
+  }, delay)
+  return () => {
+    clearTimeout(timer)
+    cancelAnimationFrame(raf)
+    clear()
+  }
 }
 
 function Specimen({ frame }: { frame: FrameDatum }) {
@@ -341,6 +362,7 @@ function FolioFrame({
     const byKeyboard = lastPoint.current === null
     let flipTimer = 0
     let focusTimer = 0
+    let stopRipple: (() => void) | null = null
     if (!reduce) {
       // the turn's shading plays on every turn, either way
       cell.classList.remove('is-turning')
@@ -361,24 +383,19 @@ function FolioFrame({
       }
       cell.style.setProperty('--fw-ox', `${(1 - x) * 100}%`)
       cell.style.setProperty('--fw-oy', `${y * 100}%`)
-      if (!reduce) {
-        // The reveal starts now and waits out the first half of the turn in its
-        // unclear first frame (animation-delay), so no clear frame can flash.
-        cell.classList.remove('is-revealing')
-        void cell.offsetWidth
-        cell.classList.add('is-revealing')
-        stirWater(TURN_MS / 2 + REVEAL_MS)
-      }
+      // The back is under water from the start of the turn, so no clear frame
+      // can flash as it comes into view; the ripple starts at the half-turn.
+      if (!reduce) stopRipple = runRipple(cell, TURN_MS / 2, REVEAL_MS)
       if (byKeyboard)
         focusTimer = window.setTimeout(() => backRef.current?.focus({ preventScroll: true }), reduce ? 0 : TURN_MS / 2 + 50)
     } else {
-      cell.classList.remove('is-revealing')
       if (byKeyboard)
         focusTimer = window.setTimeout(() => frontRef.current?.focus({ preventScroll: true }), reduce ? 0 : TURN_MS / 2 + 50)
     }
     return () => {
       clearTimeout(flipTimer)
       clearTimeout(focusTimer)
+      stopRipple?.()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
@@ -427,7 +444,9 @@ function FolioFrame({
           onKeyDown={onKey}
         >
           <div className="fw-haze" aria-hidden="true">
-            <BackFace frame={frame} phrases={phrases} />
+            <div className="fw-haze-in">
+              <BackFace frame={frame} phrases={phrases} />
+            </div>
           </div>
           <div className="fw-reveal">
             <BackFace frame={frame} phrases={phrases} />
@@ -567,11 +586,11 @@ export default function Portfolio({ lang = 'en' as Locale }: { lang?: Locale }) 
             />
           ))}
         </div>
-        {/* The water on the back of a turning plate (see stirWater). */}
+        {/* The water on the back of a turning plate (fixed: see runRipple). */}
         <svg width="0" height="0" className="fw-water-defs" aria-hidden="true" focusable="false">
           <filter id="fw-water" x="-5%" y="-5%" width="110%" height="110%">
-            <feTurbulence id="fw-water-noise" type="fractalNoise" baseFrequency="0.012 0.03" numOctaves={2} seed={7} result="n" />
-            <feDisplacementMap id="fw-water-map" in="SourceGraphic" in2="n" scale="0" xChannelSelector="R" yChannelSelector="G" />
+            <feTurbulence type="fractalNoise" baseFrequency="0.012 0.03" numOctaves={2} seed={7} result="n" />
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="34" xChannelSelector="R" yChannelSelector="G" />
           </filter>
         </svg>
       </div>
