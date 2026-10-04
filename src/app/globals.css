@@ -772,6 +772,50 @@ html.arrive footer {
   }
 }
 
+/* The front's cue that there is more on the back: an open book at the end of
+   the category line, drawn in the plates' white hairline. It lifts a little
+   on hover / focus. */
+.fw-cat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.fw-cat-row .fw-cat {
+  margin-bottom: 0;
+}
+
+.fw-cue {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.35s ease, stroke 0.35s ease;
+}
+
+.fw-cue-page {
+  stroke: rgba(204, 183, 24, 0.9);
+  transform-origin: 12px 6.6px;
+  transition: transform 0.45s ease;
+}
+
+.fw-front:hover .fw-cue,
+.fw-front:focus-visible .fw-cue {
+  stroke: #fff;
+  transform: translateY(-2px);
+}
+
+.fw-front:hover .fw-cue-page,
+.fw-front:focus-visible .fw-cue-page {
+  transform: rotate(-14deg);
+}
+
 /* The back: the front's artwork mirrored, the long description up top, the
    front's caption readable at the foot (same place as on the front). */
 .fw-mirror {

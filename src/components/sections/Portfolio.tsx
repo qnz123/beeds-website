@@ -251,11 +251,23 @@ function Specimen({ frame }: { frame: FrameDatum }) {
   )
 }
 
-function Caption({ frame }: { frame: FrameDatum }) {
+// An open book at the end of the category line: there is more to read on the back.
+const bookCue = (
+  <svg className="fw-cue" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d="M12 6.6C9.6 5 6.6 4.6 3.5 5.4v13.1c3.1-.8 6.1-.4 8.5 1.2" />
+    <path d="M12 6.6c2.4-1.6 5.4-2 8.5-1.2v13.1c-3.1-.8-6.1-.4-8.5 1.2z" />
+    <path className="fw-cue-page" d="M12 6.6c1.9-1.3 4.2-1.7 6.6-1.3" />
+  </svg>
+)
+
+function Caption({ frame, cue = false }: { frame: FrameDatum; cue?: boolean }) {
   return (
     <div className="fw-meta">
       <div className="fw-rule">
-        <div className="fw-cat">{frame.category}</div>
+        <div className="fw-cat-row">
+          <div className="fw-cat">{frame.category}</div>
+          {cue && bookCue}
+        </div>
         <h3>{frame.title}</h3>
         <p>{frame.blurb}</p>
       </div>
@@ -367,7 +379,7 @@ function FolioFrame({
           <div className="fw-plate">
             <div className={`fw-field fw-field--${frame.field}`} />
             <Specimen frame={frame} />
-            <Caption frame={frame} />
+            <Caption frame={frame} cue />
           </div>
           <span className="fw-shade" aria-hidden="true" />
         </div>
