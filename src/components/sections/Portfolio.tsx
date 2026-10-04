@@ -207,62 +207,27 @@ function ScrambleWord({ word }: { word: string }) {
 // The plate writes its description: "Ink on paper" (client-approved
 // 2026-10-04, from the Service Plate Writing study; it replaced the turning
 // plate). Clicking a plate turns its coloured field into an ivory page with
-// the artwork pressed faintly into it, and the description writes on, letter
-// by letter, in ink; the caption turns to ink too and
+// the artwork pressed faintly into it, and the description is there on it in
+// ink (no writing animation, his ask 2026-10-05); the caption turns to ink too and
 // the book fills solid. The ink is black on every plate (his ask). Clicking
 // again clears it; one plate is open at a time.
 // Styles: "The Folio — ink on paper" in globals.css.
 // ---------------------------------------------------------------------------
 
-const SETTLE_MS = 350 // the page settles before the writing starts
-const WRITE_MS = 1700
-
-// The description as letters. In spaced scripts words are kept whole so lines
-// wrap as normal text; Japanese wraps between any letters. The phrases the
-// Services page brushes yellow are set a size up.
-const CJK = /[　-鿿＀-￯]/
-function Letters({ paragraph, phrases }: { paragraph: string; phrases: string[] }) {
+// The phrases the Services page brushes yellow are set a size up on the page.
+function withLifts(paragraph: string, phrases: string[]) {
   const hit = phrases.filter((p) => paragraph.includes(p))
-  const segs: { text: string; lift: boolean }[] = []
-  if (hit.length) {
-    const pattern = new RegExp(`(${hit.map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`)
-    for (const part of paragraph.split(pattern)) if (part) segs.push({ text: part, lift: hit.includes(part) })
-  } else segs.push({ text: paragraph, lift: false })
-  const out: React.ReactNode[] = []
-  let k = 0
-  for (const seg of segs) {
-    const cls = seg.lift ? 'fw-l fw-lift' : 'fw-l'
-    if (CJK.test(seg.text)) {
-      for (const ch of Array.from(seg.text))
-        out.push(
-          <span key={k++} className={cls}>
-            {ch}
-          </span>
-        )
-      continue
-    }
-    for (const tok of seg.text.split(/(\s+)/)) {
-      if (!tok) continue
-      if (/^\s+$/.test(tok)) {
-        out.push(
-          <span key={k++} className="fw-l">
-            {' '}
-          </span>
-        )
-        continue
-      }
-      out.push(
-        <span key={k++} className="fw-w">
-          {Array.from(tok).map((ch, i) => (
-            <span key={i} className={cls}>
-              {ch}
-            </span>
-          ))}
-        </span>
-      )
-    }
-  }
-  return <>{out}</>
+  if (hit.length === 0) return paragraph
+  const pattern = new RegExp(`(${hit.map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`)
+  return paragraph.split(pattern).map((part, i) =>
+    hit.includes(part) ? (
+      <span key={i} className="fw-lift">
+        {part}
+      </span>
+    ) : (
+      part
+    )
+  )
 }
 
 function Specimen({ frame }: { frame: FrameDatum }) {
@@ -317,54 +282,11 @@ function FolioFrame({
   onToggle: () => void
 }) {
   const descRef = useRef<HTMLDivElement>(null)
-  const mounted = useRef(false)
   const text = frame.card ?? frame.about ?? [frame.blurb]
 
+  // each opening starts at the top of the description (it can scroll on phones)
   useEffect(() => {
-    const desc = descRef.current
-    if (!desc) return
-    if (!mounted.current) {
-      mounted.current = true
-      return
-    }
-    const letters = Array.from(desc.querySelectorAll<HTMLElement>('.fw-l'))
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    let raf = 0
-    let timer = 0
-    if (open) {
-      desc.classList.remove('is-leaving')
-      desc.scrollTop = 0
-      letters.forEach((l) => l.classList.remove('is-on'))
-      if (reduce) {
-        letters.forEach((l) => l.classList.add('is-on'))
-      } else {
-        // written on time, not on scroll: a letter for each slice of WRITE_MS
-        timer = window.setTimeout(() => {
-          const t0 = performance.now()
-          let shown = 0
-          const tick = (now: number) => {
-            const t = Math.min(1, (now - t0) / WRITE_MS)
-            const n = Math.round(t * letters.length)
-            for (; shown < n; shown++) letters[shown].classList.add('is-on')
-            if (t < 1) raf = requestAnimationFrame(tick)
-          }
-          raf = requestAnimationFrame(tick)
-        }, SETTLE_MS)
-      }
-    } else {
-      desc.classList.add('is-leaving')
-      timer = window.setTimeout(
-        () => {
-          letters.forEach((l) => l.classList.remove('is-on'))
-          desc.classList.remove('is-leaving')
-        },
-        reduce ? 0 : 400
-      )
-    }
-    return () => {
-      clearTimeout(timer)
-      cancelAnimationFrame(raf)
-    }
+    if (open && descRef.current) descRef.current.scrollTop = 0
   }, [open])
 
   const onKey = (e: React.KeyboardEvent) => {
@@ -391,7 +313,7 @@ function FolioFrame({
         <div ref={descRef} className="fw-desc" aria-hidden={!open}>
           {text.map((p, i) => (
             <p key={i}>
-              <Letters paragraph={p} phrases={phrases} />
+              {withLifts(p, phrases)}
             </p>
           ))}
         </div>

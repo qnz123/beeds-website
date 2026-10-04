@@ -680,16 +680,14 @@ html.arrive footer {
 }
 
 /* ---- The Folio — ink on paper (client-approved 2026-10-04) ----
-   Clicking a plate (Portfolio.tsx) turns its coloured field into an ivory page
-   with the artwork pressed faintly into it, writes the description on letter
-   by letter in black ink, turns the caption to
-   ink and fills the book. It replaced the turning plate the same day. */
-/* The page slides down over the card with a crisp edge rather than fading in:
-   a fade passed every caption through light ink on a half-faded page, where it
-   all but vanished (his "the text blinked", 2026-10-04). So each part of the
-   card is either white on colour or ink on paper, and the caption, rule and
-   book SWITCH (no fade) to ink as the page's edge crosses them (0.37–0.4s in),
-   and back as it uncovers them on the way out (0.31–0.32s). */
+   Clicking a plate (Portfolio.tsx) slides an ivory page down over the card's
+   upper part, with the artwork pressed faintly into it and the description
+   printed on it in black ink, and fills the book. The page stops at the
+   divider line (his ask, 2026-10-05): the plate is two rows, the page area and
+   the caption, and the page, its description and its hairlines live in the
+   first row, so the caption stays white on the card's colour. The slide is
+   0.9s, ease-out (quick to start, gliding to a soft stop). It replaced the
+   turning plate on 2026-10-04. */
 /* the ink on the page: black on every plate (his ask, 2026-10-04) */
 .fw-cell {
   --fw-solid: #141414;
@@ -697,7 +695,20 @@ html.arrive footer {
 
 .fw-plate {
   cursor: pointer;
-  transition: color 0s linear 0.32s;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+.fw-paper,
+.fw-hairline,
+.fw-desc {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+.fw-plate > .fw-meta {
+  grid-row: 2;
+  grid-column: 1;
 }
 
 .fw-plate:focus-visible {
@@ -706,35 +717,74 @@ html.arrive footer {
 }
 
 .fw-paper {
-  position: absolute;
-  /* a pixel past the plate (which clips it), so no sliver of the field shows */
-  inset: -1px;
+  position: relative;
+  /* a pixel past the plate's top and sides (it clips them), so no sliver of the
+     field shows there; its foot comes down ONTO the divider line and covers it
+     (his ask, 2026-10-05), so the page's edge is the line: one clean boundary,
+     no pale stripe of line showing under it */
+  margin: -1px -1px -1px;
   z-index: 0;
   pointer-events: none;
   background: #f2eee4;
-  clip-path: inset(0 0 100% 0);
-  transition: clip-path 0.6s cubic-bezier(0.65, 0, 0.35, 1) 0.1s;
+  /* the page SLIDES down from above (a composited transform, smooth in every
+     browser) on an ease-out */
+  transform: translateY(-101%);
+  transition: transform 0.9s cubic-bezier(0.33, 1, 0.68, 1) 0.1s;
+  will-change: transform;
 }
 
 /* A hairline of the card's colour along the top and right of the page (his
-   ask, 2026-10-04). Drawn as a border, one device pixel thick: an earlier
-   version left a half-pixel sliver of the field uncovered, which Safari and
-   Firefox rounded differently from card to card ("not stable"). It is always
-   there, in the field's own colour, so it only shows once the page is down. */
+   ask, 2026-10-04). Each line is a border (it snaps to whole device pixels:
+   an earlier half-pixel sliver of the field was "not stable" in Safari and
+   Firefox), one device pixel on Retina. When the page opens both lines draw
+   on from the top-right corner, the top one leftwards and the right one
+   downwards to the divider line, at about the SAME constant speed (the page
+   area is about as tall as the plate is wide). Closed, they reset once the
+   page has gone. */
 .fw-hairline {
-  position: absolute;
-  inset: 0;
+  --fw-hw: 1px;
+  position: relative;
   z-index: 5;
   pointer-events: none;
-  border-top: 1px solid var(--fw-hair);
-  border-right: 1px solid var(--fw-hair);
 }
 
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx) {
   .fw-hairline {
-    border-top-width: 0.5px;
-    border-right-width: 0.5px;
+    --fw-hw: 0.5px;
   }
+}
+
+.fw-hairline::before,
+.fw-hairline::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  transition: transform 0s linear 1.05s;
+}
+
+.fw-hairline::before {
+  left: 0;
+  border-top: var(--fw-hw) solid var(--fw-hair);
+  transform: scaleX(0);
+  transform-origin: right center;
+}
+
+.fw-hairline::after {
+  bottom: 0;
+  border-right: var(--fw-hw) solid var(--fw-hair);
+  transform: scaleY(0);
+  transform-origin: center top;
+}
+
+.fw-plate.is-open .fw-hairline::before {
+  transform: scaleX(1);
+  transition: transform 0.675s linear;
+}
+
+.fw-plate.is-open .fw-hairline::after {
+  transform: scaleY(1);
+  transition: transform 0.675s linear;
 }
 
 .fw-hairline--gold {
@@ -763,14 +813,22 @@ html.arrive footer {
     repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.012) 0 2px, transparent 2px 4px);
 }
 
-.fw-plate.is-open {
-  color: var(--fw-solid);
-  transition: color 0s linear 0.4s;
+.fw-plate.is-open .fw-paper {
+  transform: translateY(0);
+  transition: transform 0.9s cubic-bezier(0.33, 1, 0.68, 1);
 }
 
-.fw-plate.is-open .fw-paper {
-  clip-path: inset(0 0 0 0);
-  transition: clip-path 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+/* The page lands ON the divider: the line (drawn above the page) gives way
+   the moment the page's edge reaches it (0.75s into the 0.9s ease-out, when the
+   edge is within a pixel), and comes back as the page lifts off it on closing
+   (after the 0.1s delay), so there is one clean edge where the line was. */
+.fw-rule {
+  transition: border-top-color 0s linear 0.1s;
+}
+
+.fw-plate.is-open .fw-rule {
+  border-top-color: transparent;
+  transition: border-top-color 0s linear 0.75s;
 }
 
 /* the artwork pressed into the page */
@@ -780,14 +838,6 @@ html.arrive footer {
 .fw-goldstroke,
 .fw-word {
   transition: stroke 0.6s, fill 0.6s, color 0.6s;
-}
-
-.fw-rule {
-  transition: border-color 0s linear 0.31s;
-}
-
-.fw-plate.is-open .fw-rule {
-  transition: border-color 0s linear 0.37s;
 }
 
 .fw-num {
@@ -812,16 +862,11 @@ html.arrive footer {
   color: color-mix(in srgb, var(--fw-solid) 7%, transparent);
 }
 
-.fw-plate.is-open .fw-rule {
-  border-top-color: color-mix(in srgb, var(--fw-solid) 55%, transparent);
-}
-
-/* The description, written in the upper part of the page above the caption. */
+/* The description, printed on the page above the divider line. */
 .fw-desc {
   position: relative;
   z-index: 3;
   color: var(--fw-solid);
-  flex: 1;
   min-height: 0;
   overflow-y: auto;
   display: grid;
@@ -833,23 +878,18 @@ html.arrive footer {
   scrollbar-width: thin;
 }
 
-.fw-desc.is-leaving {
-  opacity: 0;
-  transition: opacity 0.35s;
+/* No writing animation (his ask, 2026-10-05): the description is printed on
+   the page and comes down WITH it, moving exactly as .fw-paper does (same
+   curve, timing and distance: both are the page row's height). Closed, it
+   sits above the plate, clipped away. */
+.fw-desc {
+  transform: translateY(-101%);
+  transition: transform 0.9s cubic-bezier(0.33, 1, 0.68, 1) 0.1s;
 }
 
-.fw-w {
-  white-space: nowrap;
-}
-
-/* each letter simply appears, in order (no blur ahead of the writing) */
-.fw-l {
-  opacity: 0;
-  transition: opacity 0.08s;
-}
-
-.fw-l.is-on {
-  opacity: 1;
+.fw-plate.is-open .fw-desc {
+  transform: translateY(0);
+  transition: transform 0.9s cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 /* the phrases the Services page brushes yellow are set a size up here */
@@ -882,8 +922,7 @@ html.arrive footer {
   stroke-width: 1.2;
   stroke-linecap: round;
   stroke-linejoin: round;
-  /* back to the outline as the page uncovers it, not before (see .fw-plate) */
-  transition: transform 0.35s ease, stroke 0s linear 0.32s, fill 0s linear 0.32s;
+  transition: transform 0.35s ease, stroke 0.35s ease, fill 0.35s ease;
 }
 
 .fw-cue-page {
@@ -906,8 +945,7 @@ html.arrive footer {
 
 .fw-plate.is-open .fw-cue {
   fill: #fff;
-  stroke: var(--fw-solid);
-  transition: transform 0.35s ease, stroke 0s linear 0.4s, fill 0s linear 0.4s;
+  stroke: #fff;
 }
 
 .fw-plate.is-open .fw-cue-page {
@@ -932,14 +970,18 @@ html.arrive footer {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .fw-hairline::before,
+  .fw-hairline::after,
+  .fw-plate.is-open .fw-hairline::before,
+  .fw-plate.is-open .fw-hairline::after,
   .fw-plate,
   .fw-plate.is-open,
   .fw-paper,
   .fw-plate.is-open .fw-paper,
   .fw-rule,
   .fw-plate.is-open .fw-rule,
-  .fw-l,
-  .fw-desc.is-leaving {
+  .fw-desc,
+  .fw-plate.is-open .fw-desc {
     transition: none;
   }
 }
