@@ -3132,9 +3132,10 @@ textarea.blank:focus {
   position: absolute; left: 50%; top: 50%; z-index: 2; width: 46px; height: 46px; margin: -23px 0 0 -23px;
   display: grid; place-items: center; border-radius: 50%; border: 1px solid #fff; background: transparent;
   pointer-events: none;
-  opacity: 0; transition: opacity .5s ease;
+  /* once scrolling starts it waits 1s, twice its 0.5s fade, then fades out */
+  opacity: 0; transition: opacity .5s ease 1s;
 }
-.si-cue.is-shown { opacity: 1; }
+.si-cue.is-shown { opacity: 1; transition: opacity .5s ease; }
 .si-cue svg {
   width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
   animation: si-bob 1.6s ease-in-out infinite;

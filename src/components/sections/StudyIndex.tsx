@@ -105,6 +105,28 @@ function guardEmbed(iframe: HTMLIFrameElement) {
   }
 }
 
+// The scroll guide is shown until the visitor has scrolled ONE sample; after
+// that it stays away from the others for the rest of the visit in this tab.
+const GUIDE_KEY = 'beeds:scrollGuide'
+let guideDone = false
+const isGuideDone = () => {
+  if (guideDone) return true
+  try {
+    guideDone = window.sessionStorage.getItem(GUIDE_KEY) === 'done'
+  } catch {
+    /* storage denied: this page visit still remembers it */
+  }
+  return guideDone
+}
+const markGuideDone = () => {
+  guideDone = true
+  try {
+    window.sessionStorage.setItem(GUIDE_KEY, 'done')
+  } catch {
+    /* storage denied: this page visit still remembers it */
+  }
+}
+
 // The live study inside an open row: the 390px phone layout scaled to the
 // window's width, its logical height sized to the window so the page's own
 // 100vh hero fits. Scrolling is the browser's own (scrolling enabled,
@@ -116,7 +138,8 @@ function StudyWindow({ row, title }: { row: Row; title: string }) {
   const [loaded, setLoaded] = useState(false)
   // A small up-and-down guide sits on the sample until it has been scrolled a
   // little (his ask, 2026-10-05; it replaced the "scroll inside the frame" line).
-  const [scrolled, setScrolled] = useState(false)
+  // A row opened only after another sample was scrolled never shows it.
+  const [scrolled, setScrolled] = useState(() => typeof window !== 'undefined' && isGuideDone())
 
   useEffect(() => {
     const el = winRef.current
@@ -150,6 +173,7 @@ function StudyWindow({ row, title }: { row: Row; title: string }) {
             if (!win) return
             const onScroll = () => {
               if (win.scrollY > 24) {
+                markGuideDone()
                 setScrolled(true)
                 win.removeEventListener('scroll', onScroll)
               }
