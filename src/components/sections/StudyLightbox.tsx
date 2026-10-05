@@ -25,7 +25,12 @@ export default function StudyLightbox({
 }) {
   const panelRef = useRef<HTMLDivElement>(null)
   const closeRef = useRef<HTMLButtonElement>(null)
-  const [mode, setMode] = useState<ReviewMode>('desktop')
+  // Phones open the review in Mobile first, like the phone rows; desktops in
+  // Desktop (his ask, 2026-10-05). The lightbox only mounts after a click, so
+  // the window is there to ask.
+  const [mode, setMode] = useState<ReviewMode>(() =>
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches ? 'mobile' : 'desktop'
+  )
 
   useEffect(() => {
     const returnFocus = document.activeElement as HTMLElement | null
