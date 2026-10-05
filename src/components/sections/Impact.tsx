@@ -341,23 +341,89 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [counting])
 
-  // The photos stay at their full width, still (his ask, 2026-10-05: they used to shrink as they
-  // scrolled up to the nav). The bar block and its note keep the narrower width they always had, the
-  // width at which photos, figures and bars once fitted one screen (--ic-fitw on the container).
+  // The photos start at full width and shrink as they scroll up toward the nav, landing at the width
+  // where photos, figures and bars fit one screen (~420px of text and bars below 4:5 photos).
+  // A layout effect, so a page opened at the booking form has its photos at their final size before
+  // Next scrolls there (it does so from its own layout-time handler, which runs after this one).
   useLayoutEffect(() => {
     const el = phasesRef.current
     if (!el) return
+    let raf = 0, cur = -1, last = 0, passing = false, endTrip: (() => void) | undefined
+    // Both widths live on the container: --ic-phw is the photos' moving width; --ic-fitw is the width
+    // they land at, which the bar block and the note below keep all the time (they do not shrink along)
     const host = el.parentElement ?? el
-    const setFit = () => {
-      const cs = getComputedStyle(host)
-      const full = host.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)
+    let fitSet = -1, written = ''
+    // the container's measurements change only with the window, so they are read once and on resize
+    // (a style read on every scroll event, and a width written even when it had not changed, cost
+    // Safari a frame in four all the way down the section)
+    let box: { full: number; fit: number; nav: number } | null = null
+    const measure = () => {
+      const c = el.parentElement ?? el, cs = getComputedStyle(c)
+      const full = c.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)
       const fit = Math.min(full, Math.max(600, 2.4 * window.innerHeight - 1230))
-      if (fit >= full) host.style.removeProperty('--ic-fitw')
-      else host.style.setProperty('--ic-fitw', `${fit.toFixed(1)}px`)
+      box = { full, fit, nav: document.querySelector<HTMLElement>('.nav')?.offsetHeight ?? 64 }
+      return box
     }
-    setFit()
-    window.addEventListener('resize', setFit)
-    return () => window.removeEventListener('resize', setFit)
+    const setWidth = (v: string | null) => {
+      if (v === written) return
+      written = v ?? ''
+      if (v === null) host.style.removeProperty('--ic-phw')
+      else host.style.setProperty('--ic-phw', v)
+    }
+    const setFit = (w: number) => {
+      if (w === fitSet) return
+      fitSet = w
+      if (w < 0) host.style.removeProperty('--ic-fitw')
+      else host.style.setProperty('--ic-fitw', `${w.toFixed(1)}px`)
+    }
+    const target = () => {
+      const { full, fit, nav } = box ?? measure()
+      const vh = window.innerHeight
+      if (fit >= full || reducedMotion()) { setFit(-1); return -1 }
+      setFit(fit)
+      const top = el.getBoundingClientRect().top
+      // full size until the photos' top passes 40% of the screen, then shrink over half the stretch
+      // down to the nav (so the smaller version arrives twice as soon), easing out so the last of it
+      // slows into place
+      const from = vh * 0.4, to = from - (from - (nav + 24)) / 2
+      const p = passing ? 1 : Math.min(1, Math.max(0, (from - top) / (from - to)))
+      return full - (full - fit) * (1 - Math.pow(1 - p, 3))
+    }
+    // the width follows the scroll through a short ease-out, so wheel steps glide instead of jumping
+    const step = (now: number) => {
+      raf = 0
+      const want = target()
+      if (want < 0) { cur = -1; setWidth(null); return }
+      const dt = last ? Math.min(64, now - last) : 16
+      last = now
+      cur = cur < 0 || passing ? want : cur + (want - cur) * (1 - Math.exp(-dt / 160))
+      if (Math.abs(want - cur) < 0.3) cur = want
+      setWidth(`${cur.toFixed(1)}px`)
+      if (cur !== want) raf = requestAnimationFrame(step)
+      else last = 0
+    }
+    const queue = () => { if (!raf) raf = requestAnimationFrame(step) }
+    // On the Contact link's trip past, the photos take their final size at once, before the page is
+    // measured, so it does not change height on the way down and the booking form lands where aimed
+    const onPass = () => {
+      passing = true
+      cancelAnimationFrame(raf); raf = 0; last = 0; step(performance.now())
+      endTrip?.()
+      endTrip = whenTripEnds(() => { passing = false; endTrip = undefined; queue() })
+    }
+    const onResize = () => { box = null; queue() }
+    // Opened straight at the booking form (the nav's Contact link from another page, a shared link) is the
+    // same trip. Left to shrink after the scroll there, the photos took ~250px out from above the form,
+    // which only the browser's scroll anchoring made good, and Firefox's fell ~130px short of it.
+    if (openedAtContact()) onPass()
+    else step(performance.now())
+    window.addEventListener('scroll', queue, { passive: true })
+    window.addEventListener('resize', onResize)
+    window.addEventListener(PASS_EVENT, onPass)
+    return () => {
+      cancelAnimationFrame(raf); endTrip?.()
+      window.removeEventListener('scroll', queue); window.removeEventListener('resize', onResize); window.removeEventListener(PASS_EVENT, onPass)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const [growing, setGrowing] = useState<Entrance>('wait')
