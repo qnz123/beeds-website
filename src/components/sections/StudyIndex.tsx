@@ -41,14 +41,12 @@ const EASE = 'cubic-bezier(0.22, 0.61, 0.36, 1)'
 
 const COPY = {
   en: {
-    hint: 'Scroll inside the frame',
     close: 'Close',
     review: 'Full review',
     frame: 'mobile preview',
   },
   // 日本語（下書き：ネイティブ確認待ち / DRAFT — pending native review）
   ja: {
-    hint: 'フレームの中をスクロール',
     close: '閉じる',
     review: 'フルレビュー',
     frame: 'モバイルプレビュー',
@@ -116,6 +114,9 @@ function StudyWindow({ row, title }: { row: Row; title: string }) {
   const winRef = useRef<HTMLDivElement>(null)
   const [dims, setDims] = useState({ scale: 1, h: 844 })
   const [loaded, setLoaded] = useState(false)
+  // A small up-and-down guide sits on the sample until it has been scrolled a
+  // little (his ask, 2026-10-05; it replaced the "scroll inside the frame" line).
+  const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
     const el = winRef.current
@@ -144,6 +145,19 @@ function StudyWindow({ row, title }: { row: Row; title: string }) {
         onLoad={(e) => {
           guardEmbed(e.currentTarget)
           setLoaded(true)
+          try {
+            const win = e.currentTarget.contentWindow
+            if (!win) return
+            const onScroll = () => {
+              if (win.scrollY > 24) {
+                setScrolled(true)
+                win.removeEventListener('scroll', onScroll)
+              }
+            }
+            win.addEventListener('scroll', onScroll, { passive: true })
+          } catch {
+            /* not reachable: the guide simply stays */
+          }
         }}
         className={loaded ? 'is-loaded' : undefined}
         style={{
@@ -152,6 +166,11 @@ function StudyWindow({ row, title }: { row: Row; title: string }) {
           transform: `scale(${dims.scale})`,
         }}
       />
+      <span className={`si-cue${loaded && !scrolled ? ' is-shown' : ''}`} aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 4v16M8 8l4-4 4 4M8 16l4 4 4-4" />
+        </svg>
+      </span>
     </div>
   )
 }
@@ -396,7 +415,6 @@ export default function StudyIndex({
                 >
                   <StudyWindow row={row} title={`${row.name} — ${t.frame}`} />
                   <div className="si-actions">
-                    <span className="si-hint">{t.hint}</span>
                     <span className="si-buttons">
                       {granted && (
                         <button type="button" className="si-btn" onClick={() => onReview(row.slug)}>
