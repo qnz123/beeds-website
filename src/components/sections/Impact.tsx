@@ -438,11 +438,13 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
             </div>
             {channelLift.map((c, i) => (
               <div className="ic-row" key={c.glyph} style={{ '--i': i } as React.CSSProperties}>
-                {/* each channel is its icon (the name is for screen readers and the hover tooltip) */}
-                <div className="ic-ch" title={t.channels[i]}><Glyph name={c.glyph} /><span className="sr-only">{t.channels[i]}</span></div>
+                <div className="ic-ch"><Glyph name={c.glyph} /></div>
                 <div className="ic-track">
                   <div className="ic-base" style={{ width: pct(100) }} />
                   <div className="ic-gain" style={{ width: pct(c.after - 100) }} />
+                  {/* the channel's name rides on the bar itself (his ask, 2026-10-05), so it keeps the
+                      space that a column of names used to take */}
+                  <span className="ic-chname">{t.channels[i]}</span>
                 </div>
                 <div className="ic-up">+<Count from={0} to={c.after - 100} run={growing === 'play'} delay={120 + i * 110} dur={800} />%</div>
                 <div className="ic-end"><Count from={100} to={c.after} run={growing === 'play'} delay={120 + i * 110} dur={800} /></div>
