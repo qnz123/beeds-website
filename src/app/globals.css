@@ -3125,13 +3125,13 @@ textarea.blank:focus {
 .si-poster i { display: block; width: 56px; height: 4px; }
 .si-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0 8px; }
 .si-buttons { display: flex; gap: 8px; flex-shrink: 0; margin-left: auto; }
-/* The scroll guide: a small up-and-down arrow in a soft dark circle, in the middle of the sample,
+/* The scroll guide: a small up-and-down arrow in a thin white ring (clear inside, his ask), in the middle of the sample,
    gently bobbing; it fades out once the sample has been scrolled a little (StudyIndex). It never
    takes a touch: the finger goes straight to the sample underneath. */
 .si-cue {
   position: absolute; left: 50%; top: 50%; z-index: 2; width: 46px; height: 46px; margin: -23px 0 0 -23px;
-  display: grid; place-items: center; border-radius: 50%; background: rgba(0, 0, 0, .42);
-  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); pointer-events: none;
+  display: grid; place-items: center; border-radius: 50%; border: 1px solid #fff; background: transparent;
+  pointer-events: none;
   opacity: 0; transition: opacity .5s ease;
 }
 .si-cue.is-shown { opacity: 1; }
