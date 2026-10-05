@@ -676,8 +676,8 @@ html.arrive footer {
 
 /* ---- The Folio — accordion (client-approved 2026-10-05) ----
    The heading and all four service panels fit one screen (Portfolio.tsx).
-   Clicking a panel widens it (the others narrow) while its coloured front,
-   drawing and all, rolls up and away; the back underneath stays still: the
+   Clicking a panel widens it (the others narrow) and its coloured front gives
+   way at once to the back, which stays still as the panel widens: the
    section's grey, the description, a four-step flow and four line icons, with
    the drawing pressed faintly behind. 1.3s, ease in and out, both ways. The
    panel caption has a FIXED height so all four divider lines stay level. */
@@ -808,9 +808,8 @@ html.arrive footer {
   min-height: 0;
   overflow-y: auto;
   /* hidden while closed (in a slim phone strip its padding would poke out under
-     the title); it stays until the front has rolled back down over it */
+     the title) */
   visibility: hidden;
-  transition: visibility 0s linear 1.3s;
   /* a long description scrolls inside the page: its last lines fade at the foot
      instead of stopping hard against the divider */
   -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 22px), transparent);
@@ -918,7 +917,10 @@ html.arrive footer {
   stroke-linejoin: round;
 }
 
-/* the coloured front: it rolls up and away to open, and back down to close */
+/* the coloured front: it gives way to the back AT ONCE when a panel opens, and
+   returns at once when it closes, while the panel itself widens or narrows
+   (his pick, 2026-10-05: Safari never ran the old roll-up, and he preferred
+   how that looked, so every browser now does it) */
 .fw-cover {
   position: relative;
   z-index: 4;
@@ -933,7 +935,6 @@ html.arrive footer {
   left: 0;
   right: 0;
   height: calc(100cqh + 2px);
-  transition: transform var(--fw-panel);
 }
 
 .fw-panel.is-open .fw-cover-in {
@@ -942,7 +943,6 @@ html.arrive footer {
 
 .fw-panel.is-open .fw-desc {
   visibility: visible;
-  transition: visibility 0s;
 }
 
 /* the caption: same size in every panel, so the divider lines stay level */
@@ -958,13 +958,11 @@ html.arrive footer {
   height: var(--fw-cap);
   overflow: hidden;
   /* the line gives way while the panel is open (the back meets the caption
-     directly) and returns once the front has rolled back down */
-  transition: border-top-color 0s linear 1.3s;
+     directly) and returns when it closes */
 }
 
 .fw-panel.is-open .fw-rule {
   border-top-color: transparent;
-  transition: border-top-color 0s;
 }
 
 .fw-cat-row {
