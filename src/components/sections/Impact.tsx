@@ -411,16 +411,21 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
               <figure className="ic-shot">
                 <Image src={p.img} alt={t.alts[i]} width={1000} height={1250} sizes="(max-width: 760px) 100vw, 33vw" />
               </figure>
-              <h3 className="ic-name">{t.phases[i]}</h3>
-              <Figure stat={p.datum} run={counting} />
-              <p className="ic-cap">{t.stats[p.stat]}</p>
+              {/* the caption runs across under the photo (his ask, 2026-10-05): the figure, then the
+                  phase name over its line, so the photos and the bars fit one screen */}
+              <div className="ic-capline">
+                <Figure stat={p.datum} run={counting} />
+                <div className="ic-captext">
+                  <h3 className="ic-name">{t.phases[i]}</h3>
+                  <p className="ic-cap">{t.stats[p.stat]}</p>
+                </div>
+              </div>
             </article>
           ))}
         </div>
 
         {/* growth is a data attribute, not a class: React rewriting className would drop the fade-up's ic-in */}
         <div className="ic-lift" ref={liftRef} data-rv data-grow={growing === 'wait' ? undefined : growing === 'done' ? 'still' : ''}>
-          <div className="ic-lift-head"><b>{t.liftHeading}</b></div>
           <div
             className="ic-lift-grid"
             role="img"
@@ -433,7 +438,8 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
             </div>
             {channelLift.map((c, i) => (
               <div className="ic-row" key={c.glyph} style={{ '--i': i } as React.CSSProperties}>
-                <div className="ic-ch"><Glyph name={c.glyph} />{t.channels[i]}</div>
+                {/* each channel is its icon (the name is for screen readers and the hover tooltip) */}
+                <div className="ic-ch" title={t.channels[i]}><Glyph name={c.glyph} /><span className="sr-only">{t.channels[i]}</span></div>
                 <div className="ic-track">
                   <div className="ic-base" style={{ width: pct(100) }} />
                   <div className="ic-gain" style={{ width: pct(c.after - 100) }} />
