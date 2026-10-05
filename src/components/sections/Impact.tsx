@@ -320,30 +320,6 @@ export default function Impact({ lang = 'en' as Locale }: { lang?: Locale }) {
     }
   }, [])
 
-  // The hero's "I want to build…" (a plain #contact link) is meant to stop at CRAFT, not run on to the
-  // booking form. Left to the browser, whether it stopped depended on the headline being caught
-  // mid-scroll, which Safari's fast smooth scroll skipped. So it now scrolls to CRAFT itself: to the point
-  // where the headline starts and holds, if it has not played yet (the usual hold, play and glide follow);
-  // otherwise, or with reduced motion, to the headline sitting under the nav. (The nav's Contact link is
-  // the one that goes on to the booking form.)
-  useEffect(() => {
-    const onClick = (ev: MouseEvent) => {
-      if (ev.button !== 0 || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return
-      if (!(ev.target instanceof Element) || !ev.target.closest('a.hero-btn-connect')) return
-      const wrap = wrapRef.current, word = wrap?.querySelector('svg')
-      if (!wrap || !word) return
-      ev.preventDefault()
-      const still = reducedMotion()
-      const nav = document.querySelector<HTMLElement>('.nav')?.offsetHeight ?? 64
-      const top = !still && !playedRef.current
-        ? window.scrollY + wrap.getBoundingClientRect().top - window.innerHeight * 0.45
-        : window.scrollY + word.getBoundingClientRect().top - nav - 20
-      window.scrollTo({ top, behavior: still ? ('instant' as ScrollBehavior) : 'smooth' })
-    }
-    document.addEventListener('click', onClick)
-    return () => document.removeEventListener('click', onClick)
-  }, [])
-
   // (a figure finished unseen stays finished when the reader comes back up to it)
   const startCount = () => setCounting((c) => (c === 'wait' ? 'play' : c))
   const phasesRef = useOnceInView<HTMLDivElement>(0.35, startCount)

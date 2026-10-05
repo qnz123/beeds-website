@@ -505,8 +505,9 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
         <p className="hero-body">{t.body}</p>
 
         {/* Two pill buttons (design 03 "Ink and blue"): Work first in solid
-            blue with a film-frame icon, then the booking section in frosted
-            glass with a speech-bubble icon. */}
+            blue with a film-frame icon, then "I want to build…" in frosted
+            glass with a speech-bubble icon, to the services (his ask,
+            2026-10-05; it used to open the booking section). */}
         <div className="hero-actions">
           <a href="#work" className="hero-btn hero-btn-work">
             <span className="hero-btn-ic" aria-hidden="true">
@@ -517,7 +518,7 @@ export default function Hero({ lang = 'en' }: { lang?: Locale }) {
             </span>
             {t.ctaWork}
           </a>
-          <a href="#contact" className="hero-btn hero-btn-connect">
+          <a href="#services" className="hero-btn hero-btn-connect">
             <span className="hero-btn-ic" aria-hidden="true">
               <svg viewBox="0 0 24 24">
                 <path d="M20.5 11.6c0 4.2-3.8 7.4-8.5 7.4-1 0-2-.1-2.9-.4L4 20l1.2-3.6C4.1 15 3.5 13.4 3.5 11.6c0-4.2 3.8-7.4 8.5-7.4s8.5 3.2 8.5 7.4z" />
