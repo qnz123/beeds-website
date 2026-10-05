@@ -6,6 +6,8 @@
 import type { CSSProperties, ReactNode } from 'react'
 import type { Locale } from '@/i18n/config'
 
+export type CueIcon = 'compass' | 'people' | 'speech' | 'search' | 'spark' | 'flow' | 'tools' | 'clock' | 'clapper' | 'phone' | 'window' | 'hands' | 'globe' | 'chart'
+
 export type FrameDatum = {
   num: string
   word: string
@@ -18,6 +20,11 @@ export type FrameDatum = {
   /** Optional shorter description for the back of the homepage card, where
    *  the full `about` runs too long (falls back to `about`). */
   card?: string[]
+  /** The back of the homepage panel (Tone 1, 2026-10-05): four steps, each a
+   *  name and a short note, and four things with a line icon. */
+  steps: [string, string][]
+  makeLabel: string
+  make: { label: string; icon: CueIcon }[]
   field: 'gold' | 'navy' | 'red' | 'charcoal'
   mark: ReactNode
   /** Per-frame offset of the oversized instrument, from the approved plates. */
@@ -106,6 +113,9 @@ export const frames: FrameDatum[] = [
     about: [
       "Sometimes the biggest challenge isn't making content\u2014it's knowing what story to tell. We help you find the right direction by understanding your business, your audience, and what makes your brand different. Together, we'll shape a strategy that feels authentic and gets people to pay attention.",
     ],
+    steps: [['Listen', 'business, audience'], ['Diagnose', 'what is not landing'], ['Position', 'what sets you apart'], ['Story', 'the direction']],
+    makeLabel: 'What we shape',
+    make: [{ label: 'Brand direction', icon: 'compass' }, { label: 'Audience', icon: 'people' }, { label: 'Messaging', icon: 'speech' }, { label: 'Creative diagnosis', icon: 'search' }],
     field: 'gold',
     mark: compassMark,
   },
@@ -118,6 +128,9 @@ export const frames: FrameDatum[] = [
     about: [
       "AI moves fast, and it can be hard to know where to start. We help teams and individuals learn AI through hands-on workshops and real projects\u2014not just presentations. You'll walk away with practical skills you can use right away to work smarter and create more.",
     ],
+    steps: [['Assess', 'where you are'], ['Workshop', 'hands-on'], ['Practice', 'real projects'], ['Adopt', 'in daily work']],
+    makeLabel: 'What you get',
+    make: [{ label: 'AI tools', icon: 'spark' }, { label: 'Workflows', icon: 'flow' }, { label: 'Real projects', icon: 'tools' }, { label: 'Time saved', icon: 'clock' }],
     field: 'navy',
     mark: networkMark,
     markStyle: { left: '-20%', top: '10%' },
@@ -134,6 +147,9 @@ export const frames: FrameDatum[] = [
     card: [
       'Have an idea but not sure how to bring it to life? From the first conversation to the final launch, we create commercials, APPS, films, AI-powered content, digital platforms, and e-commerce websites\u2014all with the right team, working together from start to finish.',
     ],
+    steps: [['Idea', 'first talk'], ['Plan', 'story, team'], ['Make', 'shoot, build'], ['Launch', 'live, measured']],
+    makeLabel: 'What we make',
+    make: [{ label: 'Videos', icon: 'clapper' }, { label: 'Apps', icon: 'phone' }, { label: 'AI content', icon: 'spark' }, { label: 'Website', icon: 'window' }],
     field: 'red',
     mark: apertureMark,
     markStyle: { top: '12%' },
@@ -151,6 +167,9 @@ export const frames: FrameDatum[] = [
     card: [
       "Breaking into a new market isn't easy\u2014we've been there. Whether you're expanding into APAC or the U.S., we help you navigate the challenges and find what works locally, from strategy and partnerships to launch, so you can focus on growing your business.",
     ],
+    steps: [['Research', 'the market'], ['Strategy', 'where to win'], ['Localize', 'brand, partners'], ['Launch', 'and grow']],
+    makeLabel: 'How we help',
+    make: [{ label: 'Market research', icon: 'search' }, { label: 'Partnerships', icon: 'hands' }, { label: 'APAC & U.S.', icon: 'globe' }, { label: 'Growth', icon: 'chart' }],
     field: 'charcoal',
     mark: globeMark,
     markStyle: { left: '-10%', top: '12%' },
@@ -160,7 +179,7 @@ export const frames: FrameDatum[] = [
 // Japanese copy per frame (client-supplied). Only the text differs; the marks,
 // fields, numerals and specimen words are shared. `category` is the small
 // eyebrow/tab label, `title` the heading, `blurb`/`about` the description.
-type FrameText = Pick<FrameDatum, 'category' | 'title' | 'blurb' | 'about' | 'card'>
+type FrameText = Pick<FrameDatum, 'category' | 'title' | 'blurb' | 'about' | 'steps' | 'makeLabel' | 'make'> & { card?: string[] }
 
 const jaFrameText: FrameText[] = [
   {
@@ -173,6 +192,9 @@ const jaFrameText: FrameText[] = [
       'ビジネスや市場、ユーザーへの理解をもとに、本質的なブランド戦略を設計します。',
       '共感を生み、人を動かすストーリーを、ともに形にしていきます。',
     ],
+    steps: [['ヒアリング', '事業・顧客'], ['診断', '届いていない点'], ['ポジショニング', '独自の強み'], ['ストーリー', '進むべき方向']],
+    makeLabel: '形にするもの',
+    make: [{ label: 'ブランドの方向性', icon: 'compass' }, { label: 'オーディエンス', icon: 'people' }, { label: 'メッセージ', icon: 'speech' }, { label: 'クリエイティブ診断', icon: 'search' }],
   },
   {
     category: 'AI研修・ワークショップ',
@@ -185,6 +207,9 @@ const jaFrameText: FrameText[] = [
       '実際のプロジェクトや業務に沿ってAIを活用し、チーム全体の創造性と生産性を高めます。',
       '学んだその日から、仕事に活かせる実践力を身につけられます。',
     ],
+    steps: [['現状把握', '今の課題'], ['ワークショップ', '実践形式'], ['実践', '実際の案件'], ['定着', '日々の業務へ']],
+    makeLabel: '得られるもの',
+    make: [{ label: 'AIツール', icon: 'spark' }, { label: 'ワークフロー', icon: 'flow' }, { label: '実案件', icon: 'tools' }, { label: '時間の削減', icon: 'clock' }],
   },
   {
     category: 'エンドツーエンドのコンテンツ制作',
@@ -197,6 +222,9 @@ const jaFrameText: FrameText[] = [
       'プロジェクトごとに最適なチームを編成し、企画から公開・運用までを一貫して支援します。',
       'ブランドストーリーも、その体験を支える仕組みも。すべてがひとつにつながるクリエイティブを実現します。',
     ],
+    steps: [['アイデア', '最初の対話'], ['企画', 'ストーリー・体制'], ['制作', '撮影・開発'], ['ローンチ', '公開・効果測定']],
+    makeLabel: '制作するもの',
+    make: [{ label: '映像', icon: 'clapper' }, { label: 'アプリ', icon: 'phone' }, { label: 'AIコンテンツ', icon: 'spark' }, { label: 'ウェブサイト', icon: 'window' }],
   },
   {
     category: 'APAC・米国市場へのグロース',
@@ -209,6 +237,9 @@ const jaFrameText: FrameText[] = [
       '地域ごとの文化や市場特性を踏まえながら、スムーズで効果的な市場展開をサポートします。',
       'チームの負担を軽減し、本来の事業成長に集中できる環境をともにつくります。',
     ],
+    steps: [['調査', '市場を知る'], ['戦略', '勝ち筋を描く'], ['ローカライズ', 'ブランド・パートナー'], ['ローンチ', 'そして成長へ']],
+    makeLabel: '支援内容',
+    make: [{ label: '市場調査', icon: 'search' }, { label: 'パートナーシップ', icon: 'hands' }, { label: 'APAC・米国', icon: 'globe' }, { label: '成長', icon: 'chart' }],
   },
 ]
 

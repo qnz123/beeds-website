@@ -17,7 +17,7 @@
 // Styles live in the "Featured Work — The Folio" block of globals.css.
 
 import { useEffect, useRef, useState } from 'react'
-import { getFrames, HIGHLIGHT_PHRASES, type FrameDatum } from './folioData'
+import { getFrames, HIGHLIGHT_PHRASES, type CueIcon, type FrameDatum } from './folioData'
 import type { Locale } from '@/i18n/config'
 import { whenPassedUnseen } from '@/lib/passedUnseen'
 
@@ -204,14 +204,16 @@ function ScrambleWord({ word }: { word: string }) {
 }
 
 // ---------------------------------------------------------------------------
-// The plate writes its description: "Ink on paper" (client-approved
-// 2026-10-04, from the Service Plate Writing study; it replaced the turning
-// plate). Clicking a plate turns its coloured field into an ivory page with
-// the artwork pressed faintly into it, and the description is there on it in
-// ink (no writing animation, his ask 2026-10-05); the caption turns to ink too and
-// the book fills solid. The ink is black on every plate (his ask). Clicking
-// again clears it; one plate is open at a time.
-// Styles: "The Folio — ink on paper" in globals.css.
+// The services as an accordion (client-approved 2026-10-05, from the "Services
+// on One Screen" study): the heading and all four panels fit one screen. Click
+// a panel and it widens while the others narrow; its coloured front, drawing
+// and all, rolls up and away (and back down to close), uncovering the back on
+// the section's own grey: the description, a four-step flow and four line
+// icons ("Tone 1"), with the drawing pressed faintly behind. Everything on the
+// back stays still: on a desktop it is laid out once at the OPEN panel's width
+// (--fw-open-w, set below), so widening only uncovers it. One panel open at a
+// time; click again or press Esc to close. Styles: "The Folio — accordion" in
+// globals.css.
 // ---------------------------------------------------------------------------
 
 // The phrases the Services page brushes yellow are set a size up on the page.
@@ -232,7 +234,7 @@ function withLifts(paragraph: string, phrases: string[]) {
 
 function Specimen({ frame }: { frame: FrameDatum }) {
   return (
-    <>
+    <span className="fw-artbox">
       <span className="fw-word" aria-hidden="true">
         {frame.word}
       </span>
@@ -242,8 +244,26 @@ function Specimen({ frame }: { frame: FrameDatum }) {
       <span className="fw-num" aria-hidden="true">
         {frame.num}
       </span>
-    </>
+    </span>
   )
+}
+
+// Line icons for the back (32-unit grid, 1px stroke set in CSS).
+const CUE_ICONS: Record<CueIcon, React.ReactNode> = {
+  compass: (<><circle cx="16" cy="16" r="12" /><path d="M20.5 11.5l-2.8 6.2-6.2 2.8 2.8-6.2z" /></>),
+  people: (<><circle cx="12" cy="11" r="4" /><path d="M4 26c0-4.4 3.6-8 8-8s8 3.6 8 8" /><circle cx="23" cy="12" r="3" /><path d="M21 18.5c3.9-.6 7 2.3 7 6.5" /></>),
+  speech: (<><path d="M5 7h22v14H14l-6 5v-5H5z" /><path d="M10 12h12M10 16h8" /></>),
+  search: (<><circle cx="14" cy="14" r="8" /><path d="M20 20l7 7" /></>),
+  spark: (<><path d="M16 4l2.6 7.4L26 14l-7.4 2.6L16 24l-2.6-7.4L6 14l7.4-2.6z" /><path d="M25 22l1 2.5 2.5 1-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1z" /></>),
+  flow: (<><circle cx="7" cy="16" r="3" /><circle cx="25" cy="8" r="3" /><circle cx="25" cy="24" r="3" /><path d="M10 15l12-6M10 17l12 6" /></>),
+  tools: (<path d="M19 5a6 6 0 0 0-5.6 8.1L5 21.5 8.5 25l8.4-8.4A6 6 0 0 0 25 11l-3.5 3.5-3.5-.5-.5-3.5z" />),
+  clock: (<><circle cx="16" cy="16" r="12" /><path d="M16 9v7l5 3" /></>),
+  clapper: (<><rect x="4" y="9" width="24" height="17" rx="1" /><path d="M4 9l4-5h20l-4 5M12 4l-4 5M20 4l-4 5" /><path d="M14 14l6 3.5-6 3.5z" /></>),
+  phone: (<><rect x="10" y="3" width="12" height="26" rx="2.5" /><path d="M14 25.5h4" /></>),
+  window: (<><rect x="3" y="6" width="26" height="20" rx="1.5" /><path d="M3 11h26M8 15h9M8 19h14M8 23h6" /></>),
+  hands: (<><path d="M4 15l6-6 5 3 5-3 8 6" /><path d="M9 18l4 4c1 1 2.5 1 3.5 0l1-1M15 16l5 5c1 1 2.5 1 3.5 0l.5-.5c1-1 1-2.5 0-3.5L19 12" /></>),
+  globe: (<><circle cx="16" cy="16" r="12" /><ellipse cx="16" cy="16" rx="5" ry="12" /><path d="M4 16h24M6 10h20M6 22h20" /></>),
+  chart: (<path d="M4 27h24M8 23v-6M14 23V12M20 23v-8M26 23V7" />),
 }
 
 // An open book at the end of the category line: there is more to read on the back.
@@ -273,18 +293,20 @@ function Caption({ frame, cue = false }: { frame: FrameDatum; cue?: boolean }) {
 function FolioFrame({
   frame,
   phrases,
+  labels,
   open,
   onToggle,
 }: {
   frame: FrameDatum
   phrases: string[]
+  labels: { steps: string }
   open: boolean
   onToggle: () => void
 }) {
   const descRef = useRef<HTMLDivElement>(null)
   const text = frame.card ?? frame.about ?? [frame.blurb]
 
-  // each opening starts at the top of the description (it can scroll on phones)
+  // each opening starts at the top of the description (it can scroll on small phones)
   useEffect(() => {
     if (open && descRef.current) descRef.current.scrollTop = 0
   }, [open])
@@ -297,28 +319,58 @@ function FolioFrame({
   }
 
   return (
-    <div className="fw-cell">
-      <div
-        className={`fw-plate${open ? ' is-open' : ''}`}
-        role="button"
-        tabIndex={0}
-        aria-expanded={open}
-        onClick={onToggle}
-        onKeyDown={onKey}
-      >
-        <div className={`fw-field fw-field--${frame.field}`} />
-        <div className="fw-paper" aria-hidden="true" />
-        <div className={`fw-hairline fw-hairline--${frame.field}`} aria-hidden="true" />
-        <Specimen frame={frame} />
-        <div ref={descRef} className="fw-desc" aria-hidden={!open}>
-          {text.map((p, i) => (
-            <p key={i}>
-              {withLifts(p, phrases)}
-            </p>
-          ))}
+    <div
+      className={`fw-panel${open ? ' is-open' : ''}`}
+      role="button"
+      tabIndex={0}
+      aria-expanded={open}
+      onClick={onToggle}
+      onKeyDown={onKey}
+    >
+      <div className={`fw-field fw-field--${frame.field}`} />
+      <div className="fw-paper" aria-hidden="true">
+        <div className="fw-press">
+          <Specimen frame={frame} />
         </div>
-        <Caption frame={frame} cue />
       </div>
+      <div ref={descRef} className="fw-desc" aria-hidden={!open}>
+        {text.map((p, i) => (
+          <p key={i}>{withLifts(p, phrases)}</p>
+        ))}
+        <div className="fw-extra">
+          <div className="fw-blk">
+            <span className="fw-lbl">{labels.steps}</span>
+            <div className="fw-flow">
+              {frame.steps.map(([name, note], k) => (
+                <div key={k} className="fw-step">
+                  <span className="fw-dot">{k + 1}</span>
+                  {name}
+                  <small>{note}</small>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="fw-blk">
+            <span className="fw-lbl">{frame.makeLabel}</span>
+            <div className="fw-icons">
+              {frame.make.map((m) => (
+                <div key={m.label} className="fw-ic">
+                  <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+                    {CUE_ICONS[m.icon]}
+                  </svg>
+                  {m.label}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="fw-cover" aria-hidden="true">
+        <div className={`fw-cover-in fw-field--${frame.field}`}>
+          <Specimen frame={frame} />
+        </div>
+      </div>
+      <Caption frame={frame} cue />
     </div>
   )
 }
@@ -328,6 +380,33 @@ export default function Portfolio({ lang = 'en' as Locale }: { lang?: Locale }) 
   const phrases = HIGHLIGHT_PHRASES[lang] ?? []
   const [openIndex, setOpenIndex] = useState<number | null>(null)
   const sectionRef = useRef<HTMLElement>(null)
+  const panelsRef = useRef<HTMLDivElement>(null)
+  const labels = { steps: lang === 'ja' ? '進め方' : 'How it runs' }
+
+  // The open and closed panel widths, for the still back and the front drawing
+  // (see the header above): four panels, three 14px gaps, open grows 3 : 0.7.
+  useEffect(() => {
+    const el = panelsRef.current
+    if (!el || typeof ResizeObserver === 'undefined') return
+    const set = () => {
+      const free = el.clientWidth - 3 * 14
+      el.style.setProperty('--fw-open-w', `${(free * 3) / (3 + 3 * 0.7)}px`)
+      el.style.setProperty('--fw-closed-w', `${free / 4}px`)
+    }
+    set()
+    const ro = new ResizeObserver(set)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (openIndex === null) return
+    const onEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpenIndex(null)
+    }
+    window.addEventListener('keydown', onEsc)
+    return () => window.removeEventListener('keydown', onEsc)
+  }, [openIndex])
   const { ref: folioRef, dataAnimate, still } = useInView<HTMLDivElement>(0.15)
 
   // The spin-down (client-directed, 2026-07-09): once the section enters the
@@ -421,17 +500,13 @@ export default function Portfolio({ lang = 'en' as Locale }: { lang?: Locale }) 
             </span>
           </h2>
         </div>
-        <div
-          className="fw-strip"
-          tabIndex={0}
-          role="region"
-          aria-label="Featured work — four frames, scrolls horizontally"
-        >
+        <div ref={panelsRef} className={`fw-panels${openIndex !== null ? ' has-open' : ''}`}>
           {frames.map((frame, i) => (
             <FolioFrame
               key={frame.title}
               frame={frame}
               phrases={phrases}
+              labels={labels}
               open={openIndex === i}
               onToggle={() => setOpenIndex((cur) => (cur === i ? null : i))}
             />

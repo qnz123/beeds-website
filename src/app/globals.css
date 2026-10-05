@@ -625,11 +625,6 @@ html.arrive footer {
     -webkit-line-clamp: 3;
   }
 
-  /* the third caption line comes out of the description's room */
-  :lang(en) .fw-desc {
-    padding-top: 12px;
-    font-size: 14px;
-  }
 }
 
 @media (max-width: 760px) {
@@ -679,217 +674,155 @@ html.arrive footer {
   }
 }
 
-/* ---- The Folio — ink on paper (client-approved 2026-10-04) ----
-   Clicking a plate (Portfolio.tsx) slides an ivory page down over the card's
-   upper part, with the artwork pressed faintly into it and the description
-   printed on it in black ink, and fills the book. The page stops at the
-   divider line (his ask, 2026-10-05): the plate is two rows, the page area and
-   the caption, and the page, its description and its hairlines live in the
-   first row, so the caption stays white on the card's colour. The slide is
-   0.9s, ease-out (quick to start, gliding to a soft stop). It replaced the
-   turning plate on 2026-10-04. */
-/* the ink on the page: black on every plate (his ask, 2026-10-04) */
-.fw-cell {
-  --fw-solid: #141414;
+/* ---- The Folio — accordion (client-approved 2026-10-05) ----
+   The heading and all four service panels fit one screen (Portfolio.tsx).
+   Clicking a panel widens it (the others narrow) while its coloured front,
+   drawing and all, rolls up and away; the back underneath stays still: the
+   section's grey, the description, a four-step flow and four line icons, with
+   the drawing pressed faintly behind. 1.3s, ease in and out, both ways. The
+   panel caption has a FIXED height so all four divider lines stay level. */
+.fw-folio {
+  --fw-panel: 1.3s cubic-bezier(0.65, 0, 0.35, 1);
+  --fw-ink: #141414;
+  --fw-gap: 14px;
+  /* the caption block: rule + padding + category row + two title lines + two blurb lines */
+  --fw-cap: calc(1px + 12px + 20px + 6px + 17px * 1.25 * 2 + 5px + 12px * 1.6 * 2);
+  /* one screen under the site's sticky 64px bar */
+  height: calc(100svh - 64px);
+  min-height: 520px;
+  max-height: 1040px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 24px 40px 0;
+  max-width: 1760px;
+  margin-inline: auto;
 }
 
-.fw-plate {
-  cursor: pointer;
+.fw-folio .fw-head {
+  padding: 0;
+}
+
+.fw-folio .fw-journey {
+  font-size: clamp(22px, 3vw, 42px);
+}
+
+.fw-panels {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: var(--fw-gap);
+}
+
+.fw-panel {
+  position: relative;
+  overflow: hidden;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
+  color: #fff;
+  cursor: pointer;
+  container-type: size;
+  transition: flex-grow var(--fw-panel);
 }
 
-.fw-paper,
-.fw-hairline,
-.fw-desc {
-  grid-row: 1;
-  grid-column: 1;
+.fw-panels.has-open .fw-panel {
+  flex-grow: 0.7;
 }
 
-.fw-plate > .fw-meta {
-  grid-row: 2;
-  grid-column: 1;
+.fw-panels.has-open .fw-panel.is-open {
+  flex-grow: 3;
 }
 
-.fw-plate:focus-visible {
+.fw-panel:focus-visible {
   outline: 2px solid #ccb718;
   outline-offset: 3px;
 }
 
-.fw-paper {
-  position: relative;
-  /* a pixel past the plate's top and sides (it clips them), so no sliver of the
-     field shows there; its foot comes down ONTO the divider line and covers it
-     (his ask, 2026-10-05), so the page's edge is the line: one clean boundary,
-     no pale stripe of line showing under it */
-  margin: -1px -1px -1px;
-  z-index: 0;
-  pointer-events: none;
-  background: #f2eee4;
-  /* the page SLIDES down from above (a composited transform, smooth in every
-     browser) on an ease-out */
-  transform: translateY(-101%);
-  transition: transform 0.9s cubic-bezier(0.33, 1, 0.68, 1) 0.1s;
-  will-change: transform;
-}
-
-/* A hairline of the card's colour along the top and right of the page (his
-   ask, 2026-10-04). Each line is a border (it snaps to whole device pixels:
-   an earlier half-pixel sliver of the field was "not stable" in Safari and
-   Firefox), one device pixel on Retina. When the page opens both lines draw
-   on from the top-right corner, the top one leftwards and the right one
-   downwards to the divider line, at about the SAME constant speed (the page
-   area is about as tall as the plate is wide). Closed, they reset once the
-   page has gone. */
-.fw-hairline {
-  --fw-hw: 1px;
-  position: relative;
-  z-index: 5;
-  pointer-events: none;
-}
-
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx) {
-  .fw-hairline {
-    --fw-hw: 0.5px;
-  }
-}
-
-.fw-hairline::before,
-.fw-hairline::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  transition: transform 0s linear 1.05s;
-}
-
-.fw-hairline::before {
-  left: 0;
-  border-top: var(--fw-hw) solid var(--fw-hair);
-  transform: scaleX(0);
-  transform-origin: right center;
-}
-
-.fw-hairline::after {
-  bottom: 0;
-  border-right: var(--fw-hw) solid var(--fw-hair);
-  transform: scaleY(0);
-  transform-origin: center top;
-}
-
-.fw-plate.is-open .fw-hairline::before {
-  transform: scaleX(1);
-  transition: transform 0.675s linear;
-}
-
-.fw-plate.is-open .fw-hairline::after {
-  transform: scaleY(1);
-  transition: transform 0.675s linear;
-}
-
-.fw-hairline--gold {
-  --fw-hair: #8b7d0a;
-}
-
-.fw-hairline--navy {
-  --fw-hair: #1d2a41;
-}
-
-.fw-hairline--red {
-  --fw-hair: #a13636;
-}
-
-.fw-hairline--charcoal {
-  --fw-hair: #262626;
-}
-
-/* a little light and a fine grain, so it reads as paper */
-.fw-paper::after {
-  content: '';
+/* the drawing: sized by its own box, so it scales with the panel, never past
+   the closed width on the coloured front (no zoom while a panel widens) */
+.fw-artbox {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(120% 90% at 30% 10%, rgba(255, 255, 255, 0.55), transparent 60%),
-    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.012) 0 2px, transparent 2px 4px);
+  container-type: size;
 }
 
-.fw-plate.is-open .fw-paper {
-  transform: translateY(0);
-  transition: transform 0.9s cubic-bezier(0.33, 1, 0.68, 1);
+.fw-artbox .fw-num {
+  right: -5cqi;
+  font-size: min(47cqi, 40cqh);
 }
 
-/* The page lands ON the divider: the line (drawn above the page) gives way
-   the moment the page's edge reaches it (0.75s into the 0.9s ease-out, when the
-   edge is within a pixel), and comes back as the page lifts off it on closing
-   (after the 0.1s delay), so there is one clean edge where the line was. */
-.fw-rule {
-  transition: border-top-color 0s linear 0.1s;
+.fw-artbox .fw-word {
+  left: -3cqi;
+  font-size: min(18.5cqi, 16cqh);
 }
 
-.fw-plate.is-open .fw-rule {
-  border-top-color: transparent;
-  transition: border-top-color 0s linear 0.75s;
+/* the back: the section's grey, still; the drawing pressed faintly into it */
+.fw-paper,
+.fw-desc,
+.fw-cover {
+  grid-row: 1;
+  grid-column: 1;
 }
 
-/* the artwork pressed into the page */
-.fw-mark svg,
-.fw-goldfill,
-.fw-whitefill,
-.fw-goldstroke,
-.fw-word {
-  transition: stroke 0.6s, fill 0.6s, color 0.6s;
+.fw-paper {
+  position: relative;
+  z-index: 0;
+  overflow: hidden;
+  margin: -1px -1px -1px;
+  background: #f5f5f5;
+  pointer-events: none;
 }
 
-.fw-num {
-  transition: -webkit-text-stroke-color 0.7s;
+.fw-press {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: calc(100% - 2px);
+  height: 100cqh;
 }
 
-.fw-plate.is-open .fw-mark svg,
-.fw-plate.is-open .fw-goldstroke {
-  stroke: color-mix(in srgb, var(--fw-solid) 22%, transparent);
+.fw-press .fw-mark svg,
+.fw-press .fw-goldstroke {
+  stroke: rgba(20, 20, 20, 0.13);
 }
 
-.fw-plate.is-open .fw-goldfill,
-.fw-plate.is-open .fw-whitefill {
-  fill: color-mix(in srgb, var(--fw-solid) 12%, transparent);
+.fw-press .fw-goldfill,
+.fw-press .fw-whitefill {
+  fill: rgba(20, 20, 20, 0.06);
 }
 
-.fw-plate.is-open .fw-num {
-  -webkit-text-stroke-color: color-mix(in srgb, var(--fw-solid) 22%, transparent);
+.fw-press .fw-num {
+  -webkit-text-stroke-color: rgba(20, 20, 20, 0.14);
 }
 
-.fw-plate.is-open .fw-word {
-  color: color-mix(in srgb, var(--fw-solid) 7%, transparent);
+.fw-press .fw-word {
+  color: rgba(20, 20, 20, 0.04);
 }
 
-/* The description, printed on the page above the divider line. */
 .fw-desc {
   position: relative;
   z-index: 3;
-  color: var(--fw-solid);
   min-height: 0;
   overflow-y: auto;
+  /* hidden while closed (in a slim phone strip its padding would poke out under
+     the title); it stays until the front has rolled back down over it */
+  visibility: hidden;
+  transition: visibility 0s linear 1.3s;
+  /* a long description scrolls inside the page: its last lines fade at the foot
+     instead of stopping hard against the divider */
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 22px), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 22px), transparent);
   display: grid;
   align-content: start;
-  gap: 10px;
-  padding: 56px 26px 18px;
+  gap: 8px;
+  padding: 48px 22px 14px;
+  color: var(--fw-ink);
   font-size: 16px;
-  line-height: 1.55;
+  line-height: 1.5;
   scrollbar-width: thin;
-}
-
-/* No writing animation (his ask, 2026-10-05): the description is printed on
-   the page and comes down WITH it, moving exactly as .fw-paper does (same
-   curve, timing and distance: both are the page row's height). Closed, it
-   sits above the plate, clipped away. */
-.fw-desc {
-  transform: translateY(-101%);
-  transition: transform 0.9s cubic-bezier(0.33, 1, 0.68, 1) 0.1s;
-}
-
-.fw-plate.is-open .fw-desc {
-  transform: translateY(0);
-  transition: transform 0.9s cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 /* the phrases the Services page brushes yellow are set a size up here */
@@ -898,90 +831,370 @@ html.arrive footer {
   line-height: 1.3;
 }
 
-/* The front's cue that there is more: an open book at the end of the category
-   line, in the plates' white hairline. It lifts a little on hover / focus, and
-   fills solid white while the description is written and open. */
+/* Tone 1 · Draughtsman: a hairline flow and line icons in the drawings' thin ink */
+.fw-extra {
+  display: grid;
+  gap: 18px;
+  margin-top: 14px;
+}
+
+.fw-blk {
+  display: grid;
+  gap: 10px;
+}
+
+.fw-lbl {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(20, 20, 20, 0.55);
+}
+
+.fw-flow {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.fw-flow::before {
+  content: '';
+  position: absolute;
+  left: 12.5%;
+  right: 12.5%;
+  top: 9px;
+  border-top: 1px solid rgba(20, 20, 20, 0.45);
+}
+
+.fw-step {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  text-align: center;
+  font-size: 13.5px;
+  line-height: 1.2;
+}
+
+.fw-dot {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 19px;
+  height: 19px;
+  border: 1px solid var(--fw-ink);
+  border-radius: 50%;
+  background: #f5f5f5;
+  font-size: 9px;
+}
+
+.fw-step small {
+  font-size: 10.5px;
+  color: rgba(20, 20, 20, 0.55);
+}
+
+.fw-icons {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.fw-ic {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  line-height: 1.2;
+  color: #333;
+  text-align: center;
+}
+
+.fw-ic svg {
+  width: 28px;
+  height: 28px;
+  fill: none;
+  stroke: var(--fw-ink);
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* the coloured front: it rolls up and away to open, and back down to close */
+.fw-cover {
+  position: relative;
+  z-index: 4;
+  overflow: hidden;
+  margin: -1px -1px 0;
+  pointer-events: none;
+}
+
+.fw-cover-in {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(100cqh + 2px);
+  transition: transform var(--fw-panel);
+}
+
+.fw-panel.is-open .fw-cover-in {
+  transform: translateY(-101%);
+}
+
+.fw-panel.is-open .fw-desc {
+  visibility: visible;
+  transition: visibility 0s;
+}
+
+/* the caption: same size in every panel, so the divider lines stay level */
+.fw-panel > .fw-meta {
+  grid-row: 2;
+  grid-column: 1;
+  z-index: 4;
+  padding: 0 22px 22px;
+}
+
+.fw-panel .fw-rule {
+  box-sizing: border-box;
+  height: var(--fw-cap);
+  overflow: hidden;
+  /* the line gives way while the panel is open (the back meets the caption
+     directly) and returns once the front has rolled back down */
+  transition: border-top-color 0s linear 1.3s;
+}
+
+.fw-panel.is-open .fw-rule {
+  border-top-color: transparent;
+  transition: border-top-color 0s;
+}
+
 .fw-cat-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
+  height: 20px;
   margin-bottom: 6px;
 }
 
 .fw-cat-row .fw-cat {
+  min-width: 0;
   margin-bottom: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
+.fw-panel .fw-rule h3 {
+  font-size: 17px;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.fw-panel .fw-rule p {
+  font-size: 12px;
+  min-height: 0;
+}
+
+/* a narrow panel keeps the blurb's room but hides it */
+@container (max-width: 300px) {
+  .fw-panel .fw-rule p {
+    visibility: hidden;
+  }
+}
+
+/* the book: an outline; solid white on hover and while open */
 .fw-cue {
   flex: none;
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   fill: rgba(255, 255, 255, 0);
   stroke: rgba(255, 255, 255, 0.85);
   stroke-width: 1.2;
   stroke-linecap: round;
   stroke-linejoin: round;
-  transition: transform 0.35s ease, stroke 0.35s ease, fill 0.35s ease;
+  transition: fill 1.2s ease, stroke 1.2s ease;
 }
 
 .fw-cue-page {
   fill: none;
   stroke: rgba(204, 183, 24, 0.9);
-  transform-origin: 12px 6.6px;
-  transition: transform 0.45s ease, stroke 0.35s ease;
+  transition: stroke 1.2s ease;
 }
 
-.fw-plate:hover .fw-cue,
-.fw-plate:focus-visible .fw-cue {
-  stroke: #fff;
-  transform: translateY(-2px);
-}
-
-.fw-plate:hover .fw-cue-page,
-.fw-plate:focus-visible .fw-cue-page {
-  transform: rotate(-14deg);
-}
-
-.fw-plate.is-open .fw-cue {
+.fw-panel:hover .fw-cue,
+.fw-panel:focus-visible .fw-cue,
+.fw-panel.is-open .fw-cue {
   fill: #fff;
   stroke: #fff;
 }
 
-.fw-plate.is-open .fw-cue-page {
-  stroke: color-mix(in srgb, var(--fw-solid) 50%, transparent);
+.fw-panel:hover .fw-cue-page,
+.fw-panel:focus-visible .fw-cue-page,
+.fw-panel.is-open .fw-cue-page {
+  stroke: rgba(0, 0, 0, 0.25);
 }
 
-@media (max-width: 760px) {
+/* hover: the front's drawing brightens and its gold glows, slowly, without moving */
+.fw-cover-in .fw-mark svg,
+.fw-cover-in .fw-goldfill,
+.fw-cover-in .fw-whitefill,
+.fw-cover-in .fw-num {
+  transition: stroke 1.2s ease, fill 1.2s ease, -webkit-text-stroke-color 1.2s ease;
+}
+
+.fw-panel:not(.is-open):hover .fw-cover-in .fw-mark svg,
+.fw-panel:not(.is-open):focus-visible .fw-cover-in .fw-mark svg {
+  stroke: rgba(255, 255, 255, 0.34);
+}
+
+.fw-panel:not(.is-open):hover .fw-cover-in .fw-goldfill,
+.fw-panel:not(.is-open):focus-visible .fw-cover-in .fw-goldfill {
+  fill: rgba(204, 183, 24, 0.75);
+}
+
+.fw-panel:not(.is-open):hover .fw-cover-in .fw-whitefill,
+.fw-panel:not(.is-open):focus-visible .fw-cover-in .fw-whitefill {
+  fill: rgba(255, 255, 255, 0.38);
+}
+
+.fw-panel:not(.is-open):hover .fw-cover-in .fw-num,
+.fw-panel:not(.is-open):focus-visible .fw-cover-in .fw-num {
+  -webkit-text-stroke-color: rgba(255, 255, 255, 0.55);
+}
+
+/* Desktop: the back is laid out once at the open panel's width (set in
+   Portfolio.tsx), so widening only uncovers it; the front's drawing keeps at
+   most its closed size. */
+@media (min-width: 761px) {
   .fw-desc {
-    padding-top: 34px;
-    font-size: 15px;
-    line-height: 1.5;
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* it ends exactly at the divider line (the caption's height plus its 22px
+       foot), so long text scrolls inside it and never runs into the title */
+    bottom: calc(var(--fw-cap) + 22px);
+    width: var(--fw-open-w, 100%);
   }
 
-  /* The Japanese descriptions are longer and have no shorter card copy: a size
-     down fits 01–02; 03–04 still scroll a few lines inside the card. */
-  :lang(ja) .fw-desc {
-    padding-top: 30px;
+  .fw-press {
+    width: var(--fw-open-w, 100%);
+  }
+
+  .fw-cover-in .fw-artbox {
+    right: auto;
+    width: min(100%, var(--fw-closed-w, 100%));
+  }
+
+  .fw-panel > .fw-meta {
+    /* the caption's own height, including its padding, for the description's foot */
+    min-height: calc(var(--fw-cap) + 22px);
+  }
+}
+
+/* Phones: the panels stack; the open one takes most of the height and the
+   others become slim title strips. */
+@media (max-width: 760px) {
+  .fw-folio {
+    gap: 16px;
+    padding: 20px 16px 0;
+  }
+
+  .fw-panels {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .fw-panels.has-open .fw-panel {
+    flex-grow: 1;
+  }
+
+  .fw-panels.has-open .fw-panel.is-open {
+    flex-grow: 9;
+  }
+
+  .fw-panel .fw-rule {
+    height: auto;
+  }
+
+  .fw-panel .fw-rule p {
+    visibility: visible;
+  }
+
+  .fw-panels.has-open .fw-panel:not(.is-open) .fw-cat-row,
+  .fw-panels.has-open .fw-panel:not(.is-open) .fw-rule p {
+    display: none;
+  }
+
+  .fw-panels.has-open .fw-panel:not(.is-open) .fw-rule {
+    padding-top: 10px;
+  }
+
+  .fw-panels.has-open .fw-panel:not(.is-open) > .fw-meta {
+    padding-bottom: 12px;
+  }
+
+  .fw-panels.has-open .fw-panel:not(.is-open) .fw-rule h3 {
+    font-size: 15px;
+    margin-bottom: 0;
+    -webkit-line-clamp: 1;
+  }
+
+  .fw-desc {
+    padding: 22px 18px 12px;
+    font-size: 15px;
+  }
+
+  .fw-extra {
+    gap: 14px;
+    margin-top: 10px;
+  }
+
+  .fw-step small {
+    display: none;
+  }
+
+  .fw-icons {
     gap: 4px;
+  }
+
+  .fw-ic {
+    gap: 4px;
+    font-size: 9.5px;
+  }
+
+  .fw-ic svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  :lang(ja) .fw-desc {
     font-size: 13px;
     line-height: 1.55;
   }
 }
 
+/* short panels (phone strips): no drawing, a tighter caption */
+@container (max-height: 190px) {
+  .fw-panel .fw-rule p {
+    display: none;
+  }
+}
+
+@container (max-height: 120px) {
+  .fw-artbox .fw-num,
+  .fw-artbox .fw-word {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .fw-hairline::before,
-  .fw-hairline::after,
-  .fw-plate.is-open .fw-hairline::before,
-  .fw-plate.is-open .fw-hairline::after,
-  .fw-plate,
-  .fw-plate.is-open,
-  .fw-paper,
-  .fw-plate.is-open .fw-paper,
-  .fw-rule,
-  .fw-plate.is-open .fw-rule,
-  .fw-desc,
-  .fw-plate.is-open .fw-desc {
+  .fw-panel,
+  .fw-cover-in,
+  .fw-panel .fw-rule,
+  .fw-panel.is-open .fw-rule {
     transition: none;
   }
 }
