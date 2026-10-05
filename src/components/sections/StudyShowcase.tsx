@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import DeckAccess from './DeckAccess'
 import StudyLightbox from './StudyLightbox'
 import DeviceToggle from './DeviceToggle'
 import StudyIndex from './StudyIndex'
@@ -25,10 +24,10 @@ import { getDictionary } from '@/i18n/dictionaries'
 // nothing auto-playing. Touch tablets (768px and up, coarse pointer) still get
 // the cards below with the portrait mobile embed.
 //
-// Access model: before access the cards are non-interactive teasers and the
-// gated CTA below (DeckAccess) captures a lead. AFTER access is granted, these
-// same cards become clickable — clicking one opens it in the larger scroll-only
-// review canvas (StudyLightbox). No duplicate gallery; the originals do the job.
+// Access: open to everyone (his ask, 2026-10-05; the "Customers only" sign-in
+// gate is gone). Every card is clickable — clicking one opens it in the larger
+// scroll-only review canvas (StudyLightbox). No duplicate gallery; the
+// originals do the job.
 
 // Brand identity per study; the descriptor + tag copy is localized and lives
 // in the dictionary (explore.studies), keyed by these slugs.
@@ -442,7 +441,7 @@ function StudyCard({
 
 export default function StudyShowcase({ lang = 'en' }: { lang?: Locale }) {
   const t = getDictionary(lang).explore
-  const [granted, setGranted] = useState(false)
+  const granted = true
   const [active, setActive] = useState<string | null>(null)
   // Phones (767px and below) get the study index instead of the card grid: the
   // three studies as rows that pull down one at a time, read by the reader's
@@ -458,29 +457,6 @@ export default function StudyShowcase({ lang = 'en' }: { lang?: Locale }) {
     mq.addEventListener('change', sync)
     return () => mq.removeEventListener('change', sync)
   }, [])
-
-  // Returning visitors who already unlocked get the interactive cards straight
-  // away. Both accesses are guarded: with cookies blocked for the site the
-  // localStorage getter itself throws a SecurityError, and an unguarded throw
-  // in this effect replaced the whole route with Next's "Application error"
-  // screen — so blocking cookies took /explore down entirely.
-  useEffect(() => {
-    try {
-      if (window.localStorage.getItem('deckAccess') === '1') setGranted(true)
-    } catch {
-      /* storage denied — the visitor simply unlocks again */
-    }
-  }, [])
-
-  const handleGranted = () => {
-    // Unlock first: remembering it is a convenience, not a condition.
-    setGranted(true)
-    try {
-      window.localStorage.setItem('deckAccess', '1')
-    } catch {
-      /* storage denied — nothing to remember, the cards are open regardless */
-    }
-  }
 
   const activeStudy = STUDIES.find((s) => s.slug === active) ?? null
 
@@ -528,10 +504,6 @@ export default function StudyShowcase({ lang = 'en' }: { lang?: Locale }) {
           />
         )}
 
-        {!granted && (
-          // Single gated CTA — one-click Google sign-in + email fallback.
-          <DeckAccess onGranted={handleGranted} lang={lang} />
-        )}
       </div>
 
       {activeStudy && (
