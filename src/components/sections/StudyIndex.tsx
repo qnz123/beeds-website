@@ -400,7 +400,7 @@ export default function StudyIndex({
                     <span className="si-buttons">
                       {granted && (
                         <button type="button" className="si-btn" onClick={() => onReview(row.slug)}>
-                          {t.review} <span aria-hidden="true">→</span>
+                          {t.review}
                         </button>
                       )}
                       <button
@@ -411,7 +411,7 @@ export default function StudyIndex({
                           heads.current[row.slug]?.focus({ preventScroll: true })
                         }}
                       >
-                        {t.close} <span aria-hidden="true">↑</span>
+                        {t.close}
                       </button>
                     </span>
                   </div>
