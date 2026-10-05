@@ -2138,8 +2138,9 @@ html.arrive footer {
 /* scroll-through: blocks fade up as they arrive (armed by JS only, so no-JS shows everything) */
 .ic.ic-armed [data-rv] { opacity: 0; transform: translateY(28px); transition: opacity 0.9s cubic-bezier(.22, 1, .36, 1), transform 0.9s cubic-bezier(.22, 1, .36, 1); transition-delay: calc(var(--i, 0) * 120ms); }
 .ic.ic-armed [data-rv].ic-in { opacity: 1; transform: none; }
-/* the three photos take their time, each well after the one before (his ask, 2026-10-05) */
-.ic.ic-armed .ic-phase[data-rv] { transition-duration: 1.6s, 1.6s; transition-delay: calc(var(--i, 0) * 420ms); }
+/* the three photos fade up slower than the rest of the section, and their fades OVERLAP: each starts
+   well before the one before it has finished (his ask, 2026-10-05) */
+.ic.ic-armed .ic-phase[data-rv] { transition-duration: 1.2s, 1.2s; transition-delay: calc(var(--i, 0) * 220ms); }
 
 /* the growth bars: the grey 0–100 baseline stays put; only the gold gain above 100 grows out of it */
 .ic.ic-armed .ic-gain { transform: scaleX(0); transform-origin: left center; }
