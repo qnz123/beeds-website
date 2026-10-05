@@ -7,6 +7,7 @@ import CassetteMark from '@/components/CassetteMark'
 import type { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 import { isPlainClick, toWater as goToWater } from '@/lib/handover'
+import { installHashScroll } from '@/lib/hashScroll'
 import { PLACE_KEY, ROOM_KEY } from '@/lib/introReload'
 
 // Locale-aware nav. `lang` picks the copy; `switchHref` is the counterpart URL
@@ -88,6 +89,9 @@ export default function Navigation({
   // there itself: it first tells the Impact section (event 'beeds:pass') to let go of the CRAFT hold
   // and set its photos at their final size, so nothing stops the trip or moves the target on the way.
   // Only this link: the hero's "I want to build…" still stops at CRAFT. Returns true if it took over.
+  // Every in-page #section link scrolls at Chrome's pace, in every browser (lib/hashScroll.ts)
+  useEffect(() => installHashScroll(), [])
+
   const toContact = (e: React.MouseEvent, href: string) => {
     if (!href.endsWith('#contact') || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return false
     const dest = document.getElementById('contact')
