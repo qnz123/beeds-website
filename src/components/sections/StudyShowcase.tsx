@@ -55,11 +55,16 @@ function StudyCard({
   copy,
   granted,
   onOpen,
+  mode,
+  onModeChange,
 }: {
   study: Study
   copy: { descriptor: string[]; tag: string }
   granted: boolean
   onOpen: (slug: string) => void
+  /** Desktop by default; only one card shows Mobile at a time (the section keeps that). */
+  mode: ReviewMode
+  onModeChange: (m: ReviewMode) => void
 }) {
   const rootRef = useRef<HTMLDivElement>(null)
   const windowRef = useRef<HTMLDivElement>(null)
@@ -79,7 +84,7 @@ function StudyCard({
   // visible three studies, not six — it's warm long before anyone toggles.
   const [preloadHidden, setPreloadHidden] = useState(false)
   const [isDesktop, setIsDesktop] = useState(false)
-  const [cardMode, setCardMode] = useState<ReviewMode>('desktop')
+  const cardMode = mode
 
   // Ref to the caption's title row (holds this toggle) — the scroll target's
   // lower bound: frame + toggle must be visible, the description may overflow.
@@ -123,7 +128,7 @@ function StudyCard({
   //    toggle row is pinned just inside the bottom so the way back is visible
   //  - back to desktop: the whole landscape frame comes fully into view
   const handleModeChange = (m: ReviewMode) => {
-    setCardMode(m)
+    onModeChange(m)
     // No waiting for the 300ms aspect-ratio morph: predict the frame's final
     // height from its (unchanging) width and scroll immediately — the glide
     // and the morph run together and land on the same final layout.
@@ -442,6 +447,9 @@ function StudyCard({
 export default function StudyShowcase({ lang = 'en' }: { lang?: Locale }) {
   const t = getDictionary(lang).explore
   const granted = true
+  // Every sample starts in Desktop; switching one to Mobile puts any other
+  // card that was in Mobile back to Desktop (his ask, 2026-10-05).
+  const [mobileSlug, setMobileSlug] = useState<string | null>(null)
   const [active, setActive] = useState<string | null>(null)
   // Phones (767px and below) get the study index instead of the card grid: the
   // three studies as rows that pull down one at a time, read by the reader's
@@ -487,6 +495,8 @@ export default function StudyShowcase({ lang = 'en' }: { lang?: Locale }) {
                 copy={t.studies[study.slug] ?? EN_STUDY_COPY[study.slug]}
                 granted={granted}
                 onOpen={setActive}
+                mode={mobileSlug === study.slug ? 'mobile' : 'desktop'}
+                onModeChange={(m) => setMobileSlug(m === 'mobile' ? study.slug : null)}
               />
             ))}
           </div>
