@@ -56,7 +56,7 @@ export default function Navigation({
   const navLinks = [
     { label: t.work, href: isJa ? '/ja/#work' : '/#work' },
     { label: t.about, href: isJa ? '/ja/about' : '/about' },
-    { label: t.services, href: isJa ? '/ja/about#services' : '/about#services' },
+    { label: t.services, href: isJa ? '/ja/#services' : '/#services' },
     // Explore label stays in English on both locales (client direction).
     { label: 'Explore', href: isJa ? '/ja/explore' : '/explore' },
     { label: t.contact, href: isJa ? '/ja/#contact' : '/#contact' },

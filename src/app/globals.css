@@ -674,6 +674,11 @@ html.arrive footer {
   }
 }
 
+/* the nav's Services link lands here (/#services): just under the sticky 64px bar */
+.fw-section {
+  scroll-margin-top: 64px;
+}
+
 /* ---- The Folio — accordion (client-approved 2026-10-05) ----
    The heading and all four service panels fit one screen (Portfolio.tsx).
    Clicking a panel widens it (the others narrow) and its coloured front gives

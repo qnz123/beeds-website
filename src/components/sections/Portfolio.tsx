@@ -487,7 +487,7 @@ export default function Portfolio({ lang = 'en' as Locale }: { lang?: Locale }) 
   }, [])
 
   return (
-    <section id="featured-work" ref={sectionRef} className="pb-14">
+    <section id="services" ref={sectionRef} className="fw-section pb-14">
       <div ref={folioRef} data-animate={dataAnimate} data-still={still ? '' : undefined} className="fw-folio">
         <div className="fw-head">
           {/* Heading in the About-BEEDS lede voice (client-directed 2026-07-13):
