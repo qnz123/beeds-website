@@ -148,10 +148,10 @@ export default function Navigation({
   const toggleLabel = isJa ? 'English' : '日本語'
   const targetLocale = isJa ? 'en' : 'ja'
 
-  // Persist the manual choice so the detection middleware respects it and
-  // doesn't redirect the visitor back on their next visit to the root.
+  // Remember the switch for THIS visit only (a session cookie, no max-age), so the middleware
+  // doesn't send the visitor straight back; the next visit follows their device's language again.
   const rememberChoice = () => {
-    document.cookie = `NEXT_LOCALE=${targetLocale}; path=/; max-age=31536000; samesite=lax`
+    document.cookie = `beeds_lang=${targetLocale}; path=/; samesite=lax`
   }
 
   // Publish the bar's own height, so the hero can reach up underneath it and

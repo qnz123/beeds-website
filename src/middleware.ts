@@ -2,11 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 
 // Two decisions at the homepage roots, in this order:
 //
-// 1) Locale detection, at the English root only. A Japanese-preferring browser is redirected to
-//    /ja; a manual toggle choice (NEXT_LOCALE cookie, set by the nav switcher) always wins so
-//    detection never overrides the visitor. The redirect is 307 (temporary) so search engines don't
-//    treat / as permanently moved — Googlebot sends en/no Accept-Language and stays on the English
-//    root.
+// 1) Language, from the visitor's own device and browser setting (Accept-Language), never their
+//    location (his ask, 2026-10-06: "my Mac and browser are in English"). A Japanese-preferring
+//    browser at / goes to /ja, and a browser preferring anything else that opens /ja from outside
+//    goes to /. The nav's 日本語 / English toggle wins, but only for that visit: it sets a SESSION
+//    cookie (beeds_lang), so the next visit follows the device again. (The old NEXT_LOCALE cookie
+//    lasted a year and kept a visitor in the language they once clicked, whatever their device
+//    said; it is ignored and cleared.) Redirects are 307 (temporary), and only real visitors are
+//    moved: search engines and link previews send no or a fixed Accept-Language, and must still
+//    reach and index both /ja and /.
 //
 // 2) The underwater intro. A visitor entering the site at / or /ja/ is shown the underwater page
 //    (/watermark/ or /ja/watermark/) at that same address, so the address bar keeps saying
@@ -34,14 +38,31 @@ const INTRO_SEEN_LEGACY = 'beeds_in'
 const INTRO_GUARD_S = 10
 const NOT_A_VISITOR = /bot|crawl|spider|slurp|preview|facebookexternalhit|embedly|whatsapp|telegram|discord|lighthouse|pagespeed|headless/i
 
-function resolveLocale(req: NextRequest): string {
-  // 1) Manual choice wins.
-  const cookie = req.cookies.get('NEXT_LOCALE')?.value
-  if (cookie && (SUPPORTED as readonly string[]).includes(cookie)) return cookie
-  // 2) Otherwise the browser's top-preferred language.
-  const header = req.headers.get('accept-language') ?? ''
+const LANG_CHOICE = 'beeds_lang'
+const LANG_CHOICE_LEGACY = 'NEXT_LOCALE'
+
+/** The toggle's choice for this visit, if the visitor made one. */
+function chosenLocale(req: NextRequest): string | null {
+  const v = req.cookies.get(LANG_CHOICE)?.value
+  return v && (SUPPORTED as readonly string[]).includes(v) ? v : null
+}
+
+/** The device's language: the browser's top preference, or null if it sent none (most bots). */
+function deviceLocale(req: NextRequest): string | null {
+  const header = req.headers.get('accept-language')
+  if (!header) return null
   const first = header.split(',')[0]?.trim().toLowerCase() ?? ''
+  if (!first || first === '*') return null
   return first.startsWith('ja') ? 'ja' : 'en'
+}
+
+/** A visitor's own page load, not a bot, a preview, a prefetch or the router's data request. */
+function isVisitorPageLoad(req: NextRequest): boolean {
+  if (req.method !== 'GET') return false
+  const dest = req.headers.get('sec-fetch-dest')
+  if (dest && dest !== 'document') return false
+  if (req.headers.has('rsc') || req.headers.has('next-router-prefetch') || req.headers.get('purpose') === 'prefetch') return false
+  return !NOT_A_VISITOR.test(req.headers.get('user-agent') ?? '')
 }
 
 function entersWithIntro(req: NextRequest): boolean {
@@ -61,10 +82,13 @@ function entersWithIntro(req: NextRequest): boolean {
 
 export function middleware(req: NextRequest) {
   const ja = req.nextUrl.pathname.replace(/\/$/, '') === '/ja'
-  if (!ja && resolveLocale(req) === 'ja') {
+  const want = chosenLocale(req) ?? (isVisitorPageLoad(req) ? deviceLocale(req) : null)
+  if (want && (want === 'ja') !== ja) {
     const url = req.nextUrl.clone()
-    url.pathname = '/ja'
-    return NextResponse.redirect(url, 307)
+    url.pathname = want === 'ja' ? '/ja' : '/'
+    const res = NextResponse.redirect(url, 307)
+    if (req.cookies.has(LANG_CHOICE_LEGACY)) res.cookies.delete(LANG_CHOICE_LEGACY)
+    return res
   }
   if (entersWithIntro(req)) {
     const url = req.nextUrl.clone()
@@ -72,6 +96,12 @@ export function middleware(req: NextRequest) {
     const res = NextResponse.rewrite(url)
     res.cookies.set(INTRO_SEEN, '1', { path: '/', sameSite: 'lax', maxAge: INTRO_GUARD_S })
     if (req.cookies.has(INTRO_SEEN_LEGACY)) res.cookies.delete(INTRO_SEEN_LEGACY)
+    if (req.cookies.has(LANG_CHOICE_LEGACY)) res.cookies.delete(LANG_CHOICE_LEGACY)
+    return res
+  }
+  if (req.cookies.has(LANG_CHOICE_LEGACY)) {
+    const res = NextResponse.next()
+    res.cookies.delete(LANG_CHOICE_LEGACY)
     return res
   }
   return NextResponse.next()
