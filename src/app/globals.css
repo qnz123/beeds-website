@@ -180,8 +180,10 @@ h6 {
 @media (max-width: 767px) {
   .nav-mark { top: calc(50% - 13px); left: calc(50% - 18px); width: 36px; height: 26px; }
   /* the logo and the menu closer to the screen's edges on phones, on the
-     service bands' 16px margin (his ask, 2026-10-06; was 40px) */
-  .nav { padding-left: 16px; padding-right: 16px; }
+     service bands' 16px margin (his ask, 2026-10-06; was 40px), and a
+     shorter bar: 48px, not 64 (his ask, same day). Rules that size things
+     under the bar match it: .fw-section, .fw-folio, the phone .wm-mark. */
+  .nav { padding: 12px 16px; }
 }
 
 /* ---- Arriving from /watermark/ ----
@@ -701,6 +703,10 @@ html.arrive footer {
 .fw-section {
   scroll-margin-top: 64px;
 }
+/* the phone bar is 48px */
+@media (max-width: 767px) {
+  .fw-section { scroll-margin-top: 48px; }
+}
 
 /* ---- The Folio — accordion (client-approved 2026-10-05) ----
    The heading and all four service panels fit one screen (Portfolio.tsx).
@@ -1151,6 +1157,8 @@ html.arrive footer {
     /* on a phone the bands run nearly to the screen's edges (his ask, 2026-10-06: back from the
        photos' 40px margins) */
     padding: 20px 16px 0;
+    /* one screen under the phone's 48px bar */
+    height: calc(100svh - 48px);
   }
 
   /* the big number sits fully inside the band, a little in from the right, so it reads as a
@@ -3727,9 +3735,9 @@ html:has(.wm) { scrollbar-gutter: stable; }
   .wm.is-leaving .wm-mark { opacity: 1; transition: opacity 0.25s ease-out; }
 }
 @media (max-width: 767px) {
-  /* the phone's smaller cassette (.nav-mark: 36 x 26, centred on the 64px bar), and the hand-over at
-     half length (handoverMs in lib/handover.ts) */
-  .wm-mark { top: 19px; left: calc(50% - 18px); width: 36px; height: 26px; transition-duration: 0.2s; }
+  /* the phone's smaller cassette (.nav-mark: 36 x 26, centred on the 48px phone bar), and the
+     hand-over at half length (handoverMs in lib/handover.ts) */
+  .wm-mark { top: 11px; left: calc(50% - 18px); width: 36px; height: 26px; transition-duration: 0.2s; }
   .wm-veil { transition-duration: 0.35s; }
   .wm-stage { min-height: min(620px, 100%); }
   /* a deep foot on a phone, so the second button sits well clear of the edge.
