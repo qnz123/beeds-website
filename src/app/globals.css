@@ -179,6 +179,9 @@ h6 {
 /* a bit smaller on phones (36 x 26, his ask, 2026-10-01); .wm-mark matches */
 @media (max-width: 767px) {
   .nav-mark { top: calc(50% - 13px); left: calc(50% - 18px); width: 36px; height: 26px; }
+  /* the logo and the menu closer to the screen's edges on phones, on the
+     service bands' 16px margin (his ask, 2026-10-06; was 40px) */
+  .nav { padding-left: 16px; padding-right: 16px; }
 }
 
 /* ---- Arriving from /watermark/ ----
