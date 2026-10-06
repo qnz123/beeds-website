@@ -737,6 +737,12 @@ html.arrive footer {
   min-height: 0;
   display: flex;
   gap: var(--fw-gap);
+  /* the four pillars stop at 1280px and sit centred, so on a wide screen they keep a sensible
+     width (~310px closed, ~730px open) and the open description a readable line (his pick,
+     2026-10-06; the still back's widths follow, as Portfolio.tsx measures this row) */
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
 }
 
 .fw-panel {
@@ -747,6 +753,9 @@ html.arrive footer {
   min-height: 0;
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
+  /* one column held to the panel's width, so a narrow panel's caption wraps and its category
+     ellipses instead of running past the edge (clipped) */
+  grid-template-columns: minmax(0, 1fr);
   color: #fff;
   cursor: pointer;
   container-type: size;
