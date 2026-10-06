@@ -1,5 +1,6 @@
 'use client'
 
+import { Bodoni_Moda } from 'next/font/google'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
@@ -9,6 +10,11 @@ import { getDictionary } from '@/i18n/dictionaries'
 import { isPlainClick, toWater as goToWater } from '@/lib/handover'
 import { installHashScroll } from '@/lib/hashScroll'
 import { PLACE_KEY, ROOM_KEY } from '@/lib/introReload'
+
+// The BEEDS wordmark, as the intro sets it (src/lib/water.ts): Bodoni Moda 700 at its display
+// optical size, letters drawn in by -0.08em (his logotype pick, 2026-09-21). next/font serves this
+// face once for the whole site, so it is shared with the intro page rather than loaded twice.
+const wordmark = Bodoni_Moda({ subsets: ['latin'], axes: ['opsz'], display: 'swap' })
 
 // Locale-aware nav. `lang` picks the copy; `switchHref` is the counterpart URL
 // for the language toggle (the other-language version of the current page).
@@ -209,9 +215,9 @@ export default function Navigation({
   return (
     <>
     <nav ref={navRef} className={`nav sticky top-0 z-50${scrolled ? ' is-scrolled' : ''}${isOpen ? ' menu-open' : sheetUp ? ' menu-closing' : ''}`}>
-      {/* The wordmark stays in the house serif; only the link row goes sans. */}
+      {/* The same BEEDS wordmark as the intro (2026-10-06). */}
       <div className="nav-wordmark">
-        <Link href={home} onClick={() => setIsOpen(false)}>BEEDS</Link>
+        <Link href={home} className={`nav-logo ${wordmark.className}`} aria-label="BEEDS home" onClick={() => setIsOpen(false)}>BEEDS</Link>
       </div>
 
       {/* The cassette, centred in the bar: the same mark at the same size and place as on

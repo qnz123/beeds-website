@@ -218,6 +218,20 @@ html.arrive footer {
   opacity: 0.5;
 }
 
+/* The bar's BEEDS wordmark: the intro's logotype (Bodoni Moda 700, display optical size, −0.08em),
+   in place of the small spaced capitals the links use (2026-10-06). */
+.nav a.nav-logo {
+  display: inline-block;
+  font-size: 23px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.08em;
+  text-transform: none;
+  font-variation-settings: 'opsz' 96;
+  /* the last letter's negative tracking would otherwise pull the box short of the S */
+  padding-right: 0.08em;
+}
+
 /* Invisible tap-area extension (~38x48) for the glyph-only menu buttons
    (open ☰ in the bar, close ✕ in the sheet): the glyph, the layout and the
    focus ring stay exactly where they were. Not on .nav itself, which must
