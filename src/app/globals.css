@@ -184,6 +184,8 @@ h6 {
      shorter bar: 48px, not 64 (his ask, same day). Rules that size things
      under the bar match it: .fw-section, .fw-folio, the phone .wm-mark. */
   .nav { padding: 12px 16px; }
+  /* the menu lines a little in from the edge (his ask, 2026-10-06) */
+  .nav-burger { margin-right: 6px; }
 }
 
 /* ---- Arriving from /watermark/ ----
@@ -1181,17 +1183,55 @@ html.arrive footer {
     flex-grow: 9;
   }
 
+  /* The caption changes size with the band, on the band's own 1.3s curve, so
+     every title line glides with it instead of jumping as a band opens or
+     closes (his ask, 2026-10-06). Nothing here switches display: the slim
+     strips fold their category row and blurb away to nothing, and the blurb
+     shows in the open band only (it used to pop in mid-way, when the band
+     grew past the 190px container query below). */
+  .fw-panel > .fw-meta {
+    transition: padding-bottom var(--fw-panel);
+  }
+
   .fw-panel .fw-rule {
     height: auto;
+    transition: padding-top var(--fw-panel), border-top-color var(--fw-panel);
   }
 
-  .fw-panel .fw-rule p {
+  .fw-panel .fw-cat-row {
+    overflow: hidden;
+    transition: height var(--fw-panel), margin-bottom var(--fw-panel), opacity var(--fw-panel);
+  }
+
+  .fw-panel .fw-rule h3 {
+    transition: font-size var(--fw-panel), margin-bottom var(--fw-panel);
+  }
+
+  .fw-folio .fw-panel .fw-rule p {
+    display: -webkit-box;
     visibility: visible;
+    min-height: 0;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height var(--fw-panel), opacity var(--fw-panel);
   }
 
-  .fw-panels.has-open .fw-panel:not(.is-open) .fw-cat-row,
-  .fw-panels.has-open .fw-panel:not(.is-open) .fw-rule p {
-    display: none;
+  .fw-folio .fw-panel.is-open .fw-rule p {
+    max-height: calc(1.6em * 2);
+    opacity: 0.85;
+  }
+
+  /* the narrowest phones give the English blurb three lines (above) */
+  @media (max-width: 380px) {
+    .fw-folio:lang(en) .fw-panel.is-open .fw-rule p {
+      max-height: calc(1.6em * 3);
+    }
+  }
+
+  .fw-panels.has-open .fw-panel:not(.is-open) .fw-cat-row {
+    height: 0;
+    margin-bottom: 0;
+    opacity: 0;
   }
 
   .fw-panels.has-open .fw-panel:not(.is-open) .fw-rule {
@@ -1259,8 +1299,12 @@ html.arrive footer {
 @media (prefers-reduced-motion: reduce) {
   .fw-panel,
   .fw-cover-in,
+  .fw-panel > .fw-meta,
   .fw-panel .fw-rule,
-  .fw-panel.is-open .fw-rule {
+  .fw-panel.is-open .fw-rule,
+  .fw-panel .fw-cat-row,
+  .fw-panel .fw-rule h3,
+  .fw-folio .fw-panel .fw-rule p {
     transition: none;
   }
 }
