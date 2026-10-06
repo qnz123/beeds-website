@@ -719,9 +719,18 @@ html.arrive footer {
   display: flex;
   flex-direction: column;
   gap: 22px;
-  padding: 24px 40px 0;
-  max-width: 1760px;
+  /* the same frame as the lollipop photos below (the section's 40px + .container-x's 40px, and
+     1320px wide at most), so the two rows share their edges (his ask, 2026-10-06) */
+  padding: 24px 80px 0;
+  max-width: 1480px;
   margin-inline: auto;
+}
+
+/* 02's network is the sparsest drawing: on the front it keeps the size it had before the pillars
+   were narrowed (Portfolio.tsx sets the factor), instead of shrinking with them */
+.fw-cover-in.fw-field--navy .fw-mark {
+  transform: scale(var(--fw-art-scale, 1));
+  transform-origin: 50% 50%;
 }
 
 .fw-folio .fw-head {
@@ -737,11 +746,10 @@ html.arrive footer {
   min-height: 0;
   display: flex;
   gap: var(--fw-gap);
-  /* the four pillars stop at 1280px and sit centred, so on a wide screen they keep a sensible
-     width (~310px closed, ~730px open) and the open description a readable line (his pick,
-     2026-10-06; the still back's widths follow, as Portfolio.tsx measures this row) */
+  /* the four pillars share the lollipop photos' frame: their edges line up, at most 1320px wide
+     (the still back's widths follow, as Portfolio.tsx measures this row) */
   width: 100%;
-  max-width: 1280px;
+  max-width: 1320px;
   margin-inline: auto;
 }
 
@@ -851,7 +859,7 @@ html.arrive footer {
   display: grid;
   align-content: start;
   gap: 8px;
-  padding: 48px 22px 14px;
+  padding: 40px 22px 14px;
   color: var(--fw-ink);
   font-size: 16px;
   line-height: 1.5;
@@ -1101,6 +1109,12 @@ html.arrive footer {
    Portfolio.tsx), so widening only uncovers it; the front's drawing keeps at
    most its closed size. */
 @media (min-width: 761px) {
+  /* on a desktop, no taller than the heading plus pillars of 600px, near the proportion of his
+     reference (2026-10-06); phones keep the whole screen for their stacked bands */
+  .fw-folio {
+    max-height: calc(24px + 2.4 * clamp(22px, 3vw, 42px) + 14px + 22px + 600px);
+  }
+
   .fw-desc {
     position: absolute;
     top: 0;
@@ -1131,7 +1145,8 @@ html.arrive footer {
 @media (max-width: 760px) {
   .fw-folio {
     gap: 16px;
-    padding: 20px 16px 0;
+    /* the lollipop photos' 40px margins on a phone too */
+    padding: 20px 40px 0;
   }
 
   .fw-panels {
@@ -1175,7 +1190,7 @@ html.arrive footer {
   }
 
   .fw-desc {
-    padding: 22px 18px 12px;
+    padding: 18px 18px 12px;
     font-size: 15px;
   }
 

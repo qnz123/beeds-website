@@ -392,6 +392,10 @@ export default function Portfolio({ lang = 'en' as Locale }: { lang?: Locale }) 
       const free = el.clientWidth - 3 * 14
       el.style.setProperty('--fw-open-w', `${(free * 3) / (3 + 3 * 0.7)}px`)
       el.style.setProperty('--fw-closed-w', `${free / 4}px`)
+      // how much narrower a pillar is than it was before the row was framed (a 1760px row in 40px
+      // margins): 02's drawing is scaled back up by this, so it keeps its earlier size
+      const before = (Math.min(window.innerWidth, 1760) - 80 - 3 * 14) / 4
+      el.style.setProperty('--fw-art-scale', `${Math.max(1, before / (free / 4)).toFixed(3)}`)
     }
     set()
     const ro = new ResizeObserver(set)
