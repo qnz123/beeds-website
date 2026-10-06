@@ -222,7 +222,7 @@ html.arrive footer {
    in place of the small spaced capitals the links use (2026-10-06). */
 .nav a.nav-logo {
   display: inline-block;
-  font-size: 23px;
+  font-size: 21px;
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.08em;
@@ -230,6 +230,12 @@ html.arrive footer {
   font-variation-settings: 'opsz' 96;
   /* the last letter's negative tracking would otherwise pull the box short of the S */
   padding-right: 0.08em;
+}
+
+/* the wordmark keeps its colour under the pointer (the links dim; the logo does not), as the
+   cassette does (his ask, 2026-10-06) */
+.nav a.nav-logo:hover {
+  opacity: 1;
 }
 
 /* Invisible tap-area extension (~38x48) for the glyph-only menu buttons
