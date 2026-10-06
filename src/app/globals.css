@@ -1145,8 +1145,16 @@ html.arrive footer {
 @media (max-width: 760px) {
   .fw-folio {
     gap: 16px;
-    /* the lollipop photos' 40px margins on a phone too */
-    padding: 20px 40px 0;
+    /* on a phone the bands run nearly to the screen's edges (his ask, 2026-10-06: back from the
+       photos' 40px margins) */
+    padding: 20px 16px 0;
+  }
+
+  /* the big number sits fully inside the band, a little in from the right, so it reads as a
+     number instead of a cropped curve (his ask, 2026-10-06) */
+  .fw-artbox .fw-num {
+    right: 5cqi;
+    top: 6%;
   }
 
   .fw-panels {
