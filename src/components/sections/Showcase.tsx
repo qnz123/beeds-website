@@ -655,33 +655,24 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
                   <span className="sc-coin-lbl">Service</span>
                 </button>
               </nav>
+              {/* The phone wipe toggle, at the right end of the coins' row. Two cards, the after
+                  (the coins' grey) lying over the before (ink); tapped, they move apart and
+                  settle side by side as one square split down the middle: before left, after
+                  right — the frame's own split (his pick, sample 06 "Pair", 2026-10-07). */}
+              <div className="ba-mobile">
+                <button type="button" className="ba-coin" role="switch" aria-checked="false" aria-label={copy.wipe}>
+                  <svg className="ba-pair" viewBox="0 0 28 28" aria-hidden="true">
+                    <rect className="bp-b" x="3" y="3" width="11" height="22" rx="2" />
+                    <rect className="bp-a" x="14" y="3" width="11" height="22" rx="2" />
+                  </svg>
+                </button>
+              </div>
               </div>
               {/* The Approach label is static, so it sits outside the swap: it no longer
                   fades on every chapter change, and on phones it shares its line with the
                   wipe control, which must not fade either. */}
               <div className="sc-approach-row">
                 <p className="eyebrow">{copy.approach}</p>
-                <div className="ba-mobile">
-                <button type="button" className="ba-coin" role="switch" aria-checked="false" aria-label={copy.wipe}>
-                  {/* A comparison bar, no outline: two halves in one rounded shape — ink
-                      on the left, the study coins' own grey on the right — with the wipe
-                      line cut through the ink in the page ground. The box spans x 5..87, so
-                      the halves meet at 46; the line rests hard left at 14 and runs to 44,
-                      just inside the ink's edge where it still reads. */}
-                  <svg className="ba-split" viewBox="0 0 92 36" aria-hidden="true" strokeWidth="1.5">
-                    <defs>
-                      <clipPath id="sc-split-clip">
-                        <rect x="5" y="7" width="82" height="22" rx="3.5" />
-                      </clipPath>
-                    </defs>
-                    <g clipPath="url(#sc-split-clip)">
-                      <rect className="sp-rest" x="46" y="7" width="41" height="22" />
-                      <rect className="sp-fill" x="5" y="7" width="41" height="22" />
-                      <path className="sp-div" d="M44 11V25" fill="none" />
-                    </g>
-                  </svg>
-                </button>
-                </div>
               </div>
               <div className="sc-note-swap">
                 <div className="sc-note-block">
