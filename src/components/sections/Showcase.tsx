@@ -519,7 +519,35 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
     navHeight();
     updateMotion();
 
+    // ?study=hotel (or run / calm) opens the page on that study: the stage pinned at the top of
+    // its track and showing that scene, as if its coin had been pressed there. For links in
+    // outreach emails (2026-10-16): a hotel owner should land on the hotel study, not the running
+    // brand that opens the stage. Done once the page has loaded, and checked again a moment
+    // later, so late images above the stage can't leave it short.
+    const STUDY: Record<string, number> = { run: 0, hotel: 1, calm: 2 };
+    const study = STUDY[params.get('study') ?? ''];
+    let studyTimer = 0;
+    const openStudy = () => {
+      const html = document.documentElement;
+      const anchor = html.style.overflowAnchor;
+      html.style.overflowAnchor = 'none';
+      const land = () => {
+        const top = track.getBoundingClientRect().top + window.scrollY;
+        if (Math.abs(window.scrollY - top) > 1) window.scrollTo({ top, left: 0, behavior: 'instant' as ScrollBehavior });
+      };
+      land();
+      goChapter(study);
+      studyTimer = window.setTimeout(() => { land(); goChapter(study); html.style.overflowAnchor = anchor; }, 600);
+    };
+    if (study !== undefined) {
+      if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+      if (document.readyState === 'complete') requestAnimationFrame(openStudy);
+      else window.addEventListener('load', openStudy, { once: true });
+    }
+
     return () => {
+      window.removeEventListener('load', openStudy);
+      clearTimeout(studyTimer);
       reduce.removeEventListener('change', onReduce);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
