@@ -93,8 +93,8 @@ const NOTES_JA = [
   }
 ]
 const COPY = {
-  en: { notes: NOTES_EN, approach: 'Approach', beforeAfter: 'Before / After', caption: 'Left, what the category usually ships. Right, the direction.', wipe: 'Pull the before view across' },
-  ja: { notes: NOTES_JA, approach: 'アプローチ', beforeAfter: 'Before / After', caption: '左は、その業界でよく見られる作り。右は、BEEDSが提案する方向性。', wipe: 'ビフォーの画面を引き出す' },
+  en: { notes: NOTES_EN, approach: 'Approach', beforeAfter: 'Before / After', caption: 'Left, what the category usually ships. Right, the direction.', wipe: 'Pull the before view across', cta: 'Want a site like this? Start with a free Look', ctaHref: '/booking/' },
+  ja: { notes: NOTES_JA, approach: 'アプローチ', beforeAfter: 'Before / After', caption: '左は、その業界でよく見られる作り。右は、BEEDSが提案する方向性。', wipe: 'ビフォーの画面を引き出す', cta: 'このようなサイトを、まずは無料の完成イメージで', ctaHref: '/ja/booking/' },
 }
 
 export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
@@ -708,6 +708,12 @@ export default function Showcase({ lang = 'en' }: { lang?: Locale }) {
                 </div>
                 <p className="sc-note-motion" data-motion></p>
               </div>
+              {/* The next step, right under the study (2026-10-16): outreach links land here, so
+                  a visitor who likes what they see has somewhere to go. Outside the swap, so it
+                  never fades with a chapter change. */}
+              <p className="sc-note-cta">
+                <a href={copy.ctaHref}>{copy.cta} <span aria-hidden="true">→</span></a>
+              </p>
             </aside>
           </div>
         </div>

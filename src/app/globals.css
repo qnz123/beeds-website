@@ -3478,6 +3478,16 @@ textarea.blank:focus {
 .sc-showcase .sc-approach-row .eyebrow { color: var(--muted); margin: 0; }
 .sc-showcase .sc-note-copy { font-size: 15px; line-height: 1.65; }
 .sc-showcase .sc-note-motion { border-top: 1px solid #000; padding-top: 14px; font-size: 12px; line-height: 1.7; color: var(--muted); letter-spacing: .02em; }
+.sc-showcase .sc-note-cta { margin-top: 22px; font-size: 15px; line-height: 1.5; }
+.sc-showcase .sc-note-cta a { color: #000; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: #999; transition: text-decoration-color .2s; }
+.sc-showcase .sc-note-cta a:hover { text-decoration-color: #000; }
+.sc-showcase .sc-note-cta a:focus-visible { outline: 2px solid #000; outline-offset: 3px; }
+/* short laptop screens (1280x720): the notes column keeps the link inside the pinned frame */
+@media (min-width: 1001px) and (max-height: 780px) {
+  .sc-showcase .sc-note-title { margin-bottom: 16px; }
+  .sc-showcase .sc-note-cta { margin-top: 12px; }
+  .sc-showcase:lang(ja) .sc-note-copy { font-size: 14px; line-height: 1.6; }
+}
 .sc-showcase .motion-paused .scroll-cue { display: none; }
 @media (max-width: 1000px) {
   .sc-showcase .sc-head, .sc-showcase .sc-layout { grid-template-columns: 1fr; gap: 28px; }
@@ -3491,6 +3501,10 @@ textarea.blank:focus {
      514px against 523px of sticky, which is too fine a margin to ship. */
   @media (max-height: 720px) {
     .sc-showcase .sc-stage { max-height: 38svh; }
+    /* the Japanese notes run longer (the hotel one ended ~35px past a 667px screen even before
+       the free Look link was added under it, 2026-10-16): a shorter frame and tighter type */
+    .sc-showcase:lang(ja) .sc-stage { max-height: 29svh; }
+    .sc-showcase:lang(ja) .sc-note-copy { font-size: 12px; line-height: 1.42; }
   }
   .sc-showcase .sc-note-index { margin-bottom: 6px; }
   .sc-showcase .sc-note-title { font-size: 22px; margin-bottom: 10px; }
@@ -3499,6 +3513,7 @@ textarea.blank:focus {
   .sc-showcase .sc-approach-row .eyebrow { font-size: 10px; }
   .sc-showcase .sc-note-copy { font-size: 12.5px; line-height: 1.45; }
   .sc-showcase .sc-note-motion { display: none; }
+  .sc-showcase .sc-note-cta { margin-top: 8px; font-size: 13px; }
   .sc-showcase .s-eyebrow { font-size: 1.7cqw; }
   .sc-showcase .s-intro { font-size: 2cqw; }
   .sc-showcase .s-button { font-size: 1.7cqw; padding: 1.6cqw 2.2cqw; }
