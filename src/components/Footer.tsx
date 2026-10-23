@@ -22,8 +22,13 @@ export default function Footer({ lang = 'en' }: { lang?: Locale }) {
               <span className="mr-[1em] whitespace-nowrap">{place}</span>{' '}
             </React.Fragment>
           ))}
-          <a href="mailto:booking@beedstu.com" className="whitespace-nowrap text-[#666] no-underline hover:underline">
+          <a href="mailto:booking@beedstu.com" className="mr-[1em] whitespace-nowrap text-[#666] no-underline hover:underline">
             booking@beedstu.com
+          </a>{' '}
+          {/* the privacy policy, in the same grey (2026-10-23): it carries the ad/analytics tags'
+              external-transmission notice, which Japanese law requires to be easy to reach */}
+          <a href={lang === 'ja' ? '/ja/privacy/' : '/privacy/'} className="whitespace-nowrap text-[#666] no-underline hover:underline">
+            {lang === 'ja' ? 'プライバシー' : 'Privacy'}
           </a>
         </p>
       </div>

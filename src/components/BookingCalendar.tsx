@@ -7,7 +7,7 @@
 // unchanged except the service slugs, which now speak the folio language.
 
 import { CSSProperties, FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
-import { trackEvent, trackConversion } from '@/lib/analytics'
+import { trackEvent, trackConversion, trackLead } from '@/lib/analytics'
 import type { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 
@@ -459,6 +459,7 @@ export default function BookingCalendar({ lang = 'en' as Locale }: { lang?: Loca
       // the corresponding env IDs are set (see src/lib/analytics.ts).
       trackEvent('book_request_submitted', { service: form.service })
       trackConversion()
+      trackLead({ content_name: form.service })
       setStatus('success')
       setForm(EMPTY_FORM)
       setStep('details')

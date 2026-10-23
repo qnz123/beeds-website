@@ -7,6 +7,7 @@
 //   NEXT_PUBLIC_GA_ID                 — GA4 Measurement ID   e.g. G-XXXXXXXXXX
 //   NEXT_PUBLIC_GADS_ID               — Google Ads tag ID    e.g. AW-1234567890
 //   NEXT_PUBLIC_GADS_CONVERSION_LABEL — Ads conversion label e.g. AbC-D_efG
+//   NEXT_PUBLIC_META_PIXEL_ID         — Meta Pixel ID        e.g. 123456789012345
 
 type GtagParams = Record<string, unknown>
 
@@ -15,6 +16,8 @@ declare global {
     // gtag is added by the script tags in components/Analytics.tsx
     gtag?: (...args: unknown[]) => void
     dataLayer?: unknown[]
+    // fbq is added by the Meta Pixel snippet in components/Analytics.tsx
+    fbq?: (...args: unknown[]) => void
   }
 }
 
@@ -36,4 +39,10 @@ export function trackConversion(params: GtagParams = {}) {
   const label = process.env.NEXT_PUBLIC_GADS_CONVERSION_LABEL
   if (!adsId || !label) return
   window.gtag!('event', 'conversion', { send_to: `${adsId}/${label}`, ...params })
+}
+
+/** Report a lead to Meta (a booking request). No-ops unless the Meta Pixel is loaded. */
+export function trackLead(params: Record<string, unknown> = {}) {
+  if (typeof window === 'undefined' || typeof window.fbq !== 'function') return
+  window.fbq('track', 'Lead', params)
 }
