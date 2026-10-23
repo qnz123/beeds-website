@@ -25,10 +25,10 @@ const data = {
   telephone: '+81-70-8474-3860',
   address: {
     '@type': 'PostalAddress',
-    streetAddress: '6 Chome-23-4 Jingumae',
-    addressLocality: 'Shibuya',
+    streetAddress: '1-3-1 Kita-Aoyama',
+    addressLocality: 'Minato-ku',
     addressRegion: 'Tokyo',
-    postalCode: '150-0001',
+    postalCode: '107-0061',
     addressCountry: 'JP',
   },
   areaServed: ['JP', 'US'],
