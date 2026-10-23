@@ -22,7 +22,7 @@ const data = {
     'Innovation-first media studio working across Tokyo and the U.S. since 2012 — creative strategy, AI enablement, video production, and market expansion.',
   foundingDate: '2012',
   email: 'booking@beedstu.com',
-  telephone: '+81-70-4349-5384',
+  telephone: '+81-70-8474-3860',
   address: {
     '@type': 'PostalAddress',
     streetAddress: '6 Chome-23-4 Jingumae',

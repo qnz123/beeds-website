@@ -2,7 +2,7 @@ import Link from 'next/link'
 import type { Locale } from '@/i18n/config'
 
 // The privacy policy (2026-10-23), in the Terms page's editorial layout: an eyebrow label and serif
-// paragraphs per section, divided by hairlines. It covers what the booking and speed-check forms
+// paragraphs per section, separated by spacing. It covers what the booking and speed-check forms
 // collect, and Japan's external-transmission rule (電気通信事業法 外部送信規律): what the ad and
 // analytics tags send, to whom, and why. Those tags only load when their IDs are set (Analytics.tsx).
 
@@ -123,7 +123,7 @@ export default function PrivacyContent({ lang = 'en' }: { lang?: Locale }) {
         </div>
       </section>
       {t.sections.map((section) => (
-        <section key={section.heading} className="bg-white py-12 px-10 border-t border-black">
+        <section key={section.heading} className="bg-white py-12 px-10">
           <div className="container-x grid grid-cols-1 md:grid-cols-[220px_1fr] gap-x-10 gap-y-6">
             <h2 className="eyebrow md:pt-1">{section.heading}</h2>
             <div className="max-w-[680px] space-y-5">
@@ -144,7 +144,7 @@ export default function PrivacyContent({ lang = 'en' }: { lang?: Locale }) {
           </div>
         </section>
       ))}
-      <section className="bg-white py-12 px-10 border-t border-black">
+      <section className="bg-white py-12 px-10">
         <div className="container-x">
           <p className="text-base leading-[1.8]">
             <Link href="mailto:info@beedstu.com" className="underline underline-offset-4">{t.contact}</Link>
