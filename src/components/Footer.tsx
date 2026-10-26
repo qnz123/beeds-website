@@ -28,7 +28,7 @@ export default function Footer({ lang = 'en' }: { lang?: Locale }) {
           {/* the privacy policy, in the same grey (2026-10-23): it carries the ad/analytics tags'
               external-transmission notice, which Japanese law requires to be easy to reach */}
           <a href={lang === 'ja' ? '/ja/privacy/' : '/privacy/'} className="whitespace-nowrap text-[#666] no-underline hover:underline">
-            {lang === 'ja' ? 'プライバシー' : 'Privacy'}
+            {lang === 'ja' ? 'プライバシーポリシー' : 'Privacy Policy'}
           </a>
         </p>
       </div>
