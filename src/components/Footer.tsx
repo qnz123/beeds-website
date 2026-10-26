@@ -22,6 +22,10 @@ export default function Footer({ lang = 'en' }: { lang?: Locale }) {
               <span className="mr-[1em] whitespace-nowrap">{place}</span>{' '}
             </React.Fragment>
           ))}
+          {/* the web design service page, so Google and visitors can reach it (2026-10-26) */}
+          <a href={lang === 'ja' ? '/ja/web-design/' : '/web-design/'} className="mr-[1em] whitespace-nowrap text-[#666] no-underline hover:underline">
+            {lang === 'ja' ? 'ホームページ制作' : 'Web design'}
+          </a>{' '}
           {/* contact goes to the booking form, not a printed address or phone (2026-10-26) */}
           <a href={lang === 'ja' ? '/ja/booking/' : '/booking/'} className="mr-[1em] whitespace-nowrap text-[#666] no-underline hover:underline">
             {lang === 'ja' ? 'お問い合わせ' : 'Contact us'}

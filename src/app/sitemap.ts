@@ -25,6 +25,7 @@ const pages = [
   { en: '/about/', ja: '/ja/about/', lastModified: '2026-10-05', changeFrequency: 'monthly', priority: 0.8 },
   { en: '/booking/', ja: '/ja/booking/', lastModified: '2026-10-23', changeFrequency: 'monthly', priority: 0.8 },
   { en: '/explore/', ja: '/ja/explore/', lastModified: '2026-10-22', changeFrequency: 'weekly', priority: 0.7 },
+  { en: '/web-design/', ja: '/ja/web-design/', lastModified: '2026-10-26', changeFrequency: 'monthly', priority: 0.9 },
   { en: '/privacy/', ja: '/ja/privacy/', lastModified: '2026-10-23', changeFrequency: 'yearly', priority: 0.3 },
 ] as const
 
