@@ -36,7 +36,7 @@ const INTRO_SEEN_LEGACY = 'beeds_in'
 // land on the intro). A refresh, which Safari can't be told apart from an arrival here, is taken
 // back to the page the tab was on by the intro page itself (lib/introReload.ts).
 const INTRO_GUARD_S = 10
-const NOT_A_VISITOR = /bot|crawl|spider|slurp|preview|facebookexternalhit|embedly|whatsapp|telegram|discord|lighthouse|pagespeed|headless/i
+const NOT_A_VISITOR = /bot|crawl|spider|slurp|preview|facebookexternalhit|embedly|whatsapp|telegram|discord|lighthouse|pagespeed|headless|chatgpt-user|perplexity-user|claude-user|meta-externalagent/i
 
 const LANG_CHOICE = 'beeds_lang'
 const LANG_CHOICE_LEGACY = 'NEXT_LOCALE'

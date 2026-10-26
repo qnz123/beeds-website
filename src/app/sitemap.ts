@@ -13,68 +13,30 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://beedstu.com'
 // /terms is intentionally omitted: per client direction it's unlinked from
 // the footer, and listing it here would actively promote its discovery.
 //
-// The homepage carries hreflang alternates for its English (/) and Japanese
-// (/ja) versions so search engines serve the right language.
-export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date()
-  const homeLanguages = { en: `${siteUrl}/`, ja: `${siteUrl}/ja/` }
+// Every page and its Japanese twin carry the same hreflang alternates (en, ja, x-default = the English URL),
+// matching each page's own <head>.
+//
+// lastModified is the real last-edit date of the page (its route file plus the components that make its
+// content), not the build time, so it only moves when the page does. A static map rather than git at build
+// time: Vercel's clone is shallow, so git dates there would be wrong. Bump a page's date here when you
+// change it (find it with: git log -1 --format=%cs -- <route file> <its content components>).
+const pages = [
+  { en: '/', ja: '/ja/', lastModified: '2026-10-06', changeFrequency: 'weekly', priority: 1 },
+  { en: '/about/', ja: '/ja/about/', lastModified: '2026-10-05', changeFrequency: 'monthly', priority: 0.8 },
+  { en: '/booking/', ja: '/ja/booking/', lastModified: '2026-10-23', changeFrequency: 'monthly', priority: 0.8 },
+  { en: '/explore/', ja: '/ja/explore/', lastModified: '2026-10-22', changeFrequency: 'weekly', priority: 0.7 },
+  { en: '/privacy/', ja: '/ja/privacy/', lastModified: '2026-10-23', changeFrequency: 'yearly', priority: 0.3 },
+] as const
 
-  return [
-    {
-      url: `${siteUrl}/`,
+export default function sitemap(): MetadataRoute.Sitemap {
+  return pages.flatMap(({ en, ja, lastModified, changeFrequency, priority }) => {
+    const languages = { en: `${siteUrl}${en}`, ja: `${siteUrl}${ja}`, 'x-default': `${siteUrl}${en}` }
+    return [en, ja].map((path) => ({
+      url: `${siteUrl}${path}`,
       lastModified,
-      changeFrequency: 'weekly',
-      priority: 1,
-      alternates: { languages: homeLanguages },
-    },
-    {
-      url: `${siteUrl}/ja/`,
-      lastModified,
-      changeFrequency: 'weekly',
-      priority: 1,
-      alternates: { languages: homeLanguages },
-    },
-    {
-      url: `${siteUrl}/about/`,
-      lastModified,
-      changeFrequency: 'monthly',
-      priority: 0.8,
-      alternates: { languages: { en: `${siteUrl}/about/`, ja: `${siteUrl}/ja/about/` } },
-    },
-    {
-      url: `${siteUrl}/ja/about/`,
-      lastModified,
-      changeFrequency: 'monthly',
-      priority: 0.8,
-      alternates: { languages: { en: `${siteUrl}/about/`, ja: `${siteUrl}/ja/about/` } },
-    },
-    {
-      url: `${siteUrl}/booking/`,
-      lastModified,
-      changeFrequency: 'monthly',
-      priority: 0.8,
-      alternates: { languages: { en: `${siteUrl}/booking/`, ja: `${siteUrl}/ja/booking/` } },
-    },
-    {
-      url: `${siteUrl}/explore/`,
-      lastModified,
-      changeFrequency: 'weekly',
-      priority: 0.7,
-      alternates: { languages: { en: `${siteUrl}/explore/`, ja: `${siteUrl}/ja/explore/` } },
-    },
-    {
-      url: `${siteUrl}/ja/explore/`,
-      lastModified,
-      changeFrequency: 'weekly',
-      priority: 0.7,
-      alternates: { languages: { en: `${siteUrl}/explore/`, ja: `${siteUrl}/ja/explore/` } },
-    },
-    {
-      url: `${siteUrl}/ja/booking/`,
-      lastModified,
-      changeFrequency: 'monthly',
-      priority: 0.8,
-      alternates: { languages: { en: `${siteUrl}/booking/`, ja: `${siteUrl}/ja/booking/` } },
-    },
-  ]
+      changeFrequency,
+      priority,
+      alternates: { languages },
+    }))
+  })
 }

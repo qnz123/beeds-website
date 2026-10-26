@@ -9,7 +9,7 @@ const description = 'BEEDSによる本ウェブサイトの情報の取り扱い
 export const metadata: Metadata = {
   title,
   description,
-  alternates: { canonical: '/ja/privacy/', languages: { en: '/privacy/', ja: '/ja/privacy/' } },
+  alternates: { canonical: '/ja/privacy/', languages: { en: '/privacy/', ja: '/ja/privacy/', 'x-default': '/privacy/' } },
   openGraph: { title, description, url: '/ja/privacy/', siteName: 'BEEDS', locale: 'ja_JP', type: 'website' },
 }
 
