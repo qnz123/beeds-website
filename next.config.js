@@ -11,6 +11,14 @@ const nextConfig = {
   // Directory-style URLs (/about/), preserved from the previous host so existing
   // links and search-indexed URLs don't 301-churn after the migration.
   trailingSlash: true,
+  // Old WordPress pages Google still crawls (Search Console, 2026-10-28): send any remaining links to
+  // the pages that replaced them instead of a 404.
+  async redirects() {
+    return [
+      { source: '/contact-2/', destination: '/booking/', permanent: true },
+      { source: '/partner/', destination: '/web-design/', permanent: true },
+    ]
+  },
 }
 
 module.exports = nextConfig
